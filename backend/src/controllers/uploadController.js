@@ -1,7 +1,8 @@
 import path from 'path';
 import fs from 'fs';
 
-const BASE_URL = process.env.BASE_URL || 'http://localhost:5000';
+// Use FRONTEND_URL for uploads since nginx proxies /uploads to backend
+const BASE_URL = process.env.FRONTEND_URL || process.env.BASE_URL || 'http://localhost:5000';
 
 // @desc    Upload work images
 // @route   POST /api/uploads/works
