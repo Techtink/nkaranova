@@ -72,16 +72,16 @@ $sidebar-gradient: linear-gradient(rgb(30, 27, 75) 0%, rgb(49, 46, 129) 100%);
 $font-primary: 'Montserrat', -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Roboto', sans-serif;
 $font-display: 'Montserrat', -apple-system, BlinkMacSystemFont, sans-serif;
 
-// Font sizes
-$text-xs: 0.75rem;
-$text-sm: 0.875rem;
-$text-base: 1rem;
-$text-lg: 1.125rem;
-$text-xl: 1.25rem;
-$text-2xl: 1.5rem;
-$text-3xl: 1.875rem;
-$text-4xl: 2.25rem;
-$text-5xl: 3rem;
+// Font sizes (slightly reduced for cleaner look)
+$text-xs: 0.7rem;
+$text-sm: 0.8125rem;
+$text-base: 0.9375rem;
+$text-lg: 1rem;
+$text-xl: 1.125rem;
+$text-2xl: 1.25rem;
+$text-3xl: 1.5rem;
+$text-4xl: 1.875rem;
+$text-5xl: 2.25rem;
 
 // Font weights
 $font-light: 300;
@@ -91,14 +91,14 @@ $font-semibold: 600;
 $font-bold: 700;
 $font-extrabold: 800;
 
-// Spacing
+// Spacing (tightened for cleaner layout)
 $spacing-xs: 0.25rem;
-$spacing-sm: 0.5rem;
-$spacing-md: 1rem;
-$spacing-lg: 1.5rem;
-$spacing-xl: 2rem;
-$spacing-2xl: 3rem;
-$spacing-3xl: 4rem;
+$spacing-sm: 0.375rem;
+$spacing-md: 0.75rem;
+$spacing-lg: 1rem;
+$spacing-xl: 1.5rem;
+$spacing-2xl: 2rem;
+$spacing-3xl: 3rem;
 
 // Border radius - Sharp UI (set to 0)
 $radius-none: 0;
@@ -127,8 +127,8 @@ $breakpoint-lg: 1024px;
 $breakpoint-xl: 1280px;
 $breakpoint-2xl: 1536px;
 
-// Container
-$container-max: 1280px;
+// Container (slightly narrower for focused layout)
+$container-max: 1200px;
 $container-padding: $spacing-md;
 
 // Z-index
