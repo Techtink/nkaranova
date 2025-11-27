@@ -1,12 +1,16 @@
 import { useState, useEffect, useRef } from 'react';
-import { Link } from 'react-router-dom';
-import { FiSearch, FiSun, FiMoon, FiUser, FiMessageSquare, FiArrowRight, FiStar, FiHeart, FiChevronLeft, FiChevronRight, FiFeather, FiLayers, FiPackage } from 'react-icons/fi';
+import { Link, useNavigate } from 'react-router-dom';
+import { FiSearch, FiSun, FiMoon, FiUser, FiMessageSquare, FiArrowRight, FiStar, FiHeart, FiChevronLeft, FiChevronRight, FiFeather, FiLayers, FiPackage, FiLogOut, FiSettings, FiCalendar, FiEdit3 } from 'react-icons/fi';
 import { settingsAPI, tailorsAPI } from '../services/api';
 import { useTheme } from '../context/ThemeContext';
+import { useAuth } from '../context/AuthContext';
 import './Home.scss';
 
 export default function Home() {
   const { isDark, toggleTheme } = useTheme();
+  const { user, isAuthenticated, isTailor, isAdmin, logout } = useAuth();
+  const navigate = useNavigate();
+  const [profileOpen, setProfileOpen] = useState(false);
   const [settings, setSettings] = useState({
     landing_hero_image: '',
     landing_hero_title_line1: 'Clean Lines.',
@@ -214,6 +218,12 @@ export default function Home() {
     return colorsString ? colorsString.split(',').map(c => c.trim()) : [];
   };
 
+  const handleLogout = async () => {
+    await logout();
+    setProfileOpen(false);
+    navigate('/');
+  };
+
   return (
     <div className="velora-home">
       {/* Navigation */}
@@ -239,12 +249,81 @@ export default function Home() {
           >
             {isDark ? <FiSun /> : <FiMoon />}
           </button>
-          <Link to="/messages" className="nav-icon-btn" title="Messages">
-            <FiMessageSquare />
-          </Link>
-          <Link to="/login" className="nav-icon-btn" title="Account">
-            <FiUser />
-          </Link>
+          {isAuthenticated && (
+            <Link to="/messages" className="nav-icon-btn" title="Messages">
+              <FiMessageSquare />
+            </Link>
+          )}
+
+          {isAuthenticated ? (
+            <div className="profile-dropdown">
+              <button
+                className="nav-icon-btn profile-btn"
+                onClick={() => setProfileOpen(!profileOpen)}
+                title="Account"
+              >
+                <div className="nav-avatar">
+                  {user?.avatar ? (
+                    <img src={user.avatar} alt={user.firstName} />
+                  ) : (
+                    user?.firstName?.charAt(0) || <FiUser />
+                  )}
+                </div>
+              </button>
+
+              {profileOpen && (
+                <div className="dropdown-menu" onClick={() => setProfileOpen(false)}>
+                  <div className="dropdown-header">
+                    <span className="dropdown-name">{user?.firstName} {user?.lastName}</span>
+                    <span className="dropdown-email">{user?.email}</span>
+                  </div>
+
+                  {isTailor && (
+                    <>
+                      <Link to="/tailor/dashboard" className="dropdown-item">
+                        <FiUser /> Dashboard
+                      </Link>
+                      <Link to="/tailor/bookings" className="dropdown-item">
+                        <FiCalendar /> Bookings
+                      </Link>
+                    </>
+                  )}
+
+                  {isAdmin && (
+                    <Link to="/admin" className="dropdown-item">
+                      <FiSettings /> Admin Panel
+                    </Link>
+                  )}
+
+                  {!isTailor && !isAdmin && (
+                    <>
+                      <Link to="/bookings" className="dropdown-item">
+                        <FiCalendar /> My Bookings
+                      </Link>
+                      <Link to="/orders" className="dropdown-item">
+                        <FiPackage /> My Orders
+                      </Link>
+                      <Link to="/measurements" className="dropdown-item">
+                        <FiEdit3 /> My Measurements
+                      </Link>
+                    </>
+                  )}
+
+                  <Link to="/settings" className="dropdown-item">
+                    <FiSettings /> Settings
+                  </Link>
+
+                  <button onClick={handleLogout} className="dropdown-item dropdown-logout">
+                    <FiLogOut /> Logout
+                  </button>
+                </div>
+              )}
+            </div>
+          ) : (
+            <Link to="/login" className="nav-icon-btn" title="Account">
+              <FiUser />
+            </Link>
+          )}
         </div>
       </nav>
 
