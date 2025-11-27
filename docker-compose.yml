@@ -1,0 +1,58 @@
+version: '3.8'
+
+services:
+  backend:
+    build:
+      context: ./backend
+      dockerfile: Dockerfile
+    container_name: nkaranova-backend
+    restart: unless-stopped
+    env_file:
+      - ./backend/.env
+    environment:
+      - NODE_ENV=production
+    ports:
+      - "5000:5000"
+    volumes:
+      - backend_uploads:/app/uploads
+    networks:
+      - nkaranova-network
+    depends_on:
+      - mongo
+
+  frontend:
+    build:
+      context: ./frontend
+      dockerfile: Dockerfile
+      args:
+        VITE_API_URL: ${VITE_API_URL:-http://localhost:5000/api}
+        VITE_STRIPE_PUBLISHABLE_KEY: ${VITE_STRIPE_PUBLISHABLE_KEY}
+    container_name: nkaranova-frontend
+    restart: unless-stopped
+    ports:
+      - "80:80"
+    networks:
+      - nkaranova-network
+    depends_on:
+      - backend
+
+  mongo:
+    image: mongo:7
+    container_name: nkaranova-mongo
+    restart: unless-stopped
+    environment:
+      MONGO_INITDB_DATABASE: nkaranova
+    volumes:
+      - mongo_data:/data/db
+    ports:
+      - "27017:27017"
+    networks:
+      - nkaranova-network
+
+volumes:
+  mongo_data:
+  backend_uploads:
+
+networks:
+  nkaranova-network:
+    driver: bridge

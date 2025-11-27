@@ -1,0 +1,503 @@
+@import '../../styles/variables';
+@import '../../styles/mixins';
+
+.tailor-page {
+  .referral-stats-grid {
+    display: grid;
+    gap: $spacing-lg;
+    grid-template-columns: repeat(2, 1fr);
+    margin-bottom: $spacing-2xl;
+
+    @include md {
+      grid-template-columns: repeat(4, 1fr);
+    }
+  }
+
+  .stat-card {
+    @include card;
+    padding: $spacing-lg;
+    display: flex;
+    align-items: center;
+    gap: $spacing-md;
+  }
+
+  .stat-icon-wrapper {
+    @include flex-center;
+    width: 48px;
+    height: 48px;
+    border-radius: $radius-lg;
+
+    svg {
+      width: 24px;
+      height: 24px;
+    }
+
+    &.primary {
+      background: rgba($primary, 0.1);
+      color: $primary;
+    }
+
+    &.success {
+      background: rgba($success, 0.1);
+      color: $success;
+    }
+
+    &.warning {
+      background: rgba($warning, 0.1);
+      color: $warning;
+    }
+
+    &.info {
+      background: rgba($info, 0.1);
+      color: $info;
+    }
+  }
+
+  .stat-content {
+    .stat-value {
+      display: block;
+      font-size: $text-2xl;
+      font-weight: $font-bold;
+    }
+
+    .stat-label {
+      font-size: $text-sm;
+      color: $text-secondary;
+    }
+  }
+
+  .featured-banner {
+    @include card;
+    display: flex;
+    align-items: center;
+    gap: $spacing-lg;
+    padding: $spacing-lg;
+    background: linear-gradient(135deg, rgba($primary, 0.1), rgba($primary, 0.05));
+    border: 1px solid rgba($primary, 0.2);
+    margin-bottom: $spacing-2xl;
+
+    .banner-icon {
+      width: 48px;
+      height: 48px;
+      color: $primary;
+    }
+
+    h3 {
+      margin: 0 0 $spacing-xs;
+      font-size: $text-lg;
+      color: $primary;
+    }
+
+    p {
+      margin: 0;
+      color: $text-secondary;
+    }
+  }
+
+  .referral-code-section {
+    @include card;
+    padding: $spacing-xl;
+    margin-bottom: $spacing-2xl;
+    text-align: center;
+
+    h2 {
+      margin: 0 0 $spacing-sm;
+      font-size: $text-xl;
+    }
+
+    > p {
+      color: $text-secondary;
+      margin-bottom: $spacing-lg;
+      max-width: 500px;
+      margin-left: auto;
+      margin-right: auto;
+    }
+  }
+
+  .referral-code-box {
+    display: inline-flex;
+    align-items: center;
+    gap: $spacing-md;
+    background: $bg-secondary;
+    padding: $spacing-md $spacing-lg;
+    border-radius: $radius-lg;
+    margin-bottom: $spacing-lg;
+
+    .referral-code {
+      font-size: $text-2xl;
+      font-weight: $font-bold;
+      letter-spacing: 2px;
+      color: $primary;
+    }
+
+    .btn-icon {
+      @include flex-center;
+      width: 36px;
+      height: 36px;
+      border-radius: $radius-md;
+      background: $white;
+      color: $text-secondary;
+      transition: all $transition-base;
+
+      &:hover {
+        background: $primary;
+        color: $white;
+      }
+    }
+  }
+
+  .how-it-works {
+    margin-bottom: $spacing-2xl;
+
+    h2 {
+      font-size: $text-xl;
+      margin-bottom: $spacing-lg;
+    }
+  }
+
+  .steps-grid {
+    display: grid;
+    gap: $spacing-lg;
+    grid-template-columns: repeat(2, 1fr);
+
+    @include md {
+      grid-template-columns: repeat(4, 1fr);
+    }
+  }
+
+  .step {
+    @include card;
+    padding: $spacing-lg;
+    text-align: center;
+
+    .step-number {
+      @include flex-center;
+      width: 40px;
+      height: 40px;
+      background: $primary;
+      color: $white;
+      border-radius: 50%;
+      font-size: $text-lg;
+      font-weight: $font-bold;
+      margin: 0 auto $spacing-md;
+    }
+
+    h3 {
+      font-size: $text-base;
+      margin: 0 0 $spacing-xs;
+    }
+
+    p {
+      font-size: $text-sm;
+      color: $text-secondary;
+      margin: 0;
+    }
+  }
+
+  .actions-section {
+    margin-bottom: $spacing-2xl;
+
+    h2 {
+      font-size: $text-xl;
+      margin-bottom: $spacing-lg;
+    }
+  }
+
+  .action-cards {
+    display: grid;
+    gap: $spacing-lg;
+    grid-template-columns: 1fr;
+
+    @include md {
+      grid-template-columns: repeat(2, 1fr);
+    }
+  }
+
+  .action-card {
+    @include card;
+    padding: $spacing-xl;
+    text-align: center;
+
+    &.disabled {
+      opacity: 0.7;
+
+      .btn-primary {
+        background: $text-muted;
+        cursor: not-allowed;
+      }
+    }
+
+    .action-icon {
+      @include flex-center;
+      width: 64px;
+      height: 64px;
+      background: rgba($primary, 0.1);
+      color: $primary;
+      border-radius: 50%;
+      margin: 0 auto $spacing-lg;
+
+      svg {
+        width: 32px;
+        height: 32px;
+      }
+    }
+
+    h3 {
+      font-size: $text-lg;
+      margin: 0 0 $spacing-sm;
+    }
+
+    > p {
+      color: $text-secondary;
+      margin: 0 0 $spacing-lg;
+    }
+
+    .progress-bar {
+      height: 8px;
+      background: $bg-secondary;
+      border-radius: $radius-full;
+      overflow: hidden;
+      margin-bottom: $spacing-sm;
+
+      .progress {
+        height: 100%;
+        background: $primary;
+        border-radius: $radius-full;
+        transition: width $transition-base;
+      }
+    }
+
+    .progress-text {
+      display: block;
+      font-size: $text-sm;
+      color: $text-secondary;
+      margin-bottom: $spacing-lg;
+    }
+
+    .pricing-options {
+      display: flex;
+      flex-direction: column;
+      gap: $spacing-xs;
+      margin-bottom: $spacing-lg;
+
+      span {
+        font-size: $text-sm;
+        color: $text-secondary;
+      }
+    }
+  }
+
+  .token-history-section {
+    h2 {
+      font-size: $text-xl;
+      margin-bottom: $spacing-lg;
+    }
+  }
+
+  .transaction-list {
+    @include card;
+    overflow: hidden;
+  }
+
+  .transaction-item {
+    display: flex;
+    align-items: center;
+    gap: $spacing-md;
+    padding: $spacing-md $spacing-lg;
+    border-bottom: 1px solid $border-color;
+
+    &:last-child {
+      border-bottom: none;
+    }
+
+    .transaction-icon {
+      @include flex-center;
+      width: 36px;
+      height: 36px;
+      border-radius: 50%;
+      background: $bg-secondary;
+      color: $text-secondary;
+
+      &.earn {
+        background: rgba($success, 0.1);
+        color: $success;
+      }
+
+      &.spend {
+        background: rgba($primary, 0.1);
+        color: $primary;
+      }
+    }
+
+    .transaction-info {
+      flex: 1;
+
+      .transaction-description {
+        display: block;
+        font-weight: $font-medium;
+      }
+
+      .transaction-date {
+        font-size: $text-sm;
+        color: $text-muted;
+      }
+    }
+
+    .transaction-amount {
+      font-weight: $font-bold;
+
+      &.positive {
+        color: $success;
+      }
+
+      &.negative {
+        color: $error;
+      }
+    }
+  }
+
+  // Modal styles
+  .modal-overlay {
+    position: fixed;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background: rgba(0, 0, 0, 0.5);
+    @include flex-center;
+    z-index: 1000;
+  }
+
+  .modal {
+    background: $white;
+    border-radius: $radius-lg;
+    width: 100%;
+    max-width: 480px;
+    max-height: 90vh;
+    overflow-y: auto;
+    margin: $spacing-lg;
+
+    .modal-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      padding: $spacing-lg;
+      border-bottom: 1px solid $border-color;
+
+      h2 {
+        margin: 0;
+        font-size: $text-lg;
+      }
+
+      .close-btn {
+        @include flex-center;
+        width: 32px;
+        height: 32px;
+        border-radius: 50%;
+        background: transparent;
+        border: none;
+        font-size: $text-xl;
+        cursor: pointer;
+
+        &:hover {
+          background: $bg-secondary;
+        }
+      }
+    }
+
+    .modal-body {
+      padding: $spacing-lg;
+    }
+
+    .modal-footer {
+      display: flex;
+      justify-content: flex-end;
+      gap: $spacing-md;
+      padding: $spacing-lg;
+      border-top: 1px solid $border-color;
+    }
+  }
+
+  .redeem-summary {
+    text-align: center;
+
+    .redeem-details {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: $spacing-md;
+      padding: $spacing-lg;
+      background: $bg-secondary;
+      border-radius: $radius-lg;
+      margin: $spacing-lg 0;
+
+      .tokens, .duration {
+        font-size: $text-lg;
+        font-weight: $font-bold;
+      }
+
+      .arrow {
+        color: $text-muted;
+      }
+    }
+
+    .balance-after {
+      color: $text-secondary;
+    }
+  }
+
+  .duration-options {
+    display: flex;
+    flex-direction: column;
+    gap: $spacing-md;
+  }
+
+  .duration-option {
+    display: flex;
+    align-items: center;
+    padding: $spacing-md $spacing-lg;
+    border: 2px solid $border-color;
+    border-radius: $radius-lg;
+    cursor: pointer;
+    transition: all $transition-base;
+    position: relative;
+
+    input {
+      display: none;
+    }
+
+    &.selected {
+      border-color: $primary;
+      background: rgba($primary, 0.05);
+    }
+
+    .duration-days {
+      flex: 1;
+      font-weight: $font-medium;
+    }
+
+    .duration-price {
+      font-size: $text-lg;
+      font-weight: $font-bold;
+      color: $primary;
+    }
+
+    .best-value {
+      position: absolute;
+      top: -8px;
+      right: $spacing-md;
+      background: $success;
+      color: $white;
+      font-size: $text-xs;
+      padding: 2px 8px;
+      border-radius: $radius-full;
+    }
+  }
+
+  .payment-note {
+    margin-top: $spacing-lg;
+    font-size: $text-sm;
+    color: $text-muted;
+    text-align: center;
+  }
+}

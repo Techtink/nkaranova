@@ -1,0 +1,331 @@
+@import '../styles/variables';
+@import '../styles/mixins';
+
+.messages-page {
+  display: flex;
+  height: calc(100vh - 64px);
+  overflow: hidden;
+}
+
+.conversations-list {
+  width: 100%;
+  max-width: 360px;
+  background: $white;
+  border-right: 1px solid $gray-200;
+  display: flex;
+  flex-direction: column;
+
+  @include md {
+    display: flex !important;
+  }
+
+  &.hidden-mobile {
+    display: none;
+
+    @include md {
+      display: flex;
+    }
+  }
+}
+
+.conversations-header {
+  padding: $spacing-lg;
+  border-bottom: 1px solid $gray-200;
+
+  h2 {
+    margin: 0;
+    font-size: $text-lg;
+  }
+}
+
+.conversations {
+  flex: 1;
+  overflow-y: auto;
+  @include custom-scrollbar;
+}
+
+.conversation-item {
+  display: flex;
+  align-items: center;
+  gap: $spacing-md;
+  width: 100%;
+  padding: $spacing-md $spacing-lg;
+  background: none;
+  border: none;
+  text-align: left;
+  cursor: pointer;
+  transition: background $transition-base;
+
+  &:hover {
+    background: $gray-50;
+  }
+
+  &.active {
+    background: $gray-100;
+  }
+}
+
+.conversation-info {
+  flex: 1;
+  min-width: 0;
+}
+
+.conversation-name {
+  font-weight: $font-medium;
+  @include truncate;
+}
+
+.conversation-preview {
+  font-size: $text-sm;
+  color: $text-muted;
+  @include truncate;
+}
+
+.unread-badge {
+  @include flex-center;
+  min-width: 20px;
+  height: 20px;
+  padding: 0 6px;
+  font-size: $text-xs;
+  font-weight: $font-medium;
+  color: $white;
+  background: $primary;
+  border-radius: $radius-full;
+}
+
+.empty-conversations {
+  @include flex-center;
+  flex-direction: column;
+  flex: 1;
+  color: $text-muted;
+  padding: $spacing-xl;
+
+  .hint {
+    font-size: $text-sm;
+  }
+}
+
+// Chat Area
+.chat-area {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  background: $gray-50;
+
+  @include md {
+    display: flex !important;
+  }
+
+  &.hidden-mobile {
+    display: none;
+
+    @include md {
+      display: flex;
+    }
+  }
+}
+
+.chat-header {
+  display: flex;
+  align-items: center;
+  gap: $spacing-md;
+  padding: $spacing-md $spacing-lg;
+  background: $white;
+  border-bottom: 1px solid $gray-200;
+
+  .back-btn {
+    @include flex-center;
+    width: 32px;
+    height: 32px;
+    background: none;
+    border: none;
+    color: $text-secondary;
+
+    @include md {
+      display: none;
+    }
+  }
+}
+
+.chat-header-info {
+  .chat-name {
+    font-weight: $font-medium;
+  }
+}
+
+.messages-container {
+  flex: 1;
+  overflow-y: auto;
+  padding: $spacing-lg;
+  display: flex;
+  flex-direction: column;
+  gap: $spacing-sm;
+  @include custom-scrollbar;
+}
+
+.message {
+  max-width: 70%;
+  display: flex;
+  flex-direction: column;
+
+  &.sent {
+    align-self: flex-end;
+
+    .message-content {
+      background: $primary;
+      color: $white;
+      border-radius: $radius-lg $radius-lg 0 $radius-lg;
+    }
+
+    .message-time {
+      text-align: right;
+    }
+  }
+
+  &.received {
+    align-self: flex-start;
+
+    .message-content {
+      background: $white;
+      color: #1a1a1a;
+      border-radius: $radius-lg $radius-lg $radius-lg 0;
+    }
+  }
+}
+
+.message-content {
+  padding: $spacing-sm $spacing-md;
+  font-size: $text-sm;
+  line-height: 1.5;
+  box-shadow: $shadow-sm;
+}
+
+.message-time {
+  font-size: $text-xs;
+  color: $text-muted;
+  margin-top: $spacing-xs;
+}
+
+.message-form {
+  display: flex;
+  gap: $spacing-sm;
+  padding: $spacing-md $spacing-lg;
+  background: $white;
+  border-top: 1px solid $gray-200;
+
+  input {
+    flex: 1;
+    @include input-base;
+  }
+
+  button {
+    @include flex-center;
+    width: 44px;
+    height: 44px;
+    background: $primary;
+    color: $white;
+    border: none;
+    border-radius: $radius-md;
+    cursor: pointer;
+    transition: background $transition-base;
+
+    &:hover:not(:disabled) {
+      background: $primary-dark;
+    }
+
+    &:disabled {
+      opacity: 0.5;
+      cursor: not-allowed;
+    }
+
+    svg {
+      width: 20px;
+      height: 20px;
+    }
+  }
+}
+
+.no-conversation {
+  @include flex-center;
+  flex: 1;
+  color: $text-muted;
+}
+
+// Sewing Needle Typing Indicator
+.typing-indicator {
+  display: flex;
+  align-items: center;
+  gap: $spacing-sm;
+  padding: $spacing-sm $spacing-md;
+  background: $white;
+  border-radius: $radius-lg $radius-lg $radius-lg 0;
+  box-shadow: $shadow-sm;
+  align-self: flex-start;
+  max-width: fit-content;
+}
+
+.sewing-animation {
+  display: flex;
+  align-items: center;
+  gap: 2px;
+  height: 30px;
+}
+
+.needle {
+  animation: sewing 0.8s ease-in-out infinite;
+  transform-origin: center bottom;
+}
+
+@keyframes sewing {
+  0%, 100% {
+    transform: translateY(0) rotate(-5deg);
+  }
+  25% {
+    transform: translateY(-8px) rotate(0deg);
+  }
+  50% {
+    transform: translateY(0) rotate(5deg);
+  }
+  75% {
+    transform: translateY(-4px) rotate(0deg);
+  }
+}
+
+.thread-container {
+  overflow: hidden;
+  width: 60px;
+}
+
+.thread {
+  animation: thread-wave 1.2s ease-in-out infinite;
+}
+
+.thread-path {
+  stroke-dasharray: 100;
+  stroke-dashoffset: 0;
+  animation: thread-draw 1.5s linear infinite;
+}
+
+@keyframes thread-wave {
+  0%, 100% {
+    transform: translateX(0);
+  }
+  50% {
+    transform: translateX(-10px);
+  }
+}
+
+@keyframes thread-draw {
+  0% {
+    stroke-dashoffset: 100;
+  }
+  100% {
+    stroke-dashoffset: 0;
+  }
+}
+
+.typing-text {
+  font-size: $text-xs;
+  color: #666666;
+  font-style: italic;
+}

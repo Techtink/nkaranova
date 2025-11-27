@@ -1,0 +1,91 @@
+@import '../../styles/variables';
+@import '../../styles/mixins';
+
+.tailor-bookings-page {
+  .filter-tabs {
+    display: flex;
+    gap: $spacing-sm;
+    margin-bottom: $spacing-xl;
+  }
+
+  .filter-tab {
+    padding: $spacing-sm $spacing-lg;
+    font-size: $text-sm;
+    font-weight: $font-medium;
+    color: $text-secondary;
+    background: $gray-100;
+    border: none;
+    border-radius: $radius-full;
+    cursor: pointer;
+    transition: all $transition-base;
+
+    &:hover {
+      background: $gray-200;
+    }
+
+    &.active {
+      background: $primary;
+      color: $white;
+    }
+  }
+}
+
+.bookings-list {
+  display: flex;
+  flex-direction: column;
+  gap: $spacing-md;
+}
+
+.booking-card {
+  @include card;
+  padding: $spacing-lg;
+}
+
+.booking-main {
+  display: grid;
+  gap: $spacing-lg;
+  align-items: start;
+
+  @include md {
+    grid-template-columns: 1fr 2fr auto;
+  }
+}
+
+.customer-info {
+  display: flex;
+  align-items: center;
+  gap: $spacing-md;
+
+  .customer-name {
+    display: block;
+    font-weight: $font-medium;
+  }
+
+  .customer-email {
+    display: block;
+    font-size: $text-sm;
+    color: $text-muted;
+  }
+}
+
+.booking-details {
+  display: grid;
+  gap: $spacing-xs;
+
+  .detail-row {
+    font-size: $text-sm;
+
+    .label {
+      color: $text-secondary;
+      margin-right: $spacing-xs;
+    }
+  }
+}
+
+.booking-actions {
+  display: flex;
+  gap: $spacing-sm;
+  margin-top: $spacing-lg;
+  padding-top: $spacing-md;
+  border-top: 1px solid $gray-100;
+}

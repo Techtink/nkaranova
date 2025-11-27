@@ -1,0 +1,50 @@
+version: '3.8'
+
+services:
+  backend:
+    build:
+      context: ./backend
+      dockerfile: Dockerfile
+    container_name: nkaranova-backend
+    restart: always
+    env_file:
+      - ./backend/.env.production
+    environment:
+      - NODE_ENV=production
+    ports:
+      - "5000:5000"
+    volumes:
+      - backend_uploads:/app/uploads
+    networks:
+      - nkaranova-network
+    healthcheck:
+      test: ["CMD", "wget", "--no-verbose", "--tries=1", "--spider", "http://localhost:5000/api/health"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+      start_period: 10s
+
+  frontend:
+    build:
+      context: ./frontend
+      dockerfile: Dockerfile
+      args:
+        VITE_API_URL: ${VITE_API_URL}
+        VITE_STRIPE_PUBLISHABLE_KEY: ${VITE_STRIPE_PUBLISHABLE_KEY}
+    container_name: nkaranova-frontend
+    restart: always
+    ports:
+      - "80:80"
+      - "443:443"
+    networks:
+      - nkaranova-network
+    depends_on:
+      backend:
+        condition: service_healthy
+
+volumes:
+  backend_uploads:
+
+networks:
+  nkaranova-network:
+    driver: bridge

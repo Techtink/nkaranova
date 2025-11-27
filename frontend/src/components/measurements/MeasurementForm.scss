@@ -1,0 +1,251 @@
+@import '../../styles/variables';
+@import '../../styles/mixins';
+
+.measurement-form {
+  display: flex;
+  flex-direction: column;
+  gap: $spacing-lg;
+  height: 100%;
+  overflow-y: auto;
+}
+
+.measurement-progress {
+  .progress-bar {
+    height: 8px;
+    background: var(--bg-tertiary);
+    border-radius: 4px;
+    overflow: hidden;
+    margin-bottom: $spacing-xs;
+  }
+
+  .progress-fill {
+    height: 100%;
+    background: linear-gradient(90deg, $primary, $secondary);
+    border-radius: 4px;
+    transition: width 0.3s ease;
+  }
+
+  .progress-text {
+    font-size: $text-xs;
+    color: var(--text-muted);
+  }
+}
+
+.unit-indicator {
+  padding: $spacing-sm $spacing-md;
+  background: var(--info-light);
+  border-radius: 8px;
+  font-size: $text-sm;
+  color: var(--text-secondary);
+
+  strong {
+    color: $primary;
+  }
+}
+
+.measurement-groups {
+  display: flex;
+  flex-direction: column;
+  gap: $spacing-lg;
+}
+
+.measurement-group {
+  .group-title {
+    font-size: $text-sm;
+    font-weight: $font-semibold;
+    color: var(--text-secondary);
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+    margin-bottom: $spacing-md;
+    padding-bottom: $spacing-xs;
+    border-bottom: 1px solid var(--border-color);
+  }
+}
+
+.measurement-fields {
+  display: flex;
+  flex-direction: column;
+  gap: $spacing-md;
+}
+
+.measurement-field {
+  padding: $spacing-md;
+  background: var(--bg-secondary);
+  border: 1px solid var(--border-color);
+  border-radius: 8px;
+  transition: all 0.2s ease;
+
+  &:hover {
+    border-color: var(--border-hover);
+  }
+
+  &.active {
+    border-color: $primary;
+    box-shadow: 0 0 0 3px rgba($primary, 0.1);
+    background: var(--card-bg);
+  }
+
+  &.completed {
+    .field-header label {
+      color: var(--text-primary);
+    }
+  }
+
+  &.error {
+    border-color: $error;
+
+    input {
+      border-color: $error;
+    }
+  }
+
+  .field-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: $spacing-sm;
+
+    label {
+      font-size: $text-sm;
+      font-weight: $font-medium;
+      color: var(--text-secondary);
+      transition: color 0.2s;
+
+      .required {
+        color: $error;
+        margin-left: 2px;
+      }
+    }
+
+    .field-status {
+      .status-icon {
+        width: 16px;
+        height: 16px;
+
+        &.success {
+          color: $success;
+        }
+
+        &.warning {
+          color: $warning;
+        }
+      }
+    }
+  }
+
+  .field-input-wrapper {
+    display: flex;
+    align-items: center;
+    gap: $spacing-xs;
+
+    input {
+      flex: 1;
+      padding: $spacing-sm $spacing-md;
+      background: var(--input-bg);
+      border: 1px solid var(--border-color);
+      border-radius: 6px;
+      font-size: $text-base;
+      color: var(--text-primary);
+      transition: all 0.2s;
+
+      &:focus {
+        outline: none;
+        border-color: $primary;
+        box-shadow: 0 0 0 3px rgba($primary, 0.1);
+      }
+
+      &:disabled {
+        background: var(--bg-tertiary);
+        cursor: not-allowed;
+        opacity: 0.7;
+      }
+
+      &.has-error {
+        border-color: $error;
+
+        &:focus {
+          box-shadow: 0 0 0 3px rgba($error, 0.1);
+        }
+      }
+
+      // Hide spinner buttons
+      &::-webkit-outer-spin-button,
+      &::-webkit-inner-spin-button {
+        -webkit-appearance: none;
+        margin: 0;
+      }
+      -moz-appearance: textfield;
+    }
+
+    .unit-label {
+      font-size: $text-sm;
+      color: var(--text-muted);
+      min-width: 30px;
+    }
+  }
+
+  .error-message {
+    display: block;
+    font-size: $text-xs;
+    color: $error;
+    margin-top: $spacing-xs;
+  }
+
+  .field-instructions {
+    display: flex;
+    align-items: flex-start;
+    gap: $spacing-xs;
+    margin-top: $spacing-sm;
+    padding: $spacing-sm;
+    background: var(--bg-tertiary);
+    border-radius: 6px;
+
+    .info-icon {
+      width: 14px;
+      height: 14px;
+      color: var(--text-muted);
+      flex-shrink: 0;
+      margin-top: 2px;
+    }
+
+    span {
+      font-size: $text-xs;
+      color: var(--text-muted);
+      line-height: 1.5;
+    }
+  }
+}
+
+// Animation for field activation
+@keyframes pulse {
+  0%, 100% {
+    transform: scale(1);
+  }
+  50% {
+    transform: scale(1.02);
+  }
+}
+
+.measurement-field.active {
+  animation: pulse 0.3s ease;
+}
+
+// Dark mode adjustments
+[data-theme='dark'] {
+  .measurement-field {
+    &.active {
+      background: var(--bg-secondary);
+    }
+  }
+}
+
+// Mobile adjustments
+@include mobile {
+  .measurement-field {
+    padding: $spacing-sm;
+
+    .field-instructions {
+      display: none; // Hide on mobile to save space
+    }
+  }
+}

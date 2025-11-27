@@ -1,0 +1,115 @@
+@import '../../styles/variables';
+@import '../../styles/mixins';
+
+.availability-page {
+  .page-header {
+    @include flex-between;
+    flex-wrap: wrap;
+    gap: $spacing-md;
+  }
+}
+
+.availability-settings {
+  display: flex;
+  flex-direction: column;
+  gap: $spacing-xl;
+  max-width: 800px;
+}
+
+.settings-card,
+.schedule-card {
+  @include card;
+  padding: $spacing-xl;
+
+  h3 {
+    font-size: $text-lg;
+    margin-bottom: $spacing-lg;
+    padding-bottom: $spacing-md;
+    border-bottom: 1px solid $gray-200;
+  }
+}
+
+.settings-grid {
+  display: grid;
+  gap: $spacing-md;
+
+  @include md {
+    grid-template-columns: repeat(3, 1fr);
+  }
+}
+
+.setting-item {
+  label {
+    display: block;
+    font-size: $text-sm;
+    font-weight: $font-medium;
+    color: $text-secondary;
+    margin-bottom: $spacing-xs;
+  }
+
+  select {
+    @include input-base;
+  }
+}
+
+.schedule-list {
+  display: flex;
+  flex-direction: column;
+  gap: $spacing-md;
+}
+
+.day-row {
+  display: flex;
+  align-items: center;
+  gap: $spacing-lg;
+  padding: $spacing-md;
+  background: $gray-50;
+  border-radius: $radius-md;
+}
+
+.day-toggle {
+  display: flex;
+  align-items: center;
+  gap: $spacing-sm;
+  min-width: 140px;
+  cursor: pointer;
+
+  input[type="checkbox"] {
+    width: 18px;
+    height: 18px;
+    accent-color: $primary;
+  }
+
+  .day-label {
+    font-weight: $font-medium;
+  }
+}
+
+.time-slots {
+  display: flex;
+  flex-wrap: wrap;
+  gap: $spacing-sm;
+}
+
+.time-slot {
+  display: flex;
+  align-items: center;
+  gap: $spacing-sm;
+
+  input[type="time"] {
+    padding: $spacing-xs $spacing-sm;
+    border: 1px solid $gray-300;
+    border-radius: $radius-md;
+    font-size: $text-sm;
+  }
+
+  span {
+    color: $text-secondary;
+    font-size: $text-sm;
+  }
+}
+
+.closed-label {
+  color: $text-muted;
+  font-size: $text-sm;
+}

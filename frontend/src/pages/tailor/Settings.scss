@@ -1,0 +1,206 @@
+@import '../../styles/variables';
+@import '../../styles/mixins';
+
+.tailor-settings-page {
+  .settings-form {
+    max-width: 700px;
+  }
+}
+
+.settings-section {
+  @include card;
+  padding: $spacing-xl;
+  margin-bottom: $spacing-lg;
+
+  h2 {
+    font-size: $text-lg;
+    margin-bottom: $spacing-sm;
+  }
+
+  .section-desc {
+    color: $text-secondary;
+    font-size: $text-sm;
+    margin-bottom: $spacing-lg;
+  }
+
+  .form-group {
+    margin-bottom: $spacing-md;
+
+    label {
+      display: block;
+      font-size: $text-sm;
+      font-weight: $font-medium;
+      margin-bottom: $spacing-xs;
+    }
+
+    textarea {
+      @include input-base;
+      resize: vertical;
+    }
+
+    .char-count {
+      display: block;
+      text-align: right;
+      font-size: $text-xs;
+      color: $text-muted;
+      margin-top: $spacing-xs;
+    }
+  }
+
+  .input-wrapper {
+    margin-bottom: $spacing-md;
+  }
+}
+
+.specialties-grid {
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  gap: $spacing-sm;
+
+  @include md {
+    grid-template-columns: repeat(3, 1fr);
+  }
+}
+
+.specialty-checkbox {
+  display: flex;
+  align-items: center;
+  gap: $spacing-sm;
+  padding: $spacing-sm;
+  background: $gray-50;
+  border-radius: $radius-md;
+  cursor: pointer;
+  transition: background $transition-base;
+
+  &:hover {
+    background: $gray-100;
+  }
+
+  input[type="checkbox"] {
+    width: 16px;
+    height: 16px;
+    accent-color: $primary;
+  }
+
+  span {
+    font-size: $text-sm;
+  }
+}
+
+.location-grid {
+  display: grid;
+  gap: $spacing-md;
+
+  @include md {
+    grid-template-columns: repeat(3, 1fr);
+  }
+}
+
+.toggle-setting {
+  display: flex;
+  align-items: flex-start;
+  gap: $spacing-md;
+  padding: $spacing-md;
+  background: $gray-50;
+  border-radius: $radius-md;
+  cursor: pointer;
+  margin-bottom: $spacing-md;
+
+  input[type="checkbox"] {
+    width: 20px;
+    height: 20px;
+    margin-top: 2px;
+    accent-color: $primary;
+  }
+
+  .toggle-title {
+    display: block;
+    font-weight: $font-medium;
+  }
+
+  .toggle-desc {
+    display: block;
+    font-size: $text-sm;
+    color: $text-secondary;
+  }
+}
+
+.form-actions {
+  padding-top: $spacing-lg;
+}
+
+// Username field with validation indicator
+.username-field {
+  margin-bottom: $spacing-md;
+
+  > label {
+    display: block;
+    font-size: $text-sm;
+    font-weight: $font-medium;
+    margin-bottom: $spacing-xs;
+  }
+
+  .username-input-wrapper {
+    position: relative;
+    display: flex;
+    align-items: center;
+
+    input {
+      @include input-base;
+      padding-right: 40px;
+      width: 100%;
+    }
+
+    .username-status {
+      position: absolute;
+      right: 12px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      width: 24px;
+      height: 24px;
+
+      svg {
+        width: 18px;
+        height: 18px;
+      }
+
+      &.checking svg {
+        color: $primary;
+        animation: spin 1s linear infinite;
+      }
+
+      &.available svg {
+        color: $success;
+      }
+
+      &.unavailable svg {
+        color: $error;
+      }
+    }
+  }
+
+  .username-message {
+    display: block;
+    font-size: $text-xs;
+    margin-top: $spacing-xs;
+    color: $text-secondary;
+
+    &.success {
+      color: $success;
+    }
+
+    &.error {
+      color: $error;
+    }
+  }
+}
+
+@keyframes spin {
+  from {
+    transform: rotate(0deg);
+  }
+  to {
+    transform: rotate(360deg);
+  }
+}

@@ -1,0 +1,153 @@
+@import '../../styles/variables';
+@import '../../styles/mixins';
+
+.auth-page {
+  min-height: calc(100vh - 64px);
+  @include flex-center;
+  padding: $spacing-xl;
+  background: $gray-50;
+}
+
+.auth-container {
+  width: 100%;
+  max-width: 440px;
+}
+
+.auth-card {
+  @include card;
+  padding: $spacing-xl;
+
+  @include md {
+    padding: $spacing-2xl;
+  }
+}
+
+.auth-header {
+  text-align: center;
+  margin-bottom: $spacing-xl;
+
+  h1 {
+    font-size: $text-2xl;
+    margin-bottom: $spacing-xs;
+  }
+
+  p {
+    color: $text-secondary;
+    margin: 0;
+  }
+}
+
+.role-toggle {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: $spacing-sm;
+  margin-bottom: $spacing-xl;
+  padding: $spacing-xs;
+  background: $gray-100;
+  border-radius: $radius-lg;
+}
+
+.role-btn {
+  padding: $spacing-sm $spacing-md;
+  font-size: $text-sm;
+  font-weight: $font-medium;
+  color: $text-secondary;
+  background: transparent;
+  border: none;
+  border-radius: $radius-md;
+  cursor: pointer;
+  transition: all $transition-base;
+
+  &:hover {
+    color: $text-primary;
+  }
+
+  &.active {
+    background: $white;
+    color: $primary;
+    box-shadow: $shadow-sm;
+  }
+}
+
+.auth-form {
+  display: flex;
+  flex-direction: column;
+  gap: $spacing-md;
+}
+
+.form-row {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: $spacing-md;
+}
+
+.auth-forgot {
+  text-align: right;
+
+  a {
+    font-size: $text-sm;
+    color: $primary;
+    text-decoration: none;
+
+    &:hover {
+      text-decoration: underline;
+    }
+  }
+}
+
+.auth-terms {
+  font-size: $text-xs;
+  color: $text-muted;
+  margin: 0;
+
+  a {
+    color: $primary;
+    text-decoration: none;
+
+    &:hover {
+      text-decoration: underline;
+    }
+  }
+}
+
+.auth-footer {
+  margin-top: $spacing-xl;
+  padding-top: $spacing-xl;
+  border-top: 1px solid $gray-200;
+  text-align: center;
+
+  p {
+    font-size: $text-sm;
+    color: $text-secondary;
+    margin: 0;
+  }
+
+  a {
+    color: $primary;
+    font-weight: $font-medium;
+    text-decoration: none;
+
+    &:hover {
+      text-decoration: underline;
+    }
+  }
+}
+
+.auth-divider {
+  @include flex-center;
+  margin: $spacing-xl 0;
+
+  &::before,
+  &::after {
+    content: '';
+    flex: 1;
+    height: 1px;
+    background: $gray-200;
+  }
+
+  span {
+    padding: 0 $spacing-md;
+    font-size: $text-sm;
+    color: $text-muted;
+  }
+}

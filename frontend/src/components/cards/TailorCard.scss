@@ -1,0 +1,165 @@
+@import '../../styles/variables';
+@import '../../styles/mixins';
+
+.tailor-card {
+  @include card;
+  display: block;
+  text-decoration: none;
+  overflow: hidden;
+  transition: all $transition-base;
+
+  &:hover {
+    transform: translateY(-4px);
+    box-shadow: $shadow-xl;
+  }
+
+  &.featured {
+    border: 2px solid $secondary;
+    box-shadow: 0 0 0 2px rgba($secondary, 0.1);
+  }
+}
+
+.tailor-card-image {
+  position: relative;
+  @include aspect-ratio(1, 1);
+  background: $gray-100;
+
+  img {
+    object-fit: cover;
+  }
+}
+
+.tailor-card-placeholder {
+  @include flex-center;
+  height: 100%;
+  font-family: $font-display;
+  font-size: $text-4xl;
+  font-weight: $font-bold;
+  color: $gray-400;
+  background: $gray-200;
+}
+
+.featured-tag {
+  position: absolute;
+  top: $spacing-sm;
+  left: $spacing-sm;
+  display: inline-flex;
+  align-items: center;
+  gap: $spacing-xs;
+  padding: $spacing-xs $spacing-sm;
+  font-size: $text-xs;
+  font-weight: $font-medium;
+  color: $white;
+  background: $secondary;
+  border-radius: $radius-full;
+
+  svg {
+    width: 12px;
+    height: 12px;
+  }
+}
+
+.verified-tag {
+  position: absolute;
+  top: $spacing-sm;
+  right: $spacing-sm;
+  display: inline-flex;
+  align-items: center;
+  gap: $spacing-xs;
+  padding: $spacing-xs $spacing-sm;
+  font-size: $text-xs;
+  font-weight: $font-medium;
+  color: $white;
+  background: $primary;
+  border-radius: $radius-full;
+
+  svg {
+    width: 12px;
+    height: 12px;
+  }
+}
+
+.tailor-card-content {
+  padding: $spacing-md;
+}
+
+.tailor-card-name {
+  font-family: $font-display;
+  font-size: $text-lg;
+  font-weight: $font-semibold;
+  color: $text-primary;
+  margin-bottom: $spacing-xs;
+  @include truncate;
+}
+
+.tailor-card-location {
+  display: flex;
+  align-items: center;
+  gap: $spacing-xs;
+  font-size: $text-sm;
+  color: $text-muted;
+  margin-bottom: $spacing-sm;
+
+  svg {
+    width: 14px;
+    height: 14px;
+    flex-shrink: 0;
+  }
+}
+
+.tailor-card-bio {
+  font-size: $text-sm;
+  color: $text-secondary;
+  margin-bottom: $spacing-md;
+  @include line-clamp(2);
+}
+
+.tailor-card-specialties {
+  display: flex;
+  flex-wrap: wrap;
+  gap: $spacing-xs;
+  margin-bottom: $spacing-md;
+}
+
+.specialty-tag {
+  padding: 2px $spacing-sm;
+  font-size: $text-xs;
+  color: $primary;
+  background: rgba($primary, 0.1);
+  border-radius: $radius-full;
+}
+
+.specialty-more {
+  padding: 2px $spacing-sm;
+  font-size: $text-xs;
+  color: $text-muted;
+}
+
+.tailor-card-footer {
+  @include flex-between;
+  padding-top: $spacing-md;
+  border-top: 1px solid $gray-100;
+}
+
+.tailor-card-rating {
+  display: flex;
+  align-items: center;
+  gap: $spacing-xs;
+
+  .star-icon {
+    width: 16px;
+    height: 16px;
+    color: $secondary;
+    fill: $secondary;
+  }
+
+  .rating-value {
+    font-weight: $font-semibold;
+    color: $text-primary;
+  }
+
+  .rating-count {
+    font-size: $text-sm;
+    color: $text-muted;
+  }
+}

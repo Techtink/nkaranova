@@ -1,0 +1,42 @@
+@import '../../styles/variables';
+@import '../../styles/mixins';
+
+.input-wrapper {
+  display: flex;
+  flex-direction: column;
+  gap: $spacing-xs;
+}
+
+.input-label {
+  font-size: $text-sm;
+  font-weight: $font-medium;
+  color: $text-primary;
+}
+
+.input {
+  @include input-base;
+
+  &-error {
+    border-color: $error;
+
+    &:focus {
+      border-color: $error;
+      box-shadow: 0 0 0 3px rgba($error, 0.1);
+    }
+  }
+}
+
+.input-helper {
+  font-size: $text-xs;
+  color: $text-muted;
+
+  &-error {
+    color: $error;
+  }
+}
+
+// Textarea variant
+textarea.input {
+  min-height: 100px;
+  resize: vertical;
+}

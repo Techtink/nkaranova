@@ -1,0 +1,583 @@
+@import '../../styles/variables';
+@import '../../styles/mixins';
+
+.tailor-orders-page {
+  .filter-tabs {
+    display: flex;
+    flex-wrap: wrap;
+    gap: $spacing-sm;
+    margin-bottom: $spacing-xl;
+  }
+
+  .filter-tab {
+    padding: $spacing-sm $spacing-lg;
+    font-size: $text-sm;
+    font-weight: $font-medium;
+    color: $text-secondary;
+    background: $gray-100;
+    border: none;
+    border-radius: $radius-full;
+    cursor: pointer;
+    transition: all $transition-base;
+
+    &:hover {
+      background: $gray-200;
+    }
+
+    &.active {
+      background: $primary;
+      color: $white;
+    }
+  }
+}
+
+.orders-list {
+  display: flex;
+  flex-direction: column;
+  gap: $spacing-md;
+}
+
+.order-card {
+  @include card;
+  overflow: hidden;
+  transition: box-shadow $transition-base;
+
+  &:hover {
+    box-shadow: $shadow-lg;
+  }
+
+  &.expanded {
+    .order-header {
+      border-bottom: 1px solid $gray-100;
+    }
+  }
+}
+
+.order-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: $spacing-lg;
+  cursor: pointer;
+
+  &:hover {
+    background: $gray-50;
+  }
+}
+
+.order-main-info {
+  display: flex;
+  align-items: center;
+  gap: $spacing-xl;
+  flex: 1;
+
+  @include mobile {
+    flex-direction: column;
+    align-items: flex-start;
+    gap: $spacing-md;
+  }
+}
+
+.customer-info {
+  display: flex;
+  align-items: center;
+  gap: $spacing-md;
+
+  .customer-name {
+    display: block;
+    font-weight: $font-medium;
+  }
+
+  .order-service {
+    display: block;
+    font-size: $text-sm;
+    color: $text-muted;
+  }
+}
+
+.order-meta {
+  display: flex;
+  align-items: center;
+  gap: $spacing-md;
+
+  .deadline {
+    display: flex;
+    align-items: center;
+    gap: $spacing-xs;
+    font-size: $text-sm;
+    color: $text-secondary;
+
+    &.urgent {
+      color: $warning;
+      font-weight: $font-medium;
+    }
+
+    &.overdue {
+      color: $error;
+      font-weight: $font-medium;
+    }
+  }
+
+  .progress-badge {
+    font-size: $text-sm;
+    color: $primary;
+    font-weight: $font-medium;
+  }
+}
+
+.expand-btn {
+  width: 32px;
+  height: 32px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: $gray-100;
+  border: none;
+  border-radius: $radius-full;
+  cursor: pointer;
+  transition: all $transition-base;
+
+  &:hover {
+    background: $gray-200;
+  }
+
+  svg {
+    width: 18px;
+    height: 18px;
+    color: $text-secondary;
+  }
+}
+
+.order-details {
+  padding: $spacing-lg;
+  background: $gray-50;
+}
+
+.details-grid {
+  display: grid;
+  grid-template-columns: 1fr 2fr;
+  gap: $spacing-xl;
+
+  @include mobile {
+    grid-template-columns: 1fr;
+  }
+}
+
+.detail-section {
+  h4 {
+    font-size: $text-sm;
+    font-weight: $font-semibold;
+    color: $text-secondary;
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+    margin-bottom: $spacing-md;
+  }
+
+  .detail-row {
+    font-size: $text-sm;
+    margin-bottom: $spacing-xs;
+
+    .label {
+      color: $text-secondary;
+      margin-right: $spacing-xs;
+    }
+  }
+}
+
+.stages-list {
+  display: flex;
+  flex-direction: column;
+  gap: $spacing-sm;
+}
+
+.stage-item {
+  display: flex;
+  align-items: center;
+  gap: $spacing-md;
+  padding: $spacing-sm $spacing-md;
+  background: $white;
+  border-radius: $radius-md;
+  border: 1px solid $gray-100;
+
+  &.completed {
+    .stage-indicator {
+      background: $success;
+      color: $white;
+    }
+  }
+
+  &.in_progress {
+    border-color: $primary;
+    background: rgba($primary, 0.05);
+
+    .stage-indicator {
+      background: $primary;
+    }
+
+    .pulse {
+      width: 8px;
+      height: 8px;
+      background: $white;
+      border-radius: 50%;
+      animation: pulse 1.5s infinite;
+    }
+  }
+
+  &.pending {
+    opacity: 0.7;
+  }
+}
+
+.stage-indicator {
+  width: 28px;
+  height: 28px;
+  min-width: 28px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: $gray-200;
+  border-radius: 50%;
+  font-size: $text-xs;
+  font-weight: $font-semibold;
+  color: $text-secondary;
+
+  svg {
+    width: 14px;
+    height: 14px;
+  }
+}
+
+.stage-info {
+  flex: 1;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+
+  .stage-name {
+    font-weight: $font-medium;
+    font-size: $text-sm;
+  }
+
+  .stage-days {
+    font-size: $text-xs;
+    color: $text-muted;
+  }
+}
+
+.estimated-completion {
+  display: flex;
+  align-items: center;
+  gap: $spacing-xs;
+  margin-top: $spacing-md;
+  padding-top: $spacing-md;
+  border-top: 1px solid $gray-100;
+  font-size: $text-sm;
+  color: $text-secondary;
+
+  svg {
+    width: 14px;
+    height: 14px;
+  }
+}
+
+.order-actions {
+  display: flex;
+  gap: $spacing-sm;
+  margin-top: $spacing-lg;
+  padding-top: $spacing-md;
+  border-top: 1px solid $gray-200;
+}
+
+.rejection-notice {
+  display: flex;
+  align-items: flex-start;
+  gap: $spacing-md;
+  margin-top: $spacing-lg;
+  padding: $spacing-md;
+  background: rgba($error, 0.1);
+  border-radius: $radius-md;
+  border: 1px solid rgba($error, 0.2);
+
+  svg {
+    color: $error;
+    flex-shrink: 0;
+    margin-top: 2px;
+  }
+
+  strong {
+    display: block;
+    font-size: $text-sm;
+    color: $error;
+  }
+
+  p {
+    margin: $spacing-xs 0 0;
+    font-size: $text-sm;
+    color: $text-primary;
+  }
+}
+
+// Work Plan Modal
+.work-plan-modal {
+  width: 100%;
+  max-width: 600px;
+  max-height: 90vh;
+  overflow-y: auto;
+}
+
+.modal-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: $spacing-lg;
+  border-bottom: 1px solid $gray-100;
+
+  h2 {
+    margin: 0;
+    font-size: $text-xl;
+  }
+
+  .close-btn {
+    width: 32px;
+    height: 32px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    background: transparent;
+    border: none;
+    border-radius: $radius-full;
+    cursor: pointer;
+    transition: background $transition-base;
+
+    &:hover {
+      background: $gray-100;
+    }
+
+    svg {
+      width: 20px;
+      height: 20px;
+    }
+  }
+}
+
+.modal-body {
+  padding: $spacing-lg;
+}
+
+.order-summary {
+  padding: $spacing-md;
+  background: $gray-50;
+  border-radius: $radius-md;
+  margin-bottom: $spacing-xl;
+
+  h4 {
+    font-size: $text-sm;
+    font-weight: $font-semibold;
+    color: $text-secondary;
+    margin-bottom: $spacing-sm;
+  }
+
+  p {
+    margin: $spacing-xs 0;
+    font-size: $text-sm;
+  }
+}
+
+.stages-form {
+  margin-bottom: $spacing-xl;
+
+  h4 {
+    font-size: $text-base;
+    font-weight: $font-semibold;
+    margin-bottom: $spacing-xs;
+  }
+
+  .form-help {
+    font-size: $text-sm;
+    color: $text-muted;
+    margin-bottom: $spacing-lg;
+  }
+}
+
+.stage-input-group {
+  display: flex;
+  gap: $spacing-md;
+  margin-bottom: $spacing-md;
+  padding: $spacing-md;
+  background: $gray-50;
+  border-radius: $radius-md;
+  border: 1px solid $gray-100;
+
+  .stage-number {
+    width: 28px;
+    height: 28px;
+    min-width: 28px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    background: $primary;
+    color: $white;
+    border-radius: 50%;
+    font-size: $text-sm;
+    font-weight: $font-semibold;
+  }
+
+  .stage-fields {
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    gap: $spacing-sm;
+
+    input[type="text"],
+    textarea {
+      width: 100%;
+      padding: $spacing-sm $spacing-md;
+      border: 1px solid $gray-200;
+      border-radius: $radius-md;
+      font-size: $text-sm;
+      transition: border-color $transition-base;
+
+      &:focus {
+        outline: none;
+        border-color: $primary;
+      }
+    }
+  }
+
+  .days-input {
+    display: flex;
+    align-items: center;
+    gap: $spacing-xs;
+
+    input {
+      width: 60px;
+      padding: $spacing-sm;
+      text-align: center;
+    }
+
+    span {
+      font-size: $text-sm;
+      color: $text-secondary;
+    }
+  }
+
+  .remove-stage-btn {
+    width: 32px;
+    height: 32px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    background: transparent;
+    border: 1px solid $gray-200;
+    border-radius: $radius-md;
+    cursor: pointer;
+    color: $text-secondary;
+    transition: all $transition-base;
+
+    &:hover {
+      background: rgba($error, 0.1);
+      border-color: $error;
+      color: $error;
+    }
+  }
+}
+
+.add-stage-btn {
+  display: flex;
+  align-items: center;
+  gap: $spacing-xs;
+  width: 100%;
+  padding: $spacing-md;
+  background: transparent;
+  border: 2px dashed $gray-200;
+  border-radius: $radius-md;
+  color: $text-secondary;
+  font-size: $text-sm;
+  font-weight: $font-medium;
+  cursor: pointer;
+  transition: all $transition-base;
+
+  &:hover {
+    border-color: $primary;
+    color: $primary;
+  }
+}
+
+.plan-summary {
+  display: flex;
+  gap: $spacing-xl;
+  padding: $spacing-md;
+  background: rgba($primary, 0.05);
+  border-radius: $radius-md;
+  margin-bottom: $spacing-xl;
+
+  .summary-item {
+    display: flex;
+    flex-direction: column;
+    gap: $spacing-xs;
+
+    span {
+      font-size: $text-xs;
+      color: $text-muted;
+    }
+
+    strong {
+      font-size: $text-base;
+      color: $primary;
+    }
+  }
+}
+
+.modal-actions {
+  display: flex;
+  justify-content: flex-end;
+  gap: $spacing-md;
+  padding-top: $spacing-lg;
+  border-top: 1px solid $gray-100;
+}
+
+@keyframes pulse {
+  0%,
+  100% {
+    opacity: 1;
+    transform: scale(1);
+  }
+  50% {
+    opacity: 0.5;
+    transform: scale(1.2);
+  }
+}
+
+// Mobile adjustments
+@include mobile {
+  .tailor-orders-page {
+    .filter-tabs {
+      overflow-x: auto;
+      flex-wrap: nowrap;
+      padding-bottom: $spacing-sm;
+    }
+  }
+
+  .work-plan-modal {
+    max-width: 100%;
+    margin: $spacing-md;
+    max-height: calc(100vh - $spacing-lg * 2);
+  }
+
+  .stage-input-group {
+    flex-direction: column;
+
+    .stage-number {
+      align-self: flex-start;
+    }
+
+    .remove-stage-btn {
+      align-self: flex-end;
+    }
+  }
+
+  .plan-summary {
+    flex-direction: column;
+    gap: $spacing-md;
+  }
+}

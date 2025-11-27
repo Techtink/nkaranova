@@ -1,0 +1,113 @@
+@import '../styles/variables';
+@import '../styles/mixins';
+
+.ai-search-hero {
+  text-align: center;
+  max-width: 800px;
+  margin: 0 auto $spacing-3xl;
+
+  h1 {
+    margin-bottom: $spacing-md;
+  }
+
+  > p {
+    font-size: $text-lg;
+    color: $text-secondary;
+    margin-bottom: $spacing-xl;
+  }
+}
+
+.ai-search-form {
+  display: flex;
+  flex-direction: column;
+  gap: $spacing-md;
+  margin-bottom: $spacing-xl;
+
+  @include md {
+    flex-direction: row;
+    align-items: flex-end;
+  }
+}
+
+.search-input-wrapper {
+  flex: 1;
+  position: relative;
+
+  .search-icon {
+    position: absolute;
+    top: $spacing-md;
+    left: $spacing-md;
+    width: 20px;
+    height: 20px;
+    color: $gray-400;
+  }
+
+  textarea {
+    width: 100%;
+    padding: $spacing-md $spacing-md $spacing-md calc($spacing-md * 2 + 20px);
+    font-family: $font-primary;
+    font-size: $text-base;
+    border: 2px solid $gray-200;
+    border-radius: $radius-lg;
+    resize: none;
+    transition: all $transition-base;
+
+    &:focus {
+      outline: none;
+      border-color: $primary;
+      box-shadow: 0 0 0 3px rgba($primary, 0.1);
+    }
+
+    &::placeholder {
+      color: $gray-400;
+    }
+  }
+}
+
+.example-queries {
+  > p {
+    font-size: $text-sm;
+    color: $text-muted;
+    margin-bottom: $spacing-md;
+  }
+}
+
+.examples {
+  display: flex;
+  flex-wrap: wrap;
+  gap: $spacing-sm;
+  justify-content: center;
+}
+
+.example-btn {
+  padding: $spacing-sm $spacing-md;
+  font-size: $text-sm;
+  color: $text-secondary;
+  background: $gray-100;
+  border: none;
+  border-radius: $radius-lg;
+  cursor: pointer;
+  transition: all $transition-base;
+  text-align: left;
+
+  &:hover {
+    background: $gray-200;
+    color: $text-primary;
+  }
+}
+
+.ai-search-results {
+  h2 {
+    text-align: center;
+    margin-bottom: $spacing-xl;
+  }
+
+  .loading-container {
+    flex-direction: column;
+    gap: $spacing-md;
+
+    p {
+      color: $text-secondary;
+    }
+  }
+}

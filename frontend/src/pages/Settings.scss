@@ -1,0 +1,64 @@
+@import '../styles/variables';
+@import '../styles/mixins';
+
+.settings-grid {
+  display: grid;
+  gap: $spacing-xl;
+  max-width: 600px;
+}
+
+.settings-section {
+  @include card;
+  padding: $spacing-xl;
+
+  h2 {
+    font-size: $text-lg;
+    margin-bottom: $spacing-lg;
+    padding-bottom: $spacing-md;
+    border-bottom: 1px solid $gray-200;
+  }
+
+  form {
+    display: flex;
+    flex-direction: column;
+    gap: $spacing-md;
+
+    button {
+      align-self: flex-start;
+      margin-top: $spacing-md;
+    }
+  }
+}
+
+.preferences-list {
+  display: flex;
+  flex-direction: column;
+  gap: $spacing-md;
+  margin-bottom: $spacing-lg;
+}
+
+.preference-item {
+  display: flex;
+  align-items: flex-start;
+  gap: $spacing-md;
+  cursor: pointer;
+
+  input[type="checkbox"] {
+    width: 20px;
+    height: 20px;
+    margin-top: 2px;
+    accent-color: $primary;
+  }
+
+  .preference-title {
+    display: block;
+    font-weight: $font-medium;
+    margin-bottom: $spacing-xs;
+  }
+
+  .preference-desc {
+    display: block;
+    font-size: $text-sm;
+    color: $text-secondary;
+  }
+}

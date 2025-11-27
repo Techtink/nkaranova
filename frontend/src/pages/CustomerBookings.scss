@@ -1,0 +1,104 @@
+@import '../styles/variables';
+@import '../styles/mixins';
+
+.filter-tabs {
+  display: flex;
+  gap: $spacing-sm;
+  margin-bottom: $spacing-xl;
+  overflow-x: auto;
+  padding-bottom: $spacing-sm;
+}
+
+.filter-tab {
+  padding: $spacing-sm $spacing-lg;
+  font-size: $text-sm;
+  font-weight: $font-medium;
+  color: $text-secondary;
+  background: $gray-100;
+  border: none;
+  border-radius: $radius-full;
+  white-space: nowrap;
+  cursor: pointer;
+  transition: all $transition-base;
+
+  &:hover {
+    background: $gray-200;
+  }
+
+  &.active {
+    background: $primary;
+    color: $white;
+  }
+}
+
+.bookings-list {
+  display: flex;
+  flex-direction: column;
+  gap: $spacing-lg;
+}
+
+.booking-card {
+  @include card;
+  padding: $spacing-lg;
+}
+
+.booking-header {
+  @include flex-between;
+  margin-bottom: $spacing-md;
+}
+
+.tailor-info {
+  display: flex;
+  align-items: center;
+  gap: $spacing-md;
+
+  .tailor-name {
+    display: block;
+    font-weight: $font-medium;
+    color: $text-primary;
+    text-decoration: none;
+    margin-bottom: $spacing-xs;
+
+    &:hover {
+      color: $primary;
+    }
+  }
+}
+
+.booking-details {
+  display: flex;
+  flex-wrap: wrap;
+  gap: $spacing-lg;
+  margin-bottom: $spacing-md;
+
+  .detail {
+    display: flex;
+    align-items: center;
+    gap: $spacing-xs;
+    font-size: $text-sm;
+    color: $text-secondary;
+
+    svg {
+      width: 16px;
+      height: 16px;
+    }
+  }
+}
+
+.booking-service,
+.booking-notes {
+  font-size: $text-sm;
+  margin-bottom: $spacing-sm;
+
+  strong {
+    color: $text-secondary;
+  }
+}
+
+.booking-actions {
+  display: flex;
+  gap: $spacing-sm;
+  margin-top: $spacing-md;
+  padding-top: $spacing-md;
+  border-top: 1px solid $gray-100;
+}

@@ -1,0 +1,161 @@
+@import '../styles/variables';
+@import '../styles/mixins';
+
+.tailors-page {
+  .page-header {
+    @include flex-between;
+    flex-wrap: wrap;
+    gap: $spacing-md;
+  }
+}
+
+.filter-toggle {
+  @include button-base;
+  @include button-secondary;
+  display: flex;
+
+  @include lg {
+    display: none;
+  }
+
+  svg {
+    width: 18px;
+    height: 18px;
+  }
+}
+
+.filters-panel {
+  display: none;
+  margin-bottom: $spacing-xl;
+  padding: $spacing-lg;
+  background: $white;
+  border-radius: $radius-lg;
+  box-shadow: $shadow-md;
+
+  @include lg {
+    display: block;
+
+    .filters-header {
+      display: none;
+    }
+
+    .filters-body {
+      display: flex;
+      flex-wrap: wrap;
+      gap: $spacing-md;
+    }
+
+    .filter-group {
+      flex: 1;
+      min-width: 150px;
+    }
+
+    .filters-actions {
+      display: flex;
+      align-items: flex-end;
+      gap: $spacing-sm;
+    }
+  }
+
+  &.open {
+    display: block;
+    position: fixed;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    z-index: $z-modal;
+    margin: 0;
+    border-radius: 0;
+    overflow-y: auto;
+
+    @include lg {
+      position: static;
+      border-radius: $radius-lg;
+    }
+  }
+}
+
+.filters-header {
+  @include flex-between;
+  margin-bottom: $spacing-lg;
+  padding-bottom: $spacing-md;
+  border-bottom: 1px solid $gray-200;
+
+  h3 {
+    margin: 0;
+  }
+
+  button {
+    @include flex-center;
+    width: 32px;
+    height: 32px;
+    background: none;
+    border: none;
+    color: $text-secondary;
+
+    svg {
+      width: 24px;
+      height: 24px;
+    }
+  }
+}
+
+.filters-body {
+  display: flex;
+  flex-direction: column;
+  gap: $spacing-md;
+
+  @include lg {
+    flex-direction: row;
+  }
+}
+
+.filter-group {
+  display: flex;
+  flex-direction: column;
+  gap: $spacing-xs;
+
+  label {
+    font-size: $text-sm;
+    font-weight: $font-medium;
+    color: $text-secondary;
+  }
+
+  input,
+  select {
+    @include input-base;
+    padding: $spacing-sm $spacing-md;
+  }
+}
+
+.filters-actions {
+  display: flex;
+  gap: $spacing-sm;
+  margin-top: $spacing-lg;
+  padding-top: $spacing-lg;
+  border-top: 1px solid $gray-200;
+
+  @include lg {
+    margin-top: 0;
+    padding-top: 0;
+    border-top: none;
+  }
+}
+
+.results-count {
+  font-size: $text-sm;
+  color: $text-secondary;
+  margin-bottom: $spacing-lg;
+}
+
+.pagination {
+  @include flex-center;
+  gap: $spacing-md;
+  margin-top: $spacing-2xl;
+
+  .page-info {
+    font-size: $text-sm;
+    color: $text-secondary;
+  }
+}

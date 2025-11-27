@@ -1,0 +1,231 @@
+@import '../../styles/variables';
+@import '../../styles/mixins';
+
+.tailor-dashboard {
+  .alert {
+    display: flex;
+    align-items: flex-start;
+    gap: $spacing-md;
+    padding: $spacing-lg;
+    border-radius: $radius-lg;
+    margin-bottom: $spacing-lg;
+
+    > svg {
+      width: 24px;
+      height: 24px;
+      flex-shrink: 0;
+    }
+
+    strong {
+      display: block;
+      margin-bottom: $spacing-xs;
+    }
+
+    p {
+      margin: 0;
+      font-size: $text-sm;
+    }
+
+    &-warning {
+      background: rgba($warning, 0.1);
+      color: darken($warning, 20%);
+
+      svg {
+        color: $warning;
+      }
+    }
+
+    &-error {
+      background: rgba($error, 0.1);
+      color: darken($error, 20%);
+
+      svg {
+        color: $error;
+      }
+    }
+
+    &-info {
+      background: rgba($primary, 0.1);
+      color: $primary-dark;
+
+      svg {
+        color: $primary;
+      }
+    }
+  }
+}
+
+.stats-grid {
+  display: grid;
+  gap: $spacing-lg;
+  grid-template-columns: repeat(2, 1fr);
+  margin-bottom: $spacing-2xl;
+
+  @include md {
+    grid-template-columns: repeat(4, 1fr);
+  }
+}
+
+.stat-card {
+  @include card;
+  padding: $spacing-lg;
+  display: flex;
+  align-items: center;
+  gap: $spacing-md;
+}
+
+.stat-icon {
+  @include flex-center;
+  width: 48px;
+  height: 48px;
+  background: rgba($primary, 0.1);
+  color: $primary;
+  border-radius: $radius-lg;
+
+  &.success {
+    background: rgba($success, 0.1);
+    color: $success;
+  }
+
+  &.warning {
+    background: rgba($warning, 0.1);
+    color: $warning;
+  }
+
+  svg {
+    width: 24px;
+    height: 24px;
+  }
+}
+
+.stat-content {
+  .stat-value {
+    display: block;
+    font-size: $text-2xl;
+    font-weight: $font-bold;
+  }
+
+  .stat-label {
+    font-size: $text-sm;
+    color: $text-secondary;
+  }
+}
+
+.quick-actions {
+  margin-bottom: $spacing-2xl;
+
+  h2 {
+    font-size: $text-lg;
+    margin-bottom: $spacing-lg;
+  }
+}
+
+.actions-grid {
+  display: grid;
+  gap: $spacing-md;
+  grid-template-columns: repeat(2, 1fr);
+
+  @include md {
+    grid-template-columns: repeat(4, 1fr);
+  }
+}
+
+.action-card {
+  @include card;
+  @include flex-center;
+  flex-direction: column;
+  gap: $spacing-sm;
+  padding: $spacing-xl;
+  text-decoration: none;
+  color: $text-primary;
+  transition: all $transition-base;
+
+  &:hover {
+    transform: translateY(-2px);
+    box-shadow: $shadow-lg;
+    color: $primary;
+  }
+
+  svg {
+    width: 32px;
+    height: 32px;
+    color: $primary;
+  }
+
+  span {
+    font-size: $text-sm;
+    font-weight: $font-medium;
+  }
+}
+
+.upcoming-bookings {
+  h2 {
+    font-size: $text-lg;
+    margin-bottom: $spacing-lg;
+  }
+}
+
+.bookings-list {
+  display: flex;
+  flex-direction: column;
+  gap: $spacing-md;
+  margin-bottom: $spacing-md;
+}
+
+.booking-item {
+  @include card;
+  padding: $spacing-md;
+  display: flex;
+  gap: $spacing-lg;
+}
+
+.booking-date {
+  @include flex-center;
+  flex-direction: column;
+  width: 60px;
+  padding: $spacing-sm;
+  background: $primary;
+  color: $white;
+  border-radius: $radius-md;
+
+  .day {
+    font-size: $text-2xl;
+    font-weight: $font-bold;
+    line-height: 1;
+  }
+
+  .month {
+    font-size: $text-xs;
+    text-transform: uppercase;
+  }
+}
+
+.booking-info {
+  display: flex;
+  flex-direction: column;
+  gap: $spacing-xs;
+
+  .customer-name {
+    font-weight: $font-medium;
+  }
+
+  .booking-time {
+    font-size: $text-sm;
+    color: $text-secondary;
+  }
+
+  .booking-service {
+    font-size: $text-sm;
+    color: $text-muted;
+  }
+}
+
+.view-all {
+  font-size: $text-sm;
+  color: $primary;
+  text-decoration: none;
+
+  &:hover {
+    text-decoration: underline;
+  }
+}

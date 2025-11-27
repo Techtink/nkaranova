@@ -1,0 +1,271 @@
+@import '../../styles/variables';
+@import '../../styles/mixins';
+
+.header {
+  position: sticky;
+  top: 0;
+  background: var(--header-bg);
+  border-bottom: 1px solid var(--border-color);
+  z-index: $z-sticky;
+  transition: background-color $transition-base, border-color $transition-base;
+}
+
+.header-container {
+  @include flex-between;
+  height: 64px;
+}
+
+.logo {
+  text-decoration: none;
+
+  &-text {
+    font-family: $font-display;
+    font-size: $text-xl;
+    font-weight: $font-extrabold;
+    color: $primary;
+    letter-spacing: -0.025em;
+  }
+}
+
+.nav {
+  display: none;
+  gap: $spacing-xl;
+
+  @include md {
+    display: flex;
+  }
+
+  &-link {
+    font-size: $text-sm;
+    font-weight: $font-medium;
+    color: var(--text-secondary);
+    text-decoration: none;
+    transition: color $transition-fast;
+    padding: $spacing-sm 0;
+    position: relative;
+
+    &::after {
+      content: '';
+      position: absolute;
+      bottom: 0;
+      left: 0;
+      width: 0;
+      height: 2px;
+      background: $primary;
+      transition: width $transition-fast;
+    }
+
+    &:hover {
+      color: $primary;
+
+      &::after {
+        width: 100%;
+      }
+    }
+  }
+
+  &-open {
+    display: flex;
+    flex-direction: column;
+    position: absolute;
+    top: 64px;
+    left: 0;
+    right: 0;
+    background: var(--header-bg);
+    padding: $spacing-lg;
+    border-bottom: 1px solid var(--border-color);
+    gap: $spacing-md;
+    box-shadow: var(--shadow-lg);
+
+    @include md {
+      display: flex;
+      flex-direction: row;
+      position: static;
+      padding: 0;
+      border: none;
+      box-shadow: none;
+    }
+  }
+}
+
+.header-actions {
+  display: flex;
+  align-items: center;
+  gap: $spacing-sm;
+}
+
+.header-icon-btn {
+  @include flex-center;
+  width: 40px;
+  height: 40px;
+  color: var(--text-secondary);
+  background: transparent;
+  border: 1px solid transparent;
+  cursor: pointer;
+  transition: all $transition-fast;
+
+  &:hover {
+    background: var(--bg-tertiary);
+    border-color: var(--border-color);
+    color: $primary;
+  }
+
+  svg {
+    width: 20px;
+    height: 20px;
+  }
+}
+
+.profile-dropdown {
+  position: relative;
+}
+
+.profile-btn {
+  background: none;
+  border: none;
+  padding: 0;
+  cursor: pointer;
+  transition: transform $transition-fast;
+
+  &:hover {
+    transform: scale(1.05);
+  }
+}
+
+.dropdown-menu {
+  position: absolute;
+  top: calc(100% + $spacing-sm);
+  right: 0;
+  min-width: 220px;
+  background: var(--card-bg);
+  border: 1px solid var(--border-color);
+  box-shadow: var(--shadow-xl);
+  overflow: hidden;
+  animation: slideInDown 0.2s ease;
+  z-index: $z-dropdown;
+}
+
+.dropdown-header {
+  padding: $spacing-md $spacing-lg;
+  border-bottom: 1px solid var(--border-color);
+  background: var(--bg-tertiary);
+  display: flex;
+  flex-direction: column;
+}
+
+.dropdown-name {
+  font-weight: $font-semibold;
+  color: var(--text-primary);
+  font-size: $text-sm;
+}
+
+.dropdown-email {
+  font-size: $text-xs;
+  color: var(--text-muted);
+  margin-top: 2px;
+}
+
+.dropdown-item {
+  display: flex;
+  align-items: center;
+  gap: $spacing-sm;
+  width: 100%;
+  padding: $spacing-sm $spacing-lg;
+  font-size: $text-sm;
+  font-weight: $font-medium;
+  color: var(--text-secondary);
+  text-decoration: none;
+  background: none;
+  border: none;
+  cursor: pointer;
+  transition: all $transition-fast;
+  text-align: left;
+
+  &:hover {
+    background: var(--bg-hover);
+    color: var(--text-primary);
+  }
+
+  svg {
+    width: 16px;
+    height: 16px;
+    flex-shrink: 0;
+  }
+}
+
+.dropdown-logout {
+  border-top: 1px solid var(--border-color);
+  color: $error;
+  margin-top: $spacing-xs;
+
+  &:hover {
+    background: var(--error-light);
+    color: $error-dark;
+  }
+}
+
+.auth-buttons {
+  display: none;
+  gap: $spacing-sm;
+
+  @include sm {
+    display: flex;
+  }
+}
+
+.menu-toggle {
+  @include flex-center;
+  width: 40px;
+  height: 40px;
+  background: none;
+  border: none;
+  color: var(--text-primary);
+  cursor: pointer;
+  transition: color $transition-fast;
+
+  &:hover {
+    color: $primary;
+  }
+
+  @include md {
+    display: none;
+  }
+
+  svg {
+    width: 24px;
+    height: 24px;
+  }
+}
+
+// Header button overrides
+.header .btn {
+  font-weight: $font-semibold;
+
+  &-primary {
+    background: $primary;
+    color: $white;
+    border: none;
+
+    &:hover {
+      background: $primary-dark;
+      transform: translateY(-1px);
+      box-shadow: var(--shadow-md);
+    }
+  }
+
+  &-ghost {
+    background: transparent;
+    color: var(--text-secondary);
+    border: 1px solid transparent;
+
+    &:hover {
+      color: var(--text-primary);
+      background: var(--bg-tertiary);
+    }
+  }
+
+  &-sm {
+    padding: $spacing-sm $spacing-md;
+    font-size: $text-sm;
+  }
+}

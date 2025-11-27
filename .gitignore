@@ -1,0 +1,72 @@
+# Dependencies
+node_modules/
+
+# Environment files (keep .env.example)
+.env
+.env.local
+.env.*.local
+*.env
+
+# Build outputs
+dist/
+build/
+.next/
+out/
+
+# Logs
+logs/
+*.log
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+
+# OS files
+.DS_Store
+Thumbs.db
+*.swp
+*.swo
+*~
+
+# IDE
+.idea/
+.vscode/
+*.sublime-project
+*.sublime-workspace
+
+# Expo / React Native
+.expo/
+web-build/
+expo-env.d.ts
+.metro-health-check*
+*.jks
+*.p8
+*.p12
+*.key
+*.mobileprovision
+*.orig.*
+.kotlin/
+
+# Generated native folders (Expo)
+mobile/apps/*/ios/
+mobile/apps/*/android/
+
+# TypeScript
+*.tsbuildinfo
+
+# Test coverage
+coverage/
+.nyc_output/
+
+# Uploads (production uploads shouldn't be in git)
+backend/uploads/*
+!backend/uploads/.gitkeep
+
+# Debug
+*.pem
+
+# Temporary files
+tmp/
+temp/
+
+# Claude Code
+.claude/

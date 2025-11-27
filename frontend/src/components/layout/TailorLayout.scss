@@ -1,0 +1,258 @@
+@import '../../styles/variables';
+@import '../../styles/mixins';
+
+.tailor-layout {
+  display: flex;
+  min-height: 100vh;
+
+  .mobile-menu-btn {
+    display: none;
+    position: fixed;
+    bottom: 20px;
+    right: 20px;
+    width: 56px;
+    height: 56px;
+    background: $primary;
+    color: white;
+    border: none;
+    box-shadow: var(--shadow-lg);
+    z-index: 1001;
+    cursor: pointer;
+    @include flex-center;
+
+    svg {
+      width: 24px;
+      height: 24px;
+    }
+
+    @include mobile {
+      display: flex;
+    }
+  }
+
+  .sidebar-overlay {
+    display: none;
+    position: fixed;
+    inset: 0;
+    background: rgba(0, 0, 0, 0.5);
+    backdrop-filter: blur(4px);
+    z-index: 999;
+
+    @include mobile {
+      display: block;
+    }
+  }
+}
+
+.tailor-sidebar {
+  width: 280px;
+  background: $sidebar-gradient;
+  color: $white;
+  position: fixed;
+  top: 0;
+  left: 0;
+  height: 100vh;
+  overflow: hidden auto;
+  flex-shrink: 0;
+  z-index: $z-fixed;
+  transition: width 0.3s;
+  display: flex;
+  flex-direction: column;
+
+  @include mobile {
+    z-index: 1000;
+    transform: translateX(-100%);
+    transition: transform 0.3s ease;
+    box-shadow: var(--shadow-xl);
+
+    &.open {
+      transform: translateX(0);
+    }
+  }
+
+  .sidebar-header {
+    padding: 24px 20px;
+    border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+    display: flex;
+    align-items: center;
+    gap: 12px;
+
+    .logo-icon {
+      width: 40px;
+      height: 40px;
+      background: linear-gradient(135deg, $primary 0%, $secondary 100%);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 20px;
+      font-weight: 700;
+      flex-shrink: 0;
+    }
+
+    .logo-text {
+      flex: 1;
+
+      h1 {
+        font-size: 18px;
+        font-weight: 700;
+        margin: 0;
+        color: $white;
+      }
+
+      p {
+        font-size: 11px;
+        color: $primary-light;
+        margin: 2px 0 0;
+      }
+    }
+
+    .theme-toggle-btn {
+      width: 36px;
+      height: 36px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      background: rgba(255, 255, 255, 0.1);
+      border: 1px solid rgba(255, 255, 255, 0.2);
+      border-radius: 8px;
+      color: $white;
+      cursor: pointer;
+      transition: all 0.2s;
+      flex-shrink: 0;
+
+      &:hover {
+        background: rgba(255, 255, 255, 0.2);
+      }
+
+      svg {
+        width: 18px;
+        height: 18px;
+      }
+    }
+  }
+
+  .sidebar-nav {
+    padding: 20px 0;
+    flex: 1;
+    overflow-y: auto;
+  }
+
+  .nav-divider {
+    padding: 16px 20px 8px;
+    margin-top: 8px;
+
+    span {
+      font-size: 11px;
+      font-weight: $font-semibold;
+      color: rgba(255, 255, 255, 0.5);
+      text-transform: uppercase;
+      letter-spacing: 0.1em;
+    }
+  }
+
+  .nav-item {
+    width: 100%;
+    padding: 12px 20px;
+    background: transparent;
+    border: none;
+    border-left: 4px solid transparent;
+    color: $white;
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    cursor: pointer;
+    font-size: 14px;
+    font-weight: 500;
+    transition: all 0.2s;
+    text-align: left;
+    text-decoration: none;
+    justify-content: flex-start;
+
+    &:hover {
+      background: rgba(255, 255, 255, 0.05);
+    }
+
+    &.active {
+      background: rgba($primary, 0.2);
+      border-left-color: $primary;
+
+      .nav-icon {
+        opacity: 1;
+      }
+    }
+
+    .nav-icon {
+      width: 20px;
+      height: 20px;
+      flex-shrink: 0;
+      opacity: 0.7;
+    }
+
+    span {
+      font-size: 14px;
+      font-weight: 500;
+    }
+  }
+
+  .sidebar-footer {
+    padding: 20px;
+    border-top: 1px solid rgba(255, 255, 255, 0.1);
+    margin-top: auto;
+  }
+
+  .logout-btn {
+    width: 100%;
+    padding: 12px 16px;
+    background: rgba(255, 255, 255, 0.1);
+    border: 1px solid rgba(255, 255, 255, 0.15);
+    border-radius: 8px;
+    color: $white;
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    cursor: pointer;
+    font-size: 14px;
+    font-weight: 500;
+    transition: all 0.2s;
+
+    &:hover {
+      background: rgba(#e53935, 0.2);
+      border-color: rgba(#e53935, 0.3);
+    }
+
+    .nav-icon {
+      width: 20px;
+      height: 20px;
+      flex-shrink: 0;
+      opacity: 0.8;
+    }
+  }
+}
+
+.tailor-main {
+  flex: 1;
+  background: var(--bg-primary);
+  min-width: 0;
+  margin-left: 280px;
+
+  @include mobile {
+    width: 100%;
+    margin-left: 0;
+  }
+}
+
+// Override page styles when inside layout
+.tailor-layout .tailor-page,
+.tailor-layout .admin-page {
+  padding: $spacing-xl;
+  min-height: auto;
+
+  .container {
+    max-width: 100%;
+    padding: 0;
+  }
+
+  @include mobile {
+    padding: $spacing-md;
+  }
+}

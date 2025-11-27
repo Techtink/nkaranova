@@ -1,0 +1,69 @@
+{
+  "expo": {
+    "name": "Tailor Connect",
+    "slug": "tailor-connect-customer",
+    "version": "1.0.0",
+    "orientation": "portrait",
+    "icon": "./assets/icon.png",
+    "userInterfaceStyle": "light",
+    "newArchEnabled": true,
+    "splash": {
+      "image": "./assets/splash-icon.png",
+      "resizeMode": "contain",
+      "backgroundColor": "#8b5cf6"
+    },
+    "ios": {
+      "supportsTablet": true,
+      "bundleIdentifier": "com.tailorconnect.customer",
+      "infoPlist": {
+        "NSCameraUsageDescription": "Allow Tailor Connect to access your camera to take photos for your profile and messages.",
+        "NSPhotoLibraryUsageDescription": "Allow Tailor Connect to access your photos to upload images for your profile and messages."
+      }
+    },
+    "android": {
+      "adaptiveIcon": {
+        "foregroundImage": "./assets/adaptive-icon.png",
+        "backgroundColor": "#8b5cf6"
+      },
+      "package": "com.tailorconnect.customer",
+      "edgeToEdgeEnabled": true,
+      "permissions": [
+        "android.permission.CAMERA",
+        "android.permission.READ_EXTERNAL_STORAGE",
+        "android.permission.WRITE_EXTERNAL_STORAGE"
+      ]
+    },
+    "web": {
+      "favicon": "./assets/favicon.png"
+    },
+    "plugins": [
+      [
+        "expo-notifications",
+        {
+          "icon": "./assets/notification-icon.png",
+          "color": "#8b5cf6",
+          "sounds": []
+        }
+      ],
+      [
+        "expo-image-picker",
+        {
+          "photosPermission": "Allow Tailor Connect to access your photos to upload images.",
+          "cameraPermission": "Allow Tailor Connect to access your camera to take photos."
+        }
+      ]
+    ],
+    "notification": {
+      "icon": "./assets/notification-icon.png",
+      "color": "#8b5cf6",
+      "androidMode": "default",
+      "androidCollapsedTitle": "Tailor Connect"
+    },
+    "extra": {
+      "releaseChannel": "development",
+      "eas": {
+        "projectId": "your-project-id"
+      }
+    }
+  }
+}

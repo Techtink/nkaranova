@@ -1,0 +1,52 @@
+@import '../styles/variables';
+@import '../styles/mixins';
+
+.gallery-filters {
+  @include flex-between;
+  flex-wrap: wrap;
+  gap: $spacing-md;
+  margin-bottom: $spacing-xl;
+}
+
+.category-filters {
+  display: flex;
+  flex-wrap: wrap;
+  gap: $spacing-sm;
+}
+
+.category-btn {
+  padding: $spacing-xs $spacing-md;
+  font-size: $text-sm;
+  color: $text-secondary;
+  background: $gray-100;
+  border: none;
+  border-radius: $radius-full;
+  cursor: pointer;
+  transition: all $transition-base;
+
+  &:hover {
+    background: $gray-200;
+  }
+
+  &.active {
+    background: $primary;
+    color: $white;
+  }
+}
+
+.sort-select {
+  @include input-base;
+  width: auto;
+  padding: $spacing-sm $spacing-md;
+}
+
+.pagination {
+  @include flex-center;
+  gap: $spacing-md;
+  margin-top: $spacing-2xl;
+
+  .page-info {
+    font-size: $text-sm;
+    color: $text-secondary;
+  }
+}
