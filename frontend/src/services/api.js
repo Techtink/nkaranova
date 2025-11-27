@@ -26,7 +26,12 @@ api.interceptors.request.use(
 api.interceptors.response.use(
   (response) => response,
   (error) => {
-    if (error.response?.status === 401) {
+    // Only redirect to login for 401 errors on non-auth endpoints
+    // Don't redirect for /auth/me (handled by AuthContext) or /auth/login
+    const isAuthEndpoint = error.config?.url?.includes('/auth/me') ||
+                           error.config?.url?.includes('/auth/login');
+
+    if (error.response?.status === 401 && !isAuthEndpoint) {
       localStorage.removeItem('token');
       localStorage.removeItem('user');
       window.location.href = '/login';
