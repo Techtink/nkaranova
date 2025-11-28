@@ -1359,3 +1359,33 @@ $grid-gutter-width: 1.5rem;
     height: 20px;
   }
 }
+
+// ============================================
+// GLOBAL AVATAR ROUNDING
+// ============================================
+// Ensure ALL avatar-related elements are rounded
+[class*="avatar"] {
+  border-radius: 50% !important;
+  overflow: hidden;
+
+  img {
+    border-radius: 50% !important;
+  }
+}
+
+// Specific avatar classes that need rounding
+.profile-avatar,
+.user-avatar,
+.nav-avatar,
+.tailor-avatar,
+.reviewer-avatar,
+.message-avatar,
+.avatar-preview,
+.avatar-initials {
+  border-radius: 50% !important;
+  overflow: hidden;
+
+  img {
+    border-radius: 50% !important;
+  }
+}
