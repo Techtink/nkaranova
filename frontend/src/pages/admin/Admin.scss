@@ -1307,7 +1307,7 @@
 .admin-chat-page {
   .chat-three-column {
     display: grid;
-    grid-template-columns: 280px 320px 1fr;
+    grid-template-columns: 320px 380px 1fr;
     gap: 0;
     height: calc(100vh - 140px);
     min-height: 600px;
@@ -1317,7 +1317,7 @@
     overflow: hidden;
 
     @media (max-width: 1200px) {
-      grid-template-columns: 260px 280px 1fr;
+      grid-template-columns: 280px 320px 1fr;
     }
 
     @media (max-width: 900px) {
@@ -1536,22 +1536,24 @@
     }
 
     .details-header {
-      padding: 24px 20px;
-      text-align: center;
+      padding: 20px;
+      display: flex;
+      align-items: center;
+      gap: 16px;
       border-bottom: 1px solid $border-color;
       background: linear-gradient(180deg, #f8fafc 0%, white 100%);
 
       .profile-avatar {
-        width: 80px;
-        height: 80px;
+        width: 64px;
+        height: 64px;
         border-radius: 50%;
-        margin: 0 auto 12px;
         background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
         display: flex;
         align-items: center;
         justify-content: center;
         overflow: hidden;
         box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+        flex-shrink: 0;
 
         img {
           width: 100%;
@@ -1561,22 +1563,27 @@
 
         .avatar-initials.large {
           color: white;
-          font-size: 24px;
+          font-size: 20px;
           font-weight: 600;
         }
       }
 
-      h2 {
-        margin: 0 0 4px;
-        font-size: 18px;
-        font-weight: 600;
-        color: $text-primary;
-      }
+      .header-info {
+        flex: 1;
+        min-width: 0;
 
-      .user-subtitle {
-        margin: 0;
-        font-size: 13px;
-        color: $text-secondary;
+        h2 {
+          margin: 0 0 4px;
+          font-size: 18px;
+          font-weight: 600;
+          color: $text-primary;
+        }
+
+        .user-subtitle {
+          margin: 0;
+          font-size: 13px;
+          color: $text-secondary;
+        }
       }
     }
 

@@ -263,13 +263,15 @@ export default function AdminChat() {
                     <span className="avatar-initials large">{getUserInitials(selectedUser)}</span>
                   )}
                 </div>
-                <h2>{getUserDisplayName(selectedUser)}</h2>
-                <p className="user-subtitle">
-                  {selectedUser.role === 'tailor' && selectedUser.tailorProfile?.yearsOfExperience
-                    ? `${selectedUser.tailorProfile.yearsOfExperience} Years Experience`
-                    : selectedUser.role.charAt(0).toUpperCase() + selectedUser.role.slice(1)
-                  }
-                </p>
+                <div className="header-info">
+                  <h2>{getUserDisplayName(selectedUser)}</h2>
+                  <p className="user-subtitle">
+                    {selectedUser.role === 'tailor' && selectedUser.tailorProfile?.yearsOfExperience
+                      ? `${selectedUser.tailorProfile.yearsOfExperience} Years Experience`
+                      : selectedUser.role.charAt(0).toUpperCase() + selectedUser.role.slice(1)
+                    }
+                  </p>
+                </div>
               </div>
 
               <div className="details-content">
