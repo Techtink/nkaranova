@@ -6,13 +6,14 @@
   height: 100vh;
   max-height: 100vh;
   overflow: hidden;
+  background: var(--bg-primary);
 }
 
 .conversations-list {
   width: 100%;
   max-width: 360px;
-  background: $white;
-  border-right: 1px solid $gray-200;
+  background: var(--card-bg);
+  border-right: 1px solid var(--border-color);
   display: flex;
   flex-direction: column;
   min-height: 0;
@@ -32,11 +33,12 @@
 
 .conversations-header {
   padding: $spacing-lg;
-  border-bottom: 1px solid $gray-200;
+  border-bottom: 1px solid var(--border-color);
 
   h2 {
     margin: 0;
     font-size: $text-lg;
+    color: var(--text-primary);
   }
 }
 
@@ -57,13 +59,14 @@
   text-align: left;
   cursor: pointer;
   transition: background $transition-base;
+  color: var(--text-primary);
 
   &:hover {
-    background: $gray-50;
+    background: var(--bg-hover);
   }
 
   &.active {
-    background: $gray-100;
+    background: var(--bg-tertiary);
   }
 }
 
@@ -74,12 +77,13 @@
 
 .conversation-name {
   font-weight: $font-medium;
+  color: var(--text-primary);
   @include truncate;
 }
 
 .conversation-preview {
   font-size: $text-sm;
-  color: $text-muted;
+  color: var(--text-tertiary);
   @include truncate;
 }
 
@@ -99,7 +103,7 @@
   @include flex-center;
   flex-direction: column;
   flex: 1;
-  color: $text-muted;
+  color: var(--text-tertiary);
   padding: $spacing-xl;
 
   .hint {
@@ -112,7 +116,7 @@
   flex: 1;
   display: flex;
   flex-direction: column;
-  background: $gray-50;
+  background: var(--bg-secondary);
   min-height: 0;
   overflow: hidden;
 
@@ -134,8 +138,8 @@
   align-items: center;
   gap: $spacing-md;
   padding: $spacing-md $spacing-lg;
-  background: $white;
-  border-bottom: 1px solid $gray-200;
+  background: var(--card-bg);
+  border-bottom: 1px solid var(--border-color);
 
   .back-btn {
     @include flex-center;
@@ -143,7 +147,8 @@
     height: 32px;
     background: none;
     border: none;
-    color: $text-secondary;
+    color: var(--text-secondary);
+    cursor: pointer;
 
     @include md {
       display: none;
@@ -154,6 +159,7 @@
 .chat-header-info {
   .chat-name {
     font-weight: $font-medium;
+    color: var(--text-primary);
   }
 }
 
@@ -190,8 +196,8 @@
     align-self: flex-start;
 
     .message-content {
-      background: $white;
-      color: #1a1a1a;
+      background: var(--card-bg);
+      color: var(--text-primary);
       border-radius: $radius-lg $radius-lg $radius-lg 0;
     }
   }
@@ -206,7 +212,7 @@
 
 .message-time {
   font-size: $text-xs;
-  color: $text-muted;
+  color: var(--text-tertiary);
   margin-top: $spacing-xs;
 }
 
@@ -214,12 +220,23 @@
   display: flex;
   gap: $spacing-sm;
   padding: $spacing-md $spacing-lg;
-  background: $white;
-  border-top: 1px solid $gray-200;
+  background: var(--card-bg);
+  border-top: 1px solid var(--border-color);
 
   input {
     flex: 1;
     @include input-base;
+    background: var(--input-bg);
+    border-color: var(--border-color);
+    color: var(--text-primary);
+
+    &::placeholder {
+      color: var(--text-muted);
+    }
+
+    &:focus {
+      border-color: $primary;
+    }
   }
 
   button {
@@ -252,7 +269,7 @@
 .no-conversation {
   @include flex-center;
   flex: 1;
-  color: $text-muted;
+  color: var(--text-tertiary);
 }
 
 // Sewing Needle Typing Indicator
@@ -261,7 +278,7 @@
   align-items: center;
   gap: $spacing-sm;
   padding: $spacing-sm $spacing-md;
-  background: $white;
+  background: var(--card-bg);
   border-radius: $radius-lg $radius-lg $radius-lg 0;
   box-shadow: $shadow-sm;
   align-self: flex-start;
@@ -330,6 +347,6 @@
 
 .typing-text {
   font-size: $text-xs;
-  color: #666666;
+  color: var(--text-tertiary);
   font-style: italic;
 }
