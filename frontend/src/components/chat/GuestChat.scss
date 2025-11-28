@@ -81,7 +81,7 @@
     }
 
     &.open {
-      background: $text-secondary;
+      background: var(--text-secondary);
     }
 
     &.pulse {
@@ -243,12 +243,12 @@
       h3 {
         margin: 0 0 8px 0;
         font-size: 20px;
-        color: $text-primary;
+        color: var(--text-primary);
       }
 
       p {
         margin: 0;
-        color: $text-secondary;
+        color: var(--text-secondary);
         font-size: 14px;
       }
     }
@@ -262,10 +262,16 @@
       input {
         width: 100%;
         padding: 14px 16px;
-        border: 1px solid $border-color;
+        border: 1px solid var(--border-color);
         border-radius: 8px;
         font-size: 15px;
         transition: border-color 0.2s;
+        background: var(--input-bg);
+        color: var(--text-primary);
+
+        &::placeholder {
+          color: var(--text-muted);
+        }
 
         &:focus {
           outline: none;
@@ -338,12 +344,12 @@
         align-self: flex-start;
 
         .message-content {
-          background: $bg-secondary;
-          color: $text-primary;
+          background: var(--bg-tertiary);
+          color: var(--text-primary);
           border-radius: 16px 16px 16px 4px;
 
           .message-time {
-            color: $text-secondary;
+            color: var(--text-secondary);
           }
         }
       }
@@ -370,10 +376,10 @@
   .chat-closed-notice {
     padding: 16px;
     text-align: center;
-    color: $text-secondary;
+    color: var(--text-secondary);
     font-size: 14px;
-    background: $bg-secondary;
-    border-top: 1px solid $border-color;
+    background: var(--bg-tertiary);
+    border-top: 1px solid var(--border-color);
   }
 
   .message-input {
@@ -392,6 +398,10 @@
       transition: border-color 0.2s;
       background: var(--input-bg);
       color: var(--text-primary);
+
+      &::placeholder {
+        color: var(--text-muted);
+      }
 
       &:focus {
         outline: none;
@@ -422,7 +432,7 @@
       }
 
       &:disabled {
-        background: $text-secondary;
+        background: var(--text-secondary);
         opacity: 0.5;
         cursor: not-allowed;
       }
