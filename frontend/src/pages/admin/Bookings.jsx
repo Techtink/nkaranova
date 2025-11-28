@@ -158,80 +158,94 @@ export default function AdminBookings() {
 
   if (loading && bookings.length === 0) {
     return (
-      <div className="admin-page">
-        <div className="admin-loading">Loading bookings...</div>
+      <div className="loading-container">
+        <div className="spinner" />
       </div>
     );
   }
 
   return (
-    <div className="admin-page">
-      <div className="admin-header">
-        <h1>Booking Management</h1>
-        <p>Manage customer bookings and consultations</p>
-      </div>
-
-      {/* Stats Cards */}
-      {stats && (
-        <div className="admin-stats-grid" style={{ marginBottom: '1.5rem' }}>
-          <div className="stat-card">
-            <div className="stat-value">{stats.pending}</div>
-            <div className="stat-label">Pending</div>
+    <div className="admin-page page">
+      <div className="container">
+        {/* ERP Page Header */}
+        <div className="erp-page-header">
+          <div className="header-top">
+            <div className="header-left">
+              <div className="header-icon">
+                <FiCalendar />
+              </div>
+              <div className="header-text">
+                <h1>Booking Management</h1>
+                <p>Manage customer bookings and consultations</p>
+              </div>
+            </div>
           </div>
-          <div className="stat-card">
-            <div className="stat-value">{stats.confirmed}</div>
-            <div className="stat-label">Confirmed</div>
-          </div>
-          <div className="stat-card">
-            <div className="stat-value">{stats.consultationDone}</div>
-            <div className="stat-label">Awaiting Quote</div>
-          </div>
-          <div className="stat-card">
-            <div className="stat-value">{stats.quoteSubmitted}</div>
-            <div className="stat-label">Quote Pending</div>
-          </div>
-          <div className="stat-card">
-            <div className="stat-value">{stats.paid}</div>
-            <div className="stat-label">Paid</div>
-          </div>
-          <div className="stat-card">
-            <div className="stat-value">{stats.converted}</div>
-            <div className="stat-label">Converted</div>
-          </div>
-        </div>
-      )}
-
-      {/* Filters */}
-      <div className="admin-filters">
-        <div className="filter-tabs">
-          {STATUS_OPTIONS.map(option => (
-            <button
-              key={option.value}
-              className={`filter-tab ${filter === option.value ? 'active' : ''}`}
-              onClick={() => { setFilter(option.value); setPage(1); }}
-            >
-              {option.label}
-            </button>
-          ))}
+          <div className="header-line" />
         </div>
 
-        <form className="search-form" onSubmit={handleSearch}>
-          <div className="search-input-wrapper">
-            <FiSearch className="search-icon" />
+        {/* Stats Cards */}
+        {stats && (
+          <div className="admin-stats-grid">
+            <div className="stat-card">
+              <div className="stat-value">{stats.pending}</div>
+              <div className="stat-label">Pending</div>
+            </div>
+            <div className="stat-card">
+              <div className="stat-value">{stats.confirmed}</div>
+              <div className="stat-label">Confirmed</div>
+            </div>
+            <div className="stat-card">
+              <div className="stat-value">{stats.consultationDone}</div>
+              <div className="stat-label">Awaiting Quote</div>
+            </div>
+            <div className="stat-card">
+              <div className="stat-value">{stats.quoteSubmitted}</div>
+              <div className="stat-label">Quote Pending</div>
+            </div>
+            <div className="stat-card">
+              <div className="stat-value">{stats.paid}</div>
+              <div className="stat-label">Paid</div>
+            </div>
+            <div className="stat-card">
+              <div className="stat-value">{stats.converted}</div>
+              <div className="stat-label">Converted</div>
+            </div>
+          </div>
+        )}
+
+        {/* ERP Filters */}
+        <div className="erp-filters">
+          <form className="search-input" onSubmit={handleSearch}>
+            <span className="search-icon"><FiSearch /></span>
             <input
               type="text"
-              placeholder="Search by service..."
+              placeholder="Search bookings..."
               value={search}
               onChange={(e) => setSearch(e.target.value)}
             />
-          </div>
-          <Button type="submit" size="small">Search</Button>
-        </form>
-      </div>
+          </form>
 
-      {/* Bookings Table */}
-      <div className="admin-table-container">
-        <table className="admin-table">
+          <div className="filter-select">
+            <select value={filter} onChange={(e) => { setFilter(e.target.value); setPage(1); }}>
+              {STATUS_OPTIONS.map(option => (
+                <option key={option.value} value={option.value}>{option.label}</option>
+              ))}
+            </select>
+          </div>
+
+          <span className="filter-count">{totalCount} results</span>
+        </div>
+
+        {/* Bookings Table */}
+        <div className="erp-table-container">
+          {bookings.length === 0 ? (
+            <div className="erp-empty-state">
+              <FiCalendar />
+              <p className="empty-title">No bookings found</p>
+              <p>No bookings match the current filters.</p>
+            </div>
+          ) : (
+          <table className="erp-table">
           <thead>
             <tr>
               <th>Customer</th>
@@ -275,7 +289,7 @@ export default function AdminBookings() {
                   </div>
                 </td>
                 <td>
-                  <span className={`badge ${getStatusBadgeClass(booking.status)}`}>
+                  <span className={`erp-badge ${getStatusBadgeClass(booking.status)}`}>
                     {STATUS_LABELS[booking.status] || booking.status}
                   </span>
                 </td>
@@ -289,9 +303,9 @@ export default function AdminBookings() {
                   )}
                 </td>
                 <td>
-                  <div className="action-buttons">
+                  <div className="cell-actions">
                     <button
-                      className="action-btn"
+                      className="erp-action-btn action-view"
                       onClick={() => viewBooking(booking)}
                       title="View Details"
                     >
@@ -299,7 +313,7 @@ export default function AdminBookings() {
                     </button>
                     {booking.status === 'confirmed' && (
                       <button
-                        className="action-btn action-btn-success"
+                        className="erp-action-btn action-approve"
                         onClick={() => viewBooking(booking)}
                         title="Mark Consultation Complete"
                       >
@@ -312,36 +326,31 @@ export default function AdminBookings() {
             ))}
           </tbody>
         </table>
+          )}
 
-        {bookings.length === 0 && (
-          <div className="empty-state">
-            <p>No bookings found</p>
-          </div>
-        )}
-      </div>
-
-      {/* Pagination */}
-      {totalPages > 1 && (
-        <div className="admin-pagination">
-          <button
-            className="pagination-btn"
-            onClick={() => setPage(p => Math.max(1, p - 1))}
-            disabled={page === 1}
-          >
-            <FiChevronLeft />
-          </button>
-          <span className="pagination-info">
-            Page {page} of {totalPages} ({totalCount} total)
-          </span>
-          <button
-            className="pagination-btn"
-            onClick={() => setPage(p => Math.min(totalPages, p + 1))}
-            disabled={page === totalPages}
-          >
-            <FiChevronRight />
-          </button>
+          {totalPages > 1 && (
+            <div className="erp-pagination">
+              <span className="pagination-info">
+                Page {page} of {totalPages}
+              </span>
+              <div className="pagination-buttons">
+                <button
+                  disabled={page === 1}
+                  onClick={() => setPage(page - 1)}
+                >
+                  <FiChevronLeft />
+                </button>
+                <button className="active">{page}</button>
+                <button
+                  disabled={page === totalPages}
+                  onClick={() => setPage(page + 1)}
+                >
+                  <FiChevronRight />
+                </button>
+              </div>
+            </div>
+          )}
         </div>
-      )}
 
       {/* Booking Details Modal */}
       <Modal
@@ -573,6 +582,7 @@ export default function AdminBookings() {
           </div>
         )}
       </Modal>
+      </div>
     </div>
   );
 }
