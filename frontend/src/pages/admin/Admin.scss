@@ -655,6 +655,46 @@
   }
 }
 
+// Stats Grid (horizontal row)
+.admin-stats-grid {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 1rem;
+  margin-bottom: 1.5rem;
+
+  .stat-card {
+    flex: 1;
+    min-width: 120px;
+    background: var(--card-bg);
+    border-radius: $radius-md;
+    padding: 1rem 1.25rem;
+    text-align: center;
+    box-shadow: $shadow-sm;
+    border: 1px solid $border-color;
+
+    .stat-value {
+      font-size: 1.5rem;
+      font-weight: 700;
+      color: $text-primary;
+      margin-bottom: 4px;
+    }
+
+    .stat-label {
+      font-size: 0.75rem;
+      color: $text-secondary;
+      text-transform: uppercase;
+      letter-spacing: 0.5px;
+    }
+  }
+
+  @media (max-width: 768px) {
+    .stat-card {
+      min-width: calc(50% - 0.5rem);
+      flex: 0 0 calc(50% - 0.5rem);
+    }
+  }
+}
+
 // Pending Section
 .pending-section {
   margin-bottom: 2rem;
