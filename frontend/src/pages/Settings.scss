@@ -569,3 +569,202 @@
     margin: 0;
   }
 }
+
+// Section Header
+.section-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: $spacing-md;
+
+  h3 {
+    margin: 0;
+  }
+}
+
+// Empty State
+.empty-state {
+  text-align: center;
+  padding: $spacing-xl;
+
+  .empty-icon {
+    width: 48px;
+    height: 48px;
+    color: var(--text-muted);
+    margin-bottom: $spacing-md;
+  }
+
+  h4 {
+    font-size: $text-base;
+    font-weight: 500;
+    color: var(--text-primary);
+    margin: 0 0 $spacing-xs 0;
+  }
+
+  p {
+    font-size: $text-sm;
+    color: var(--text-tertiary);
+    margin: 0 0 $spacing-md 0;
+  }
+}
+
+// Loading Text
+.loading-text {
+  color: var(--text-tertiary);
+  font-size: $text-sm;
+  padding: $spacing-md 0;
+}
+
+// Profiles List
+.profiles-list {
+  display: flex;
+  flex-direction: column;
+  gap: $spacing-sm;
+}
+
+.profile-item {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: $spacing-md;
+  background: var(--bg-secondary);
+  border: 1px solid var(--border-color);
+  border-radius: 6px;
+
+  .profile-info {
+    h4 {
+      font-size: $text-sm;
+      font-weight: 500;
+      color: var(--text-primary);
+      margin: 0 0 4px 0;
+      display: flex;
+      align-items: center;
+      gap: $spacing-xs;
+    }
+
+    p {
+      font-size: $text-xs;
+      color: var(--text-tertiary);
+      margin: 0;
+    }
+  }
+}
+
+// Default Badge
+.default-badge {
+  display: inline-flex;
+  align-items: center;
+  padding: 2px 8px;
+  background: rgba($primary, 0.1);
+  color: $primary;
+  font-size: 10px;
+  font-weight: 600;
+  border-radius: 4px;
+  text-transform: uppercase;
+}
+
+// Benefits List
+.benefits-list {
+  list-style: none;
+  padding: 0;
+  margin: 0;
+
+  li {
+    display: flex;
+    align-items: center;
+    gap: $spacing-sm;
+    padding: $spacing-xs 0;
+    font-size: $text-sm;
+    color: var(--text-secondary);
+
+    svg {
+      color: $success;
+      flex-shrink: 0;
+    }
+  }
+}
+
+// Address Form
+.address-form {
+  background: var(--bg-secondary);
+  padding: $spacing-md;
+  border-radius: 6px;
+  margin-bottom: $spacing-md;
+}
+
+// Addresses List
+.addresses-list {
+  display: flex;
+  flex-direction: column;
+  gap: $spacing-sm;
+}
+
+.address-item {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  padding: $spacing-md;
+  background: var(--bg-secondary);
+  border: 1px solid var(--border-color);
+  border-radius: 6px;
+  gap: $spacing-md;
+
+  @include mobile {
+    flex-direction: column;
+  }
+
+  .address-info {
+    flex: 1;
+
+    h4 {
+      font-size: $text-sm;
+      font-weight: 500;
+      color: var(--text-primary);
+      margin: 0 0 $spacing-xs 0;
+      display: flex;
+      align-items: center;
+      gap: $spacing-xs;
+    }
+
+    p {
+      font-size: $text-sm;
+      color: var(--text-secondary);
+      margin: 0;
+      line-height: 1.4;
+    }
+  }
+
+  .address-actions {
+    display: flex;
+    gap: $spacing-xs;
+    flex-shrink: 0;
+
+    @include mobile {
+      width: 100%;
+      justify-content: flex-end;
+    }
+  }
+}
+
+// Small button variant
+.btn-sm {
+  padding: 6px 12px;
+  font-size: $text-xs;
+}
+
+.btn-icon {
+  padding: 6px;
+
+  svg {
+    width: 14px;
+    height: 14px;
+  }
+}
+
+// Security Note
+.security-note {
+  font-size: $text-sm;
+  color: var(--text-secondary);
+  line-height: 1.5;
+  margin: 0;
+}
