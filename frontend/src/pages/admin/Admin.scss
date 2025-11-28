@@ -1314,15 +1314,21 @@
 
 // Admin Chat Page
 .admin-chat-page {
+  padding: 0 !important;
+  min-height: calc(100vh - 80px);
+  display: flex;
+  flex-direction: column;
+
   .chat-three-column {
     display: grid;
     grid-template-columns: 320px 380px 1fr;
     gap: 0;
-    height: calc(100vh - 140px);
-    min-height: 600px;
+    flex: 1;
+    min-height: 0;
+    height: calc(100vh - 80px);
     background: var(--card-bg);
-    border-radius: $radius-lg;
-    box-shadow: $shadow-md;
+    border-radius: 0;
+    box-shadow: none;
     overflow: hidden;
 
     @media (max-width: 1200px) {
