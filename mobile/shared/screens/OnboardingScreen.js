@@ -56,12 +56,8 @@ export default function OnboardingScreen({
       try {
         const response = await settingsAPI.getMobileSettings();
         if (response.data?.success && response.data?.data) {
-          // Convert settings array to object for easier access
-          const settingsObj = {};
-          Object.entries(response.data.data).forEach(([key, data]) => {
-            settingsObj[key] = data.value;
-          });
-          setSettings(settingsObj);
+          // Settings are already in { key: value } format
+          setSettings(response.data.data);
         }
       } catch (error) {
         console.log('Failed to fetch mobile settings, using defaults:', error.message);

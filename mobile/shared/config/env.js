@@ -12,9 +12,9 @@ const getEnvironment = () => {
 // Environment-specific configurations
 const ENV = {
   development: {
-    apiUrl: 'http://192.168.1.249:6005/api',
-    socketUrl: 'http://192.168.1.249:6005',
-    imageBaseUrl: 'http://192.168.1.249:6005',
+    apiUrl: 'http://167.71.82.139/api',
+    socketUrl: 'http://167.71.82.139',
+    imageBaseUrl: 'http://167.71.82.139',
     enableDebugLogs: true,
     appName: 'Tailor Connect (Dev)'
   },

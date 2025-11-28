@@ -1,6 +1,7 @@
 import { useState, useEffect, useRef } from 'react';
-import { FiSave, FiRefreshCw, FiDollarSign, FiUsers, FiStar, FiSettings, FiImage, FiUpload, FiX, FiSmartphone } from 'react-icons/fi';
+import { FiSave, FiRefreshCw, FiDollarSign, FiUsers, FiStar, FiSettings, FiImage, FiUpload, FiX, FiSmartphone, FiCrop } from 'react-icons/fi';
 import { settingsAPI } from '../../services/api';
+import ImageCropper from '../../components/ImageCropper';
 import './Admin.scss';
 
 export default function AdminSettings() {
@@ -9,6 +10,9 @@ export default function AdminSettings() {
   const [saving, setSaving] = useState(false);
   const [uploading, setUploading] = useState(false);
   const [activeTab, setActiveTab] = useState('referral');
+  const [cropperOpen, setCropperOpen] = useState(false);
+  const [cropperTarget, setCropperTarget] = useState(null); // 'customer' or 'tailor'
+  const [uploadingMobile, setUploadingMobile] = useState(false);
   const fileInputRef = useRef(null);
 
   useEffect(() => {
@@ -87,6 +91,45 @@ export default function AdminSettings() {
 
   const handleRemoveImage = () => {
     handleChange('landing_hero_image', '');
+  };
+
+  const openCropper = (target) => {
+    setCropperTarget(target);
+    setCropperOpen(true);
+  };
+
+  const handleCroppedImage = async (blob, previewUrl) => {
+    if (!cropperTarget) return;
+
+    setUploadingMobile(true);
+    try {
+      // Create a File from the blob
+      const file = new File([blob], `splash_${cropperTarget}_${Date.now()}.jpg`, { type: 'image/jpeg' });
+
+      // Upload the cropped image
+      const response = await settingsAPI.uploadHeroImage(file);
+      if (response.data.success) {
+        const settingKey = cropperTarget === 'customer'
+          ? 'mobile_customer_splash_image'
+          : 'mobile_tailor_splash_image';
+        handleChange(settingKey, response.data.data.url);
+        alert('Image uploaded successfully!');
+      }
+    } catch (error) {
+      console.error('Error uploading cropped image:', error);
+      alert('Failed to upload image. Please try again.');
+    } finally {
+      setUploadingMobile(false);
+      // Clean up preview URL
+      URL.revokeObjectURL(previewUrl);
+    }
+  };
+
+  const handleRemoveMobileImage = (target) => {
+    const settingKey = target === 'customer'
+      ? 'mobile_customer_splash_image'
+      : 'mobile_tailor_splash_image';
+    handleChange(settingKey, '');
   };
 
   const formatCurrency = (cents) => {
@@ -1770,24 +1813,73 @@ export default function AdminSettings() {
                   <div className="row g-4">
                     <div className="col-12">
                       <div className="setting-item">
-                        <label>Background Image URL</label>
-                        <p className="setting-description">Full-screen background image for the customer onboarding screen</p>
-                        <input
-                          type="text"
-                          value={settings.mobile_customer_splash_image || ''}
-                          onChange={(e) => handleChange('mobile_customer_splash_image', e.target.value)}
-                          placeholder="https://..."
-                        />
+                        <label>Background Image</label>
+                        <p className="setting-description">Full-screen background image for the customer onboarding screen (9:16 portrait ratio)</p>
+
+                        {settings.mobile_customer_splash_image ? (
+                          <div style={{ display: 'flex', gap: '20px', alignItems: 'flex-start', marginTop: '12px' }}>
+                            <div style={{ width: '150px' }}>
+                              <div style={{
+                                width: '150px',
+                                height: '300px',
+                                borderRadius: '16px',
+                                overflow: 'hidden',
+                                border: '3px solid #333',
+                                background: '#000'
+                              }}>
+                                <img
+                                  src={settings.mobile_customer_splash_image}
+                                  alt="Customer splash preview"
+                                  style={{ width: '100%', height: '100%', objectFit: 'cover' }}
+                                />
+                              </div>
+                            </div>
+                            <div style={{ display: 'flex', flexDirection: 'column', gap: '8px' }}>
+                              <button
+                                className="btn-erp btn-erp-secondary"
+                                onClick={() => openCropper('customer')}
+                                disabled={uploadingMobile}
+                              >
+                                <FiCrop /> Change Image
+                              </button>
+                              <button
+                                className="btn-erp btn-erp-danger"
+                                onClick={() => handleRemoveMobileImage('customer')}
+                                style={{ background: 'var(--danger)', borderColor: 'var(--danger)' }}
+                              >
+                                <FiX /> Remove
+                              </button>
+                            </div>
+                          </div>
+                        ) : (
+                          <div
+                            onClick={() => openCropper('customer')}
+                            style={{
+                              marginTop: '12px',
+                              padding: '40px',
+                              border: '2px dashed var(--border-color)',
+                              borderRadius: '12px',
+                              textAlign: 'center',
+                              cursor: 'pointer',
+                              transition: 'all 0.2s'
+                            }}
+                            onMouseEnter={(e) => {
+                              e.currentTarget.style.borderColor = 'var(--primary)';
+                              e.currentTarget.style.background = 'rgba(92, 141, 106, 0.1)';
+                            }}
+                            onMouseLeave={(e) => {
+                              e.currentTarget.style.borderColor = 'var(--border-color)';
+                              e.currentTarget.style.background = 'transparent';
+                            }}
+                          >
+                            <FiCrop size={32} style={{ marginBottom: '12px', color: 'var(--primary)' }} />
+                            <p style={{ margin: 0, fontWeight: '500' }}>Click to upload & crop image</p>
+                            <span style={{ fontSize: '13px', color: 'var(--text-tertiary)' }}>
+                              Supports JPG, PNG, WebP (max 10MB)
+                            </span>
+                          </div>
+                        )}
                       </div>
-                      {settings.mobile_customer_splash_image && (
-                        <div style={{ marginTop: '12px', maxWidth: '200px' }}>
-                          <img
-                            src={settings.mobile_customer_splash_image}
-                            alt="Customer splash preview"
-                            style={{ width: '100%', borderRadius: '8px', border: '1px solid var(--border-color)' }}
-                          />
-                        </div>
-                      )}
                     </div>
 
                     <div className="col-md-6">
@@ -1826,24 +1918,73 @@ export default function AdminSettings() {
                   <div className="row g-4">
                     <div className="col-12">
                       <div className="setting-item">
-                        <label>Background Image URL</label>
-                        <p className="setting-description">Full-screen background image for the tailor onboarding screen</p>
-                        <input
-                          type="text"
-                          value={settings.mobile_tailor_splash_image || ''}
-                          onChange={(e) => handleChange('mobile_tailor_splash_image', e.target.value)}
-                          placeholder="https://..."
-                        />
+                        <label>Background Image</label>
+                        <p className="setting-description">Full-screen background image for the tailor onboarding screen (9:16 portrait ratio)</p>
+
+                        {settings.mobile_tailor_splash_image ? (
+                          <div style={{ display: 'flex', gap: '20px', alignItems: 'flex-start', marginTop: '12px' }}>
+                            <div style={{ width: '150px' }}>
+                              <div style={{
+                                width: '150px',
+                                height: '300px',
+                                borderRadius: '16px',
+                                overflow: 'hidden',
+                                border: '3px solid #333',
+                                background: '#000'
+                              }}>
+                                <img
+                                  src={settings.mobile_tailor_splash_image}
+                                  alt="Tailor splash preview"
+                                  style={{ width: '100%', height: '100%', objectFit: 'cover' }}
+                                />
+                              </div>
+                            </div>
+                            <div style={{ display: 'flex', flexDirection: 'column', gap: '8px' }}>
+                              <button
+                                className="btn-erp btn-erp-secondary"
+                                onClick={() => openCropper('tailor')}
+                                disabled={uploadingMobile}
+                              >
+                                <FiCrop /> Change Image
+                              </button>
+                              <button
+                                className="btn-erp btn-erp-danger"
+                                onClick={() => handleRemoveMobileImage('tailor')}
+                                style={{ background: 'var(--danger)', borderColor: 'var(--danger)' }}
+                              >
+                                <FiX /> Remove
+                              </button>
+                            </div>
+                          </div>
+                        ) : (
+                          <div
+                            onClick={() => openCropper('tailor')}
+                            style={{
+                              marginTop: '12px',
+                              padding: '40px',
+                              border: '2px dashed var(--border-color)',
+                              borderRadius: '12px',
+                              textAlign: 'center',
+                              cursor: 'pointer',
+                              transition: 'all 0.2s'
+                            }}
+                            onMouseEnter={(e) => {
+                              e.currentTarget.style.borderColor = 'var(--primary)';
+                              e.currentTarget.style.background = 'rgba(92, 141, 106, 0.1)';
+                            }}
+                            onMouseLeave={(e) => {
+                              e.currentTarget.style.borderColor = 'var(--border-color)';
+                              e.currentTarget.style.background = 'transparent';
+                            }}
+                          >
+                            <FiCrop size={32} style={{ marginBottom: '12px', color: 'var(--primary)' }} />
+                            <p style={{ margin: 0, fontWeight: '500' }}>Click to upload & crop image</p>
+                            <span style={{ fontSize: '13px', color: 'var(--text-tertiary)' }}>
+                              Supports JPG, PNG, WebP (max 10MB)
+                            </span>
+                          </div>
+                        )}
                       </div>
-                      {settings.mobile_tailor_splash_image && (
-                        <div style={{ marginTop: '12px', maxWidth: '200px' }}>
-                          <img
-                            src={settings.mobile_tailor_splash_image}
-                            alt="Tailor splash preview"
-                            style={{ width: '100%', borderRadius: '8px', border: '1px solid var(--border-color)' }}
-                          />
-                        </div>
-                      )}
                     </div>
 
                     <div className="col-md-6">
@@ -1876,6 +2017,18 @@ export default function AdminSettings() {
           </div>
         </div>
       </div>
+
+      {/* Image Cropper Modal */}
+      <ImageCropper
+        isOpen={cropperOpen}
+        onClose={() => {
+          setCropperOpen(false);
+          setCropperTarget(null);
+        }}
+        onCropComplete={handleCroppedImage}
+        aspectRatio={9/16}
+        title={`Crop ${cropperTarget === 'customer' ? 'Customer' : 'Tailor'} App Splash Image`}
+      />
     </div>
   );
 }
