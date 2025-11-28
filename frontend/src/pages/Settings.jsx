@@ -1,14 +1,37 @@
 import { useState, useRef } from 'react';
 import { toast } from 'react-hot-toast';
-import { FiGrid, FiUser, FiBell, FiGlobe, FiSettings, FiUsers, FiCreditCard, FiPlus, FiLogOut, FiTrash2 } from 'react-icons/fi';
+import {
+  FiUser,
+  FiLock,
+  FiBell,
+  FiGlobe,
+  FiMenu,
+  FiX,
+  FiSun,
+  FiMoon,
+  FiHome,
+  FiPlus
+} from 'react-icons/fi';
+import { Link } from 'react-router-dom';
 import { useAuth } from '../context/AuthContext';
+import { useTheme } from '../context/ThemeContext';
 import { authAPI, uploadsAPI } from '../services/api';
 import './Settings.scss';
 
+const navItems = [
+  { id: 'profile', icon: FiUser, label: 'My Profile' },
+  { id: 'security', icon: FiLock, label: 'Account Security' },
+  { divider: true, label: 'Preferences' },
+  { id: 'notifications', icon: FiBell, label: 'Notifications' },
+  { id: 'language', icon: FiGlobe, label: 'Language & Region' }
+];
+
 export default function Settings() {
-  const { user, updateUser, logout } = useAuth();
+  const { user, updateUser } = useAuth();
+  const { isDark, toggleTheme } = useTheme();
   const fileInputRef = useRef(null);
-  const [activeTab, setActiveTab] = useState('account');
+  const [sidebarOpen, setSidebarOpen] = useState(false);
+  const [activeTab, setActiveTab] = useState('profile');
   const [saving, setSaving] = useState(false);
   const [uploadingAvatar, setUploadingAvatar] = useState(false);
 
@@ -22,8 +45,6 @@ export default function Settings() {
     newPassword: '',
     confirmPassword: ''
   });
-
-  const [showPasswordForm, setShowPasswordForm] = useState(false);
 
   const [preferences, setPreferences] = useState({
     emailNotifications: user?.preferences?.emailNotifications ?? true,
@@ -71,7 +92,8 @@ export default function Settings() {
     }
   };
 
-  const handleProfileUpdate = async () => {
+  const handleProfileUpdate = async (e) => {
+    e?.preventDefault();
     setSaving(true);
     try {
       await authAPI.updateDetails(profileData);
@@ -104,7 +126,6 @@ export default function Settings() {
         newPassword: passwordData.newPassword
       });
       setPasswordData({ currentPassword: '', newPassword: '', confirmPassword: '' });
-      setShowPasswordForm(false);
       toast.success('Password updated successfully');
     } catch (error) {
       toast.error(error.response?.data?.message || 'Failed to update password');
@@ -126,77 +147,91 @@ export default function Settings() {
     }
   };
 
-  const handleLogoutAllDevices = async () => {
-    if (!confirm('Are you sure you want to log out of all devices?')) return;
-
-    try {
-      await logout();
-      toast.success('Logged out of all devices');
-    } catch (error) {
-      toast.error('Failed to log out');
-    }
-  };
-
-  const handleDeleteAccount = () => {
-    toast.error('Please contact support to delete your account');
-  };
-
-  const sidebarItems = [
-    {
-      title: 'GENERAL SETTINGS',
-      items: [
-        { id: 'apps', label: 'Apps', icon: FiGrid },
-        { id: 'account', label: 'Account', icon: FiUser },
-        { id: 'notification', label: 'Notification', icon: FiBell },
-        { id: 'language', label: 'Language & Region', icon: FiGlobe }
-      ]
-    },
-    {
-      title: 'WORKSPACE SETTINGS',
-      items: [
-        { id: 'general', label: 'General', icon: FiSettings },
-        { id: 'members', label: 'Members', icon: FiUsers },
-        { id: 'billing', label: 'Billing', icon: FiCreditCard }
-      ]
-    }
-  ];
-
   return (
-    <div className="account-settings">
-      <h1 className="settings-title">Account Settings</h1>
+    <div className="settings-layout">
+      {/* Mobile Menu Button */}
+      <button
+        className="mobile-menu-btn"
+        onClick={() => setSidebarOpen(!sidebarOpen)}
+      >
+        {sidebarOpen ? <FiX /> : <FiMenu />}
+      </button>
 
-      <div className="settings-layout">
-        {/* Sidebar */}
-        <aside className="settings-sidebar">
-          {sidebarItems.map((section, idx) => (
-            <div key={idx} className="sidebar-section">
-              <h3 className="sidebar-section-title">{section.title}</h3>
-              <ul className="sidebar-menu">
-                {section.items.map(item => (
-                  <li key={item.id}>
-                    <button
-                      className={`sidebar-item ${activeTab === item.id ? 'active' : ''}`}
-                      onClick={() => setActiveTab(item.id)}
-                    >
-                      <item.icon className="sidebar-icon" />
-                      <span>{item.label}</span>
-                    </button>
-                  </li>
-                ))}
-              </ul>
-            </div>
-          ))}
-        </aside>
+      {/* Sidebar Overlay for Mobile */}
+      {sidebarOpen && (
+        <div className="sidebar-overlay" onClick={() => setSidebarOpen(false)} />
+      )}
 
-        {/* Main Content */}
-        <main className="settings-content">
-          {activeTab === 'account' && (
-            <>
-              {/* My Profile Section */}
-              <section className="settings-section">
-                <h2 className="section-title">My Profile</h2>
+      {/* Sidebar - Exactly like Admin */}
+      <aside className={`settings-sidebar ${sidebarOpen ? 'open' : ''}`}>
+        <div className="sidebar-header">
+          <div className="logo-icon">TC</div>
+          <div className="logo-text">
+            <h1>Tailor Connect</h1>
+            <p>Account Settings</p>
+          </div>
+          <button
+            className="theme-toggle-btn"
+            onClick={toggleTheme}
+            title={isDark ? 'Switch to light mode' : 'Switch to dark mode'}
+          >
+            {isDark ? <FiSun /> : <FiMoon />}
+          </button>
+        </div>
 
-                <div className="profile-avatar-section">
+        <nav className="sidebar-nav">
+          {navItems.map((item, index) => {
+            if (item.divider) {
+              return (
+                <div key={index} className="nav-divider">
+                  <span>{item.label}</span>
+                </div>
+              );
+            }
+
+            const Icon = item.icon;
+            return (
+              <button
+                key={item.id}
+                className={`nav-item ${activeTab === item.id ? 'active' : ''}`}
+                onClick={() => {
+                  setActiveTab(item.id);
+                  setSidebarOpen(false);
+                }}
+              >
+                <Icon className="nav-icon" />
+                <span>{item.label}</span>
+              </button>
+            );
+          })}
+        </nav>
+
+        <div className="sidebar-footer">
+          <Link to="/" className="back-btn">
+            <FiHome className="nav-icon" />
+            <span>Back to Home</span>
+          </Link>
+        </div>
+      </aside>
+
+      {/* Main Content */}
+      <main className="settings-main">
+        <div className="settings-page">
+          <div className="settings-page-header">
+            <h1>
+              {activeTab === 'profile' && 'My Profile'}
+              {activeTab === 'security' && 'Account Security'}
+              {activeTab === 'notifications' && 'Notifications'}
+              {activeTab === 'language' && 'Language & Region'}
+            </h1>
+          </div>
+
+          {/* My Profile Tab */}
+          {activeTab === 'profile' && (
+            <div className="settings-card">
+              <div className="card-section">
+                <h3>Profile Photo</h3>
+                <div className="profile-photo-section">
                   <div className="avatar-preview">
                     {user?.avatar ? (
                       <img src={user.avatar} alt={user.firstName} />
@@ -204,106 +239,108 @@ export default function Settings() {
                       <span className="avatar-initial">{user?.firstName?.charAt(0) || 'U'}</span>
                     )}
                   </div>
-                  <div className="avatar-actions">
-                    <button
-                      className="btn-avatar btn-change"
-                      onClick={handleAvatarClick}
-                      disabled={uploadingAvatar}
-                    >
-                      <FiPlus />
-                      {uploadingAvatar ? 'Uploading...' : 'Change Image'}
-                    </button>
-                    <button
-                      className="btn-avatar btn-remove"
-                      onClick={handleRemoveAvatar}
-                      disabled={!user?.avatar || saving}
-                    >
-                      Remove Image
-                    </button>
-                  </div>
-                  <input
-                    ref={fileInputRef}
-                    type="file"
-                    accept="image/png,image/jpeg,image/gif"
-                    onChange={handleAvatarChange}
-                    style={{ display: 'none' }}
-                  />
-                  <p className="avatar-hint">We support PNGs, JPEGs and GIFs under 2MB</p>
-                </div>
-
-                <div className="form-row">
-                  <div className="form-group">
-                    <label>First Name</label>
+                  <div className="avatar-info">
+                    <p>Upload a new avatar. Recommended size is 256x256px.</p>
+                    <div className="avatar-actions">
+                      <button
+                        className="btn btn-primary"
+                        onClick={handleAvatarClick}
+                        disabled={uploadingAvatar}
+                      >
+                        <FiPlus />
+                        {uploadingAvatar ? 'Uploading...' : 'Upload Photo'}
+                      </button>
+                      {user?.avatar && (
+                        <button
+                          className="btn btn-outline"
+                          onClick={handleRemoveAvatar}
+                          disabled={saving}
+                        >
+                          Remove
+                        </button>
+                      )}
+                    </div>
                     <input
-                      type="text"
-                      value={profileData.firstName}
-                      onChange={(e) => setProfileData(prev => ({ ...prev, firstName: e.target.value }))}
-                      onBlur={handleProfileUpdate}
-                    />
-                  </div>
-                  <div className="form-group">
-                    <label>Last Name</label>
-                    <input
-                      type="text"
-                      value={profileData.lastName}
-                      onChange={(e) => setProfileData(prev => ({ ...prev, lastName: e.target.value }))}
-                      onBlur={handleProfileUpdate}
+                      ref={fileInputRef}
+                      type="file"
+                      accept="image/png,image/jpeg,image/gif"
+                      onChange={handleAvatarChange}
+                      style={{ display: 'none' }}
                     />
                   </div>
                 </div>
-              </section>
+              </div>
 
-              {/* Account Security Section */}
-              <section className="settings-section">
-                <h2 className="section-title">Account Security</h2>
+              <div className="card-section">
+                <h3>Personal Information</h3>
+                <form onSubmit={handleProfileUpdate}>
+                  <div className="form-grid">
+                    <div className="form-group">
+                      <label>First Name</label>
+                      <input
+                        type="text"
+                        value={profileData.firstName}
+                        onChange={(e) => setProfileData(prev => ({ ...prev, firstName: e.target.value }))}
+                        placeholder="Enter first name"
+                      />
+                    </div>
+                    <div className="form-group">
+                      <label>Last Name</label>
+                      <input
+                        type="text"
+                        value={profileData.lastName}
+                        onChange={(e) => setProfileData(prev => ({ ...prev, lastName: e.target.value }))}
+                        placeholder="Enter last name"
+                      />
+                    </div>
+                  </div>
 
-                <div className="security-item">
-                  <div className="security-info">
-                    <label>Email</label>
+                  <div className="form-group">
+                    <label>Email Address</label>
                     <input
                       type="email"
                       value={user?.email || ''}
                       disabled
-                      className="disabled-input"
+                      className="disabled"
                     />
+                    <small>Contact support to change your email address</small>
                   </div>
-                  <button className="btn-action">
-                    Change email
-                  </button>
-                </div>
 
-                <div className="security-item">
-                  <div className="security-info">
-                    <label>Password</label>
+                  <div className="form-actions">
+                    <button type="submit" className="btn btn-primary" disabled={saving}>
+                      {saving ? 'Saving...' : 'Save Changes'}
+                    </button>
+                  </div>
+                </form>
+              </div>
+            </div>
+          )}
+
+          {/* Account Security Tab */}
+          {activeTab === 'security' && (
+            <div className="settings-card">
+              <div className="card-section">
+                <h3>Change Password</h3>
+                <form onSubmit={handlePasswordUpdate}>
+                  <div className="form-group">
+                    <label>Current Password</label>
                     <input
                       type="password"
-                      value="************"
-                      disabled
-                      className="disabled-input"
+                      value={passwordData.currentPassword}
+                      onChange={(e) => setPasswordData(prev => ({ ...prev, currentPassword: e.target.value }))}
+                      placeholder="Enter current password"
+                      required
                     />
                   </div>
-                  <button className="btn-action" onClick={() => setShowPasswordForm(!showPasswordForm)}>
-                    Change password
-                  </button>
-                </div>
 
-                {showPasswordForm && (
-                  <form className="password-form" onSubmit={handlePasswordUpdate}>
-                    <div className="form-group">
-                      <label>Current Password</label>
-                      <input
-                        type="password"
-                        value={passwordData.currentPassword}
-                        onChange={(e) => setPasswordData(prev => ({ ...prev, currentPassword: e.target.value }))}
-                        required
-                      />
-                    </div>
+                  <div className="form-grid">
                     <div className="form-group">
                       <label>New Password</label>
                       <input
                         type="password"
                         value={passwordData.newPassword}
                         onChange={(e) => setPasswordData(prev => ({ ...prev, newPassword: e.target.value }))}
+                        placeholder="Enter new password"
                         required
                       />
                     </div>
@@ -313,23 +350,25 @@ export default function Settings() {
                         type="password"
                         value={passwordData.confirmPassword}
                         onChange={(e) => setPasswordData(prev => ({ ...prev, confirmPassword: e.target.value }))}
+                        placeholder="Confirm new password"
                         required
                       />
                     </div>
-                    <div className="form-actions">
-                      <button type="button" className="btn-cancel" onClick={() => setShowPasswordForm(false)}>
-                        Cancel
-                      </button>
-                      <button type="submit" className="btn-save" disabled={saving}>
-                        {saving ? 'Saving...' : 'Update Password'}
-                      </button>
-                    </div>
-                  </form>
-                )}
+                  </div>
 
-                <div className="security-toggle-item">
-                  <div>
-                    <h4>2-Step Verification</h4>
+                  <div className="form-actions">
+                    <button type="submit" className="btn btn-primary" disabled={saving}>
+                      {saving ? 'Updating...' : 'Update Password'}
+                    </button>
+                  </div>
+                </form>
+              </div>
+
+              <div className="card-section">
+                <h3>Two-Factor Authentication</h3>
+                <div className="toggle-row">
+                  <div className="toggle-info">
+                    <h4>Enable 2FA</h4>
                     <p>Add an additional layer of security to your account during login.</p>
                   </div>
                   <label className="toggle-switch">
@@ -341,16 +380,32 @@ export default function Settings() {
                     <span className="toggle-slider"></span>
                   </label>
                 </div>
-              </section>
+              </div>
 
-              {/* Support Access Section */}
-              <section className="settings-section">
-                <h2 className="section-title">Support Access</h2>
-
-                <div className="security-toggle-item">
+              <div className="card-section danger-zone">
+                <h3>Danger Zone</h3>
+                <div className="danger-item">
                   <div>
-                    <h4>Support access</h4>
-                    <p>Grant us access to your account for support purposes.</p>
+                    <h4>Delete Account</h4>
+                    <p>Permanently delete your account and all associated data.</p>
+                  </div>
+                  <button className="btn btn-danger" onClick={() => toast.error('Contact support to delete your account')}>
+                    Delete Account
+                  </button>
+                </div>
+              </div>
+            </div>
+          )}
+
+          {/* Notifications Tab */}
+          {activeTab === 'notifications' && (
+            <div className="settings-card">
+              <div className="card-section">
+                <h3>Email Notifications</h3>
+                <div className="toggle-row">
+                  <div className="toggle-info">
+                    <h4>Email Notifications</h4>
+                    <p>Receive booking updates and messages via email.</p>
                   </div>
                   <label className="toggle-switch">
                     <input
@@ -361,74 +416,60 @@ export default function Settings() {
                     <span className="toggle-slider"></span>
                   </label>
                 </div>
-
-                <div className="support-item">
-                  <div>
-                    <h4>Log out of all devices</h4>
-                    <p>Log out of all other active sessions on other devices besides this one.</p>
-                  </div>
-                  <button className="btn-action" onClick={handleLogoutAllDevices}>
-                    Log out
-                  </button>
-                </div>
-
-                <div className="support-item danger">
-                  <div>
-                    <h4 className="danger-text">Delete my account</h4>
-                    <p>Permanently delete the account and remove access from all workspaces.</p>
-                  </div>
-                  <button className="btn-action btn-danger" onClick={handleDeleteAccount}>
-                    Delete Account
-                  </button>
-                </div>
-              </section>
-            </>
-          )}
-
-          {activeTab === 'notification' && (
-            <section className="settings-section">
-              <h2 className="section-title">Notification Preferences</h2>
-
-              <div className="security-toggle-item">
-                <div>
-                  <h4>Email Notifications</h4>
-                  <p>Receive booking and message notifications via email.</p>
-                </div>
-                <label className="toggle-switch">
-                  <input
-                    type="checkbox"
-                    checked={preferences.emailNotifications}
-                    onChange={() => handlePreferenceToggle('emailNotifications')}
-                  />
-                  <span className="toggle-slider"></span>
-                </label>
               </div>
 
-              <div className="security-toggle-item">
-                <div>
-                  <h4>Push Notifications</h4>
-                  <p>Receive push notifications on your device.</p>
+              <div className="card-section">
+                <h3>Push Notifications</h3>
+                <div className="toggle-row">
+                  <div className="toggle-info">
+                    <h4>Push Notifications</h4>
+                    <p>Receive real-time notifications on your device.</p>
+                  </div>
+                  <label className="toggle-switch">
+                    <input
+                      type="checkbox"
+                      checked={preferences.pushNotifications}
+                      onChange={() => handlePreferenceToggle('pushNotifications')}
+                    />
+                    <span className="toggle-slider"></span>
+                  </label>
                 </div>
-                <label className="toggle-switch">
-                  <input
-                    type="checkbox"
-                    checked={preferences.pushNotifications}
-                    onChange={() => handlePreferenceToggle('pushNotifications')}
-                  />
-                  <span className="toggle-slider"></span>
-                </label>
               </div>
-            </section>
+            </div>
           )}
 
-          {(activeTab !== 'account' && activeTab !== 'notification') && (
-            <section className="settings-section">
-              <h2 className="section-title">{activeTab.charAt(0).toUpperCase() + activeTab.slice(1)}</h2>
-              <p className="coming-soon">This section is coming soon.</p>
-            </section>
+          {/* Language Tab */}
+          {activeTab === 'language' && (
+            <div className="settings-card">
+              <div className="card-section">
+                <h3>Language</h3>
+                <div className="form-group">
+                  <label>Display Language</label>
+                  <select defaultValue="en">
+                    <option value="en">English (US)</option>
+                    <option value="en-gb">English (UK)</option>
+                    <option value="fr">French</option>
+                    <option value="es">Spanish</option>
+                  </select>
+                </div>
+              </div>
+
+              <div className="card-section">
+                <h3>Region</h3>
+                <div className="form-group">
+                  <label>Time Zone</label>
+                  <select defaultValue="WAT">
+                    <option value="WAT">West Africa Time (WAT)</option>
+                    <option value="GMT">Greenwich Mean Time (GMT)</option>
+                    <option value="EST">Eastern Standard Time (EST)</option>
+                    <option value="PST">Pacific Standard Time (PST)</option>
+                  </select>
+                </div>
+              </div>
+            </div>
           )}
-        </main>
-      </div>
+        </div>
+      </main>
     </div>
   );
 }
