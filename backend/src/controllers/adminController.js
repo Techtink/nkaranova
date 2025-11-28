@@ -500,6 +500,131 @@ export const updateVerification = async (req, res, next) => {
   }
 };
 
+// ==========================================
+// BOOKING MANAGEMENT
+// ==========================================
+
+// @desc    Get all bookings (admin view)
+// @route   GET /api/admin/bookings
+// @access  Private/Admin
+export const getAdminBookings = async (req, res, next) => {
+  try {
+    const { page = 1, limit = 20, status, search } = req.query;
+
+    const query = {};
+    if (status && status !== 'all') {
+      query.status = status;
+    }
+    if (search) {
+      // We'll need to search across customer and tailor names
+      // For now, search by service description
+      query.service = { $regex: search, $options: 'i' };
+    }
+
+    const total = await Booking.countDocuments(query);
+    const bookings = await Booking.find(query)
+      .skip((page - 1) * limit)
+      .limit(parseInt(limit))
+      .sort({ createdAt: -1 })
+      .populate('customer', 'firstName lastName email')
+      .populate({
+        path: 'tailor',
+        select: 'username businessName profilePhoto',
+        populate: {
+          path: 'user',
+          select: 'firstName lastName'
+        }
+      })
+      .populate('order', 'status');
+
+    res.status(200).json({
+      success: true,
+      data: bookings,
+      pagination: paginationResult(total, page, limit)
+    });
+  } catch (error) {
+    next(error);
+  }
+};
+
+// @desc    Get booking stats for admin dashboard
+// @route   GET /api/admin/bookings/stats
+// @access  Private/Admin
+export const getAdminBookingStats = async (req, res, next) => {
+  try {
+    const [
+      pending,
+      confirmed,
+      consultationDone,
+      quoteSubmitted,
+      quoteAccepted,
+      paid,
+      converted,
+      cancelled
+    ] = await Promise.all([
+      Booking.countDocuments({ status: 'pending' }),
+      Booking.countDocuments({ status: 'confirmed' }),
+      Booking.countDocuments({ status: 'consultation_done' }),
+      Booking.countDocuments({ status: 'quote_submitted' }),
+      Booking.countDocuments({ status: 'quote_accepted' }),
+      Booking.countDocuments({ status: 'paid' }),
+      Booking.countDocuments({ status: 'converted' }),
+      Booking.countDocuments({ status: 'cancelled' })
+    ]);
+
+    res.status(200).json({
+      success: true,
+      data: {
+        pending,
+        confirmed,
+        consultationDone,
+        quoteSubmitted,
+        quoteAccepted,
+        paid,
+        converted,
+        cancelled,
+        total: pending + confirmed + consultationDone + quoteSubmitted + quoteAccepted + paid + converted + cancelled
+      }
+    });
+  } catch (error) {
+    next(error);
+  }
+};
+
+// @desc    Get bookings needing consultation completion (confirmed status)
+// @route   GET /api/admin/bookings/needs-consultation
+// @access  Private/Admin
+export const getBookingsNeedingConsultation = async (req, res, next) => {
+  try {
+    const { page = 1, limit = 20 } = req.query;
+
+    const query = { status: 'confirmed' };
+
+    const total = await Booking.countDocuments(query);
+    const bookings = await Booking.find(query)
+      .skip((page - 1) * limit)
+      .limit(parseInt(limit))
+      .sort({ date: 1 }) // Sort by consultation date (soonest first)
+      .populate('customer', 'firstName lastName email phone')
+      .populate({
+        path: 'tailor',
+        select: 'username businessName profilePhoto location',
+        populate: {
+          path: 'user',
+          select: 'firstName lastName email phone'
+        }
+      });
+
+    res.status(200).json({
+      success: true,
+      data: bookings,
+      pagination: paginationResult(total, page, limit)
+    });
+  } catch (error) {
+    next(error);
+  }
+};
+
 // @desc    Get all conversations (admin view)
 // @route   GET /api/admin/conversations
 // @access  Private/Admin

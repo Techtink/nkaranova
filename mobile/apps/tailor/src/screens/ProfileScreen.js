@@ -6,20 +6,60 @@ import {
   TouchableOpacity,
   Image,
   ScrollView,
-  Alert
+  Alert,
+  Switch,
+  Dimensions
 } from 'react-native';
 import { Ionicons } from '@expo/vector-icons';
+import Svg, { Circle, Ellipse, Path } from 'react-native-svg';
 import { useAuth } from '../../../../shared/context/AuthContext';
+import { useTheme } from '../../../../shared/context/ThemeContext';
 import { tailorsAPI } from '../../../../shared/services/api';
-import { colors, spacing, fontSize, borderRadius, shadows } from '../../../../shared/constants/theme';
+import { spacing, fontSize, borderRadius, shadows } from '../../../../shared/constants/theme';
+import config from '../../../../shared/config/env';
+
+const { height: SCREEN_HEIGHT } = Dimensions.get('window');
+const HEADER_HEIGHT = SCREEN_HEIGHT * 0.35;
+
+// Abstract art shapes for header decoration (same as dashboard)
+const HeaderArt = ({ isDark }) => (
+  <Svg
+    width={180}
+    height={HEADER_HEIGHT}
+    style={staticStyles.headerArt}
+    viewBox="0 0 180 280"
+  >
+    <Ellipse cx="30" cy="180" rx="60" ry="80" fill={isDark ? '#3D2B7A' : '#4A3A8C'} opacity="0.5" />
+    <Circle cx="100" cy="220" r="50" fill={isDark ? '#4B3A8E' : '#5B4A9E'} opacity="0.4" />
+    <Ellipse cx="-10" cy="140" rx="40" ry="60" fill={isDark ? '#0E0830' : '#1E1250'} opacity="0.6" />
+    <Path
+      d="M60 250 Q90 200 70 150 Q50 100 80 80"
+      stroke={isDark ? '#5B4A9F' : '#6B5AAF'}
+      strokeWidth="3"
+      fill="none"
+      opacity="0.5"
+    />
+    <Circle cx="50" cy="260" r="30" fill={isDark ? '#6B5AB0' : '#7B6AC0'} opacity="0.3" />
+  </Svg>
+);
 
 export default function ProfileScreen({ navigation }) {
   const { user, logout } = useAuth();
+  const { isDarkMode, colors, toggleDarkMode } = useTheme();
   const [profile, setProfile] = useState(null);
 
   useEffect(() => {
     loadProfile();
   }, []);
+
+  // Get profile image URL
+  const getProfileImageUrl = (imagePath) => {
+    if (!imagePath) return null;
+    if (imagePath.startsWith('http')) return imagePath;
+    // Ensure path has leading slash
+    const path = imagePath.startsWith('/') ? imagePath : `/${imagePath}`;
+    return `${config.imageBaseUrl}${path}`;
+  };
 
   const loadProfile = async () => {
     try {
@@ -49,71 +89,93 @@ export default function ProfileScreen({ navigation }) {
     Alert.alert('Coming Soon', `${feature} will be available in a future update.`);
   };
 
-  const MenuItem = ({ icon, label, onPress, danger, badge }) => (
-    <TouchableOpacity style={styles.menuItem} onPress={onPress}>
-      <View style={styles.menuLeft}>
-        <Ionicons
-          name={icon}
-          size={22}
-          color={danger ? colors.error : colors.textSecondary}
-        />
-        <Text style={[styles.menuLabel, danger && styles.menuLabelDanger]}>
+  const MenuItem = ({ icon, label, onPress, danger, badge, rightElement }) => (
+    <TouchableOpacity
+      style={[staticStyles.menuItem, { borderBottomColor: colors.border }]}
+      onPress={onPress}
+      disabled={!!rightElement}
+    >
+      <View style={staticStyles.menuLeft}>
+        <View style={[
+          staticStyles.menuIconContainer,
+          { backgroundColor: danger ? colors.error + '15' : colors.primary + '15' }
+        ]}>
+          <Ionicons
+            name={icon}
+            size={20}
+            color={danger ? colors.error : colors.primary}
+          />
+        </View>
+        <Text style={[
+          staticStyles.menuLabel,
+          { color: danger ? colors.error : colors.textPrimary }
+        ]}>
           {label}
         </Text>
       </View>
-      <View style={styles.menuRight}>
+      <View style={staticStyles.menuRight}>
         {badge && (
-          <View style={styles.badge}>
-            <Text style={styles.badgeText}>{badge}</Text>
+          <View style={[staticStyles.badge, { backgroundColor: colors.primary }]}>
+            <Text style={[staticStyles.badgeText, { color: colors.white }]}>{badge}</Text>
           </View>
         )}
-        <Ionicons name="chevron-forward" size={20} color={colors.textMuted} />
+        {rightElement ? rightElement : (
+          <Ionicons name="chevron-forward" size={20} color={colors.textMuted} />
+        )}
       </View>
     </TouchableOpacity>
   );
 
   return (
-    <ScrollView style={styles.container}>
-      {/* Profile Header */}
-      <View style={styles.header}>
-        <Image
-          source={{ uri: user?.profilePhoto || 'https://via.placeholder.com/100' }}
-          style={styles.avatar}
-        />
-        <Text style={styles.name}>{user?.name}</Text>
-        <Text style={styles.email}>{user?.email}</Text>
-        <View style={styles.statsRow}>
-          <View style={styles.statItem}>
-            <Text style={styles.statValue}>{profile?.rating?.toFixed(1) || 'N/A'}</Text>
-            <Text style={styles.statLabel}>Rating</Text>
-          </View>
-          <View style={styles.statDivider} />
-          <View style={styles.statItem}>
-            <Text style={styles.statValue}>{profile?.reviewCount || 0}</Text>
-            <Text style={styles.statLabel}>Reviews</Text>
-          </View>
-          <View style={styles.statDivider} />
-          <View style={styles.statItem}>
-            <Text style={styles.statValue}>{profile?.workCount || 0}</Text>
-            <Text style={styles.statLabel}>Works</Text>
+    <ScrollView style={[staticStyles.container, { backgroundColor: colors.bgSecondary }]}>
+      {/* Profile Header with Abstract Art */}
+      <View style={[staticStyles.header, { backgroundColor: colors.headerBg }]}>
+        <HeaderArt isDark={isDarkMode} />
+        <View style={staticStyles.headerContent}>
+          <Image
+            source={{ uri: getProfileImageUrl(user?.profilePhoto) || 'https://via.placeholder.com/100' }}
+            style={[staticStyles.avatar, { borderColor: colors.white }]}
+          />
+          <Text style={[staticStyles.name, { color: colors.white }]}>{user?.name}</Text>
+          <Text style={[staticStyles.email, { color: colors.textLight }]}>{user?.email}</Text>
+          <View style={staticStyles.statsRow}>
+            <View style={staticStyles.statItem}>
+              <Text style={[staticStyles.statValue, { color: colors.white }]}>{profile?.rating?.toFixed(1) || 'N/A'}</Text>
+              <Text style={[staticStyles.statLabel, { color: colors.textLight }]}>Rating</Text>
+            </View>
+            <View style={staticStyles.statDivider} />
+            <View style={staticStyles.statItem}>
+              <Text style={[staticStyles.statValue, { color: colors.white }]}>{profile?.reviewCount || 0}</Text>
+              <Text style={[staticStyles.statLabel, { color: colors.textLight }]}>Reviews</Text>
+            </View>
+            <View style={staticStyles.statDivider} />
+            <View style={staticStyles.statItem}>
+              <Text style={[staticStyles.statValue, { color: colors.white }]}>{profile?.workCount || 0}</Text>
+              <Text style={[staticStyles.statLabel, { color: colors.textLight }]}>Works</Text>
+            </View>
           </View>
         </View>
       </View>
 
       {/* Verification Status */}
-      <View style={styles.section}>
-        <View style={styles.verificationCard}>
-          <View style={styles.verificationInfo}>
-            <Ionicons
-              name={profile?.isVerified ? 'checkmark-circle' : 'time-outline'}
-              size={32}
-              color={profile?.isVerified ? colors.success : colors.warning}
-            />
-            <View style={styles.verificationText}>
-              <Text style={styles.verificationTitle}>
+      <View style={staticStyles.section}>
+        <View style={[staticStyles.verificationCard, { backgroundColor: colors.cardBg }, shadows.sm]}>
+          <View style={staticStyles.verificationInfo}>
+            <View style={[
+              staticStyles.verificationIcon,
+              { backgroundColor: profile?.isVerified ? colors.success + '15' : colors.warning + '15' }
+            ]}>
+              <Ionicons
+                name={profile?.isVerified ? 'checkmark-circle' : 'time-outline'}
+                size={28}
+                color={profile?.isVerified ? colors.success : colors.warning}
+              />
+            </View>
+            <View style={staticStyles.verificationText}>
+              <Text style={[staticStyles.verificationTitle, { color: colors.textPrimary }]}>
                 {profile?.isVerified ? 'Verified Tailor' : 'Not Verified'}
               </Text>
-              <Text style={styles.verificationSubtitle}>
+              <Text style={[staticStyles.verificationSubtitle, { color: colors.textMuted }]}>
                 {profile?.isVerified
                   ? 'Your profile is verified'
                   : 'Get verified to build trust'}
@@ -122,19 +184,19 @@ export default function ProfileScreen({ navigation }) {
           </View>
           {!profile?.isVerified && (
             <TouchableOpacity
-              style={styles.verifyButton}
+              style={[staticStyles.verifyButton, { backgroundColor: colors.primary }]}
               onPress={() => navigation.navigate('Verification')}
             >
-              <Text style={styles.verifyButtonText}>Verify</Text>
+              <Text style={[staticStyles.verifyButtonText, { color: colors.white }]}>Verify</Text>
             </TouchableOpacity>
           )}
         </View>
       </View>
 
       {/* Menu Sections */}
-      <View style={styles.section}>
-        <Text style={styles.sectionTitle}>Business</Text>
-        <View style={styles.menuCard}>
+      <View style={staticStyles.section}>
+        <Text style={[staticStyles.sectionTitle, { color: colors.textMuted }]}>Business</Text>
+        <View style={[staticStyles.menuCard, { backgroundColor: colors.cardBg }, shadows.sm]}>
           <MenuItem
             icon="person-outline"
             label="Edit Profile"
@@ -159,9 +221,21 @@ export default function ProfileScreen({ navigation }) {
         </View>
       </View>
 
-      <View style={styles.section}>
-        <Text style={styles.sectionTitle}>Settings</Text>
-        <View style={styles.menuCard}>
+      <View style={staticStyles.section}>
+        <Text style={[staticStyles.sectionTitle, { color: colors.textMuted }]}>Settings</Text>
+        <View style={[staticStyles.menuCard, { backgroundColor: colors.cardBg }, shadows.sm]}>
+          <MenuItem
+            icon="moon-outline"
+            label="Dark Mode"
+            rightElement={
+              <Switch
+                value={isDarkMode}
+                onValueChange={toggleDarkMode}
+                trackColor={{ false: colors.border, true: colors.primary + '50' }}
+                thumbColor={isDarkMode ? colors.primary : colors.textMuted}
+              />
+            }
+          />
           <MenuItem
             icon="notifications-outline"
             label="Notifications"
@@ -185,8 +259,8 @@ export default function ProfileScreen({ navigation }) {
         </View>
       </View>
 
-      <View style={styles.section}>
-        <View style={styles.menuCard}>
+      <View style={staticStyles.section}>
+        <View style={[staticStyles.menuCard, { backgroundColor: colors.cardBg }, shadows.sm]}>
           <MenuItem
             icon="log-out-outline"
             label="Logout"
@@ -196,46 +270,58 @@ export default function ProfileScreen({ navigation }) {
         </View>
       </View>
 
-      <Text style={styles.version}>Version 1.0.0</Text>
+      <Text style={[staticStyles.version, { color: colors.textMuted }]}>Version 1.0.0</Text>
     </ScrollView>
   );
 }
 
-const styles = StyleSheet.create({
+// Static styles (colors are applied dynamically from theme)
+const staticStyles = StyleSheet.create({
   container: {
-    flex: 1,
-    backgroundColor: colors.bgSecondary
+    flex: 1
   },
   header: {
-    backgroundColor: colors.primary,
+    height: HEADER_HEIGHT,
+    overflow: 'hidden',
+    position: 'relative'
+  },
+  headerArt: {
+    position: 'absolute',
+    left: -20,
+    top: 0,
+    bottom: 0
+  },
+  headerContent: {
+    flex: 1,
     alignItems: 'center',
     paddingTop: spacing.xxl,
-    paddingBottom: spacing.xl
+    paddingBottom: spacing.lg,
+    zIndex: 1
   },
   avatar: {
-    width: 100,
-    height: 100,
-    borderRadius: 50,
-    borderWidth: 3,
-    borderColor: colors.white
+    width: 90,
+    height: 90,
+    borderRadius: 45,
+    borderWidth: 3
   },
   name: {
     fontSize: fontSize.xl,
+    fontFamily: 'Montserrat-SemiBold',
     fontWeight: '600',
-    color: colors.white,
     marginTop: spacing.md
   },
   email: {
     fontSize: fontSize.sm,
-    color: 'rgba(255,255,255,0.8)',
+    fontFamily: 'Montserrat-Regular',
     marginTop: spacing.xs
   },
   statsRow: {
     flexDirection: 'row',
-    marginTop: spacing.lg,
-    backgroundColor: 'rgba(255,255,255,0.2)',
+    marginTop: spacing.md,
+    backgroundColor: 'rgba(255,255,255,0.15)',
     borderRadius: borderRadius.lg,
-    padding: spacing.md
+    padding: spacing.md,
+    marginHorizontal: spacing.lg
   },
   statItem: {
     flex: 1,
@@ -243,12 +329,12 @@ const styles = StyleSheet.create({
   },
   statValue: {
     fontSize: fontSize.lg,
-    fontWeight: '700',
-    color: colors.white
+    fontFamily: 'Montserrat-Bold',
+    fontWeight: '700'
   },
   statLabel: {
     fontSize: fontSize.xs,
-    color: 'rgba(255,255,255,0.8)',
+    fontFamily: 'Montserrat-Regular',
     marginTop: spacing.xs
   },
   statDivider: {
@@ -263,59 +349,60 @@ const styles = StyleSheet.create({
     flexDirection: 'row',
     alignItems: 'center',
     justifyContent: 'space-between',
-    backgroundColor: colors.white,
     borderRadius: borderRadius.lg,
-    padding: spacing.md,
-    ...shadows.sm
+    padding: spacing.md
   },
   verificationInfo: {
     flexDirection: 'row',
     alignItems: 'center',
     flex: 1
   },
+  verificationIcon: {
+    width: 48,
+    height: 48,
+    borderRadius: 24,
+    justifyContent: 'center',
+    alignItems: 'center'
+  },
   verificationText: {
     marginLeft: spacing.md
   },
   verificationTitle: {
     fontSize: fontSize.base,
-    fontWeight: '600',
-    color: colors.textPrimary
+    fontFamily: 'Montserrat-SemiBold',
+    fontWeight: '600'
   },
   verificationSubtitle: {
     fontSize: fontSize.xs,
-    color: colors.textMuted,
+    fontFamily: 'Montserrat-Regular',
     marginTop: spacing.xs
   },
   verifyButton: {
-    backgroundColor: colors.primary,
     paddingVertical: spacing.sm,
     paddingHorizontal: spacing.md,
     borderRadius: borderRadius.md
   },
   verifyButtonText: {
-    color: colors.white,
     fontSize: fontSize.sm,
+    fontFamily: 'Montserrat-SemiBold',
     fontWeight: '600'
   },
   sectionTitle: {
     fontSize: fontSize.sm,
+    fontFamily: 'Montserrat-SemiBold',
     fontWeight: '600',
-    color: colors.textSecondary,
     marginBottom: spacing.sm,
     marginLeft: spacing.sm
   },
   menuCard: {
-    backgroundColor: colors.white,
-    borderRadius: borderRadius.lg,
-    ...shadows.sm
+    borderRadius: borderRadius.lg
   },
   menuItem: {
     flexDirection: 'row',
     alignItems: 'center',
     justifyContent: 'space-between',
     padding: spacing.md,
-    borderBottomWidth: 1,
-    borderBottomColor: colors.border
+    borderBottomWidth: 1
   },
   menuLeft: {
     flexDirection: 'row',
@@ -325,30 +412,34 @@ const styles = StyleSheet.create({
     flexDirection: 'row',
     alignItems: 'center'
   },
+  menuIconContainer: {
+    width: 36,
+    height: 36,
+    borderRadius: 18,
+    justifyContent: 'center',
+    alignItems: 'center'
+  },
   menuLabel: {
     fontSize: fontSize.base,
-    color: colors.textPrimary,
+    fontFamily: 'Montserrat-Medium',
+    fontWeight: '500',
     marginLeft: spacing.md
   },
-  menuLabelDanger: {
-    color: colors.error
-  },
   badge: {
-    backgroundColor: colors.primary,
     paddingHorizontal: spacing.sm,
     paddingVertical: 2,
     borderRadius: borderRadius.full,
     marginRight: spacing.sm
   },
   badgeText: {
-    color: colors.white,
     fontSize: fontSize.xs,
+    fontFamily: 'Montserrat-SemiBold',
     fontWeight: '600'
   },
   version: {
     textAlign: 'center',
     fontSize: fontSize.xs,
-    color: colors.textMuted,
+    fontFamily: 'Montserrat-Regular',
     marginVertical: spacing.xl
   }
 });

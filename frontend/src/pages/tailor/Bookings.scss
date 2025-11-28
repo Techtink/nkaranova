@@ -6,6 +6,7 @@
     display: flex;
     gap: $spacing-sm;
     margin-bottom: $spacing-xl;
+    flex-wrap: wrap;
   }
 
   .filter-tab {
@@ -79,6 +80,29 @@
       color: $text-secondary;
       margin-right: $spacing-xs;
     }
+
+    &.quote-amount {
+      margin-top: $spacing-sm;
+      padding: $spacing-sm;
+      background: rgba($primary, 0.1);
+      border-radius: $radius-md;
+
+      .amount {
+        font-weight: $font-semibold;
+        color: $primary;
+      }
+    }
+  }
+}
+
+.status-section {
+  text-align: right;
+
+  .status-description {
+    display: block;
+    font-size: $text-xs;
+    color: $text-muted;
+    margin-top: $spacing-xs;
   }
 }
 
@@ -88,4 +112,299 @@
   margin-top: $spacing-lg;
   padding-top: $spacing-md;
   border-top: 1px solid $gray-100;
+  align-items: center;
+
+  .quote-btn {
+    background: #9b59b6;
+
+    &:hover {
+      background: darken(#9b59b6, 10%);
+    }
+  }
+}
+
+.waiting-message {
+  display: flex;
+  align-items: center;
+  gap: $spacing-sm;
+  color: $text-muted;
+  font-size: $text-sm;
+
+  svg {
+    color: $warning;
+  }
+}
+
+// Badge colors
+.badge-purple {
+  background: rgba(#9b59b6, 0.1);
+  color: #9b59b6;
+}
+
+.badge-orange {
+  background: rgba(#e67e22, 0.1);
+  color: #e67e22;
+}
+
+.badge-teal {
+  background: rgba(#1abc9c, 0.1);
+  color: #1abc9c;
+}
+
+// Quote Modal
+.quote-modal {
+  max-width: 600px;
+  max-height: 90vh;
+  overflow-y: auto;
+
+  .modal-body {
+    padding: $spacing-lg;
+  }
+
+  .booking-summary {
+    background: $gray-50;
+    padding: $spacing-md;
+    border-radius: $radius-md;
+    margin-bottom: $spacing-lg;
+
+    p {
+      margin: $spacing-xs 0;
+      font-size: $text-sm;
+    }
+  }
+
+  .form-section {
+    margin-bottom: $spacing-lg;
+
+    h3 {
+      font-size: $text-sm;
+      font-weight: $font-semibold;
+      color: $text-secondary;
+      text-transform: uppercase;
+      margin-bottom: $spacing-sm;
+    }
+  }
+
+  .item-row {
+    display: flex;
+    gap: $spacing-sm;
+    margin-bottom: $spacing-sm;
+    align-items: center;
+
+    input {
+      padding: $spacing-sm;
+      border: 1px solid $gray-200;
+      border-radius: $radius-md;
+      font-size: $text-sm;
+
+      &:focus {
+        outline: none;
+        border-color: $primary;
+      }
+    }
+
+    .item-description {
+      flex: 3;
+    }
+
+    .item-qty {
+      flex: 1;
+      min-width: 60px;
+    }
+
+    .item-price {
+      flex: 2;
+      min-width: 100px;
+    }
+
+    .remove-item-btn {
+      background: none;
+      border: none;
+      color: $error;
+      cursor: pointer;
+      padding: $spacing-xs;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+
+      &:hover {
+        background: rgba($error, 0.1);
+        border-radius: $radius-sm;
+      }
+    }
+  }
+
+  .add-item-btn {
+    background: none;
+    border: none;
+    color: $primary;
+    font-size: $text-sm;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    gap: $spacing-xs;
+    padding: $spacing-sm;
+
+    &:hover {
+      background: rgba($primary, 0.1);
+      border-radius: $radius-md;
+    }
+  }
+
+  .cost-row {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: $spacing-sm;
+
+    label {
+      font-size: $text-sm;
+      color: $text-secondary;
+    }
+
+    input {
+      width: 150px;
+      padding: $spacing-sm;
+      border: 1px solid $gray-200;
+      border-radius: $radius-md;
+      font-size: $text-sm;
+      text-align: right;
+
+      &:focus {
+        outline: none;
+        border-color: $primary;
+      }
+    }
+  }
+
+  .timeline-row {
+    display: flex;
+    gap: $spacing-md;
+
+    .timeline-item {
+      flex: 1;
+
+      label {
+        display: block;
+        font-size: $text-xs;
+        color: $text-muted;
+        margin-bottom: $spacing-xs;
+      }
+
+      input {
+        width: 100%;
+        padding: $spacing-sm;
+        border: 1px solid $gray-200;
+        border-radius: $radius-md;
+        font-size: $text-sm;
+        text-align: center;
+
+        &:focus {
+          outline: none;
+          border-color: $primary;
+        }
+      }
+    }
+  }
+
+  .total-days {
+    font-size: $text-sm;
+    color: $text-muted;
+    text-align: center;
+    margin-top: $spacing-sm;
+  }
+
+  textarea {
+    width: 100%;
+    padding: $spacing-md;
+    border: 1px solid $gray-200;
+    border-radius: $radius-md;
+    font-size: $text-sm;
+    resize: vertical;
+
+    &:focus {
+      outline: none;
+      border-color: $primary;
+    }
+  }
+
+  .quote-total {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: $spacing-md;
+    background: $gray-50;
+    border-radius: $radius-md;
+    margin-top: $spacing-lg;
+
+    span:first-child {
+      font-weight: $font-semibold;
+    }
+
+    .amount {
+      font-size: $text-xl;
+      font-weight: $font-bold;
+      color: $primary;
+    }
+  }
+
+  .modal-footer {
+    display: flex;
+    justify-content: flex-end;
+    gap: $spacing-md;
+    padding: $spacing-md $spacing-lg;
+    border-top: 1px solid $gray-100;
+  }
+}
+
+// Modal overlay and content base styles
+.modal-overlay {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background: rgba(0, 0, 0, 0.5);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 1000;
+  padding: $spacing-md;
+}
+
+.modal-content {
+  background: $white;
+  border-radius: $radius-lg;
+  width: 100%;
+  max-width: 500px;
+  box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.1), 0 10px 10px -5px rgba(0, 0, 0, 0.04);
+}
+
+.modal-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: $spacing-md $spacing-lg;
+  border-bottom: 1px solid $gray-100;
+
+  h2 {
+    font-size: $text-lg;
+    font-weight: $font-semibold;
+    margin: 0;
+  }
+
+  .close-btn {
+    background: none;
+    border: none;
+    cursor: pointer;
+    padding: $spacing-xs;
+    color: $text-secondary;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+
+    &:hover {
+      color: $text-primary;
+    }
+  }
 }

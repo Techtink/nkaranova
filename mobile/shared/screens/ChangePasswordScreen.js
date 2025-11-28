@@ -200,6 +200,7 @@ const styles = StyleSheet.create({
     flex: 1,
     marginLeft: spacing.md,
     fontSize: fontSize.sm,
+    fontFamily: 'Montserrat-Regular',
     color: colors.textSecondary,
     lineHeight: 20
   },
@@ -214,6 +215,7 @@ const styles = StyleSheet.create({
   },
   label: {
     fontSize: fontSize.sm,
+    fontFamily: 'Montserrat-SemiBold',
     fontWeight: '600',
     color: colors.textPrimary,
     marginBottom: spacing.sm
@@ -230,6 +232,7 @@ const styles = StyleSheet.create({
     flex: 1,
     padding: spacing.md,
     fontSize: fontSize.base,
+    fontFamily: 'Montserrat-Regular',
     color: colors.textPrimary
   },
   eyeButton: {
@@ -242,12 +245,14 @@ const styles = StyleSheet.create({
   },
   requirementsTitle: {
     fontSize: fontSize.sm,
+    fontFamily: 'Montserrat-SemiBold',
     fontWeight: '600',
     color: colors.textSecondary,
     marginBottom: spacing.sm
   },
   requirementItem: {
     fontSize: fontSize.xs,
+    fontFamily: 'Montserrat-Regular',
     color: colors.textMuted,
     marginTop: spacing.xs
   },
@@ -264,6 +269,7 @@ const styles = StyleSheet.create({
   buttonText: {
     color: colors.white,
     fontSize: fontSize.base,
+    fontFamily: 'Montserrat-SemiBold',
     fontWeight: '600'
   }
 });

@@ -167,6 +167,7 @@ const styles = StyleSheet.create({
   },
   sectionTitle: {
     fontSize: fontSize.sm,
+    fontFamily: 'Montserrat-SemiBold',
     fontWeight: '600',
     color: colors.textSecondary,
     marginBottom: spacing.sm,
@@ -202,11 +203,13 @@ const styles = StyleSheet.create({
   },
   settingTitle: {
     fontSize: fontSize.base,
+    fontFamily: 'Montserrat-Medium',
     fontWeight: '500',
     color: colors.textPrimary
   },
   settingDescription: {
     fontSize: fontSize.xs,
+    fontFamily: 'Montserrat-Regular',
     color: colors.textMuted,
     marginTop: spacing.xs
   },
@@ -217,6 +220,7 @@ const styles = StyleSheet.create({
   },
   footerText: {
     fontSize: fontSize.xs,
+    fontFamily: 'Montserrat-Regular',
     color: colors.textMuted,
     textAlign: 'center',
     padding: spacing.xl,

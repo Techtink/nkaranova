@@ -203,9 +203,12 @@ export const getOrder = async (req, res, next) => {
 // @access  Private/Tailor
 export const submitWorkPlan = async (req, res, next) => {
   try {
-    const { stages } = req.body;
+    const { stages, workPlan } = req.body;
 
-    if (!stages || !Array.isArray(stages) || stages.length === 0) {
+    // Support both old format (stages array) and new format (workPlan object)
+    const isNewFormat = workPlan && workPlan.stages;
+
+    if (!isNewFormat && (!stages || !Array.isArray(stages) || stages.length === 0)) {
       return res.status(400).json({
         success: false,
         message: 'At least one stage is required'
@@ -268,20 +271,23 @@ export const submitWorkPlan = async (req, res, next) => {
       }
     }
 
-    // Submit the work plan
-    order.submitWorkPlan(stages, req.user._id);
+    // Submit the work plan (supports both formats)
+    order.submitWorkPlan(isNewFormat ? workPlan : stages, req.user._id);
     await order.save();
 
-    // Check if customer approval is required
-    const approvalRequired = await Settings.getValue('order_customer_approval_required');
+    // For new format (fixed 4-stage), no customer approval needed - goes to consultation
+    if (!isNewFormat) {
+      // Old format: Check if customer approval is required
+      const approvalRequired = await Settings.getValue('order_customer_approval_required');
 
-    if (!approvalRequired) {
-      // Auto-approve and start work
-      order.approveWorkPlan(req.user._id);
-      await order.save();
-    } else {
-      // Send notification to customer for approval
-      await emailService.sendWorkPlanSubmitted(order, order.customer, tailor);
+      if (!approvalRequired) {
+        // Auto-approve and start work
+        order.approveWorkPlan(req.user._id);
+        await order.save();
+      } else {
+        // Send notification to customer for approval
+        await emailService.sendWorkPlanSubmitted(order, order.customer, tailor);
+      }
     }
 
     const populatedOrder = await Order.findById(order._id)
@@ -290,6 +296,59 @@ export const submitWorkPlan = async (req, res, next) => {
     res.status(200).json({
       success: true,
       data: populatedOrder
+    });
+  } catch (error) {
+    next(error);
+  }
+};
+
+// @desc    Complete consultation stage (admin only)
+// @route   PUT /api/orders/:id/complete-consultation
+// @access  Private/Admin
+export const completeConsultation = async (req, res, next) => {
+  try {
+    const { notes } = req.body;
+
+    // Only admin can complete consultation
+    if (req.user.role !== 'admin') {
+      return res.status(403).json({
+        success: false,
+        message: 'Only admin can complete consultation stage'
+      });
+    }
+
+    const order = await Order.findById(req.params.id)
+      .populate('customer', 'firstName lastName email')
+      .populate({
+        path: 'tailor',
+        populate: { path: 'user', select: 'firstName lastName email' }
+      });
+
+    if (!order) {
+      return res.status(404).json({
+        success: false,
+        message: 'Order not found'
+      });
+    }
+
+    if (order.status !== 'consultation') {
+      return res.status(400).json({
+        success: false,
+        message: 'Order is not in consultation stage'
+      });
+    }
+
+    // Complete consultation and start design phase
+    order.completeConsultation(req.user._id, notes);
+    await order.save();
+
+    // Notify tailor that design phase can begin
+    await emailService.sendConsultationCompleted(order, order.tailor, order.customer);
+
+    res.status(200).json({
+      success: true,
+      message: 'Consultation completed, design phase started',
+      data: order
     });
   } catch (error) {
     next(error);

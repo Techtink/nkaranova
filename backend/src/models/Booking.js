@@ -50,10 +50,20 @@ const bookingSchema = new mongoose.Schema({
     value: Number,
     unit: String
   }],
-  // Status
+  // Status - reflects the booking/consultation flow
   status: {
     type: String,
-    enum: ['pending', 'accepted', 'declined', 'completed', 'cancelled'],
+    enum: [
+      'pending',           // Initial request, waiting for tailor to accept
+      'confirmed',         // Tailor accepted, consultation scheduled
+      'consultation_done', // Consultation completed, tailor submitting quote
+      'quote_submitted',   // Quote submitted, waiting for customer to accept
+      'quote_accepted',    // Customer accepted quote, awaiting payment
+      'paid',              // Payment received, ready to create order
+      'converted',         // Converted to order - booking flow complete
+      'cancelled',         // Cancelled by either party
+      'declined'           // Tailor declined the booking
+    ],
     default: 'pending'
   },
   statusHistory: [{
@@ -68,6 +78,86 @@ const bookingSchema = new mongoose.Schema({
     },
     note: String
   }],
+  // Consultation details (filled during/after consultation)
+  consultation: {
+    completedAt: Date,
+    completedBy: {
+      type: mongoose.Schema.Types.ObjectId,
+      ref: 'User'
+    },
+    notes: String,
+    measurementsTaken: {
+      type: Boolean,
+      default: false
+    }
+  },
+  // Quote from tailor (submitted after consultation)
+  quote: {
+    submittedAt: Date,
+    submittedBy: {
+      type: mongoose.Schema.Types.ObjectId,
+      ref: 'User'
+    },
+    // Item breakdown
+    items: [{
+      description: {
+        type: String,
+        required: true
+      },
+      quantity: {
+        type: Number,
+        default: 1
+      },
+      unitPrice: {
+        type: Number,
+        required: true
+      }
+    }],
+    // Labor/service charges
+    laborCost: {
+      type: Number,
+      default: 0
+    },
+    // Material costs
+    materialCost: {
+      type: Number,
+      default: 0
+    },
+    // Total price
+    totalAmount: {
+      type: Number,
+      required: function() { return this.quote?.submittedAt; }
+    },
+    currency: {
+      type: String,
+      default: 'NGN'
+    },
+    // Estimated timeline for order stages
+    estimatedDays: {
+      design: { type: Number, default: 3 },
+      sew: { type: Number, default: 7 },
+      deliver: { type: Number, default: 2 }
+    },
+    totalEstimatedDays: Number,
+    // Quote notes/terms
+    notes: String,
+    validUntil: Date,
+    // Customer response
+    customerResponse: {
+      status: {
+        type: String,
+        enum: ['pending', 'accepted', 'rejected'],
+        default: 'pending'
+      },
+      respondedAt: Date,
+      rejectionReason: String
+    }
+  },
+  // Linked order (created after payment)
+  order: {
+    type: mongoose.Schema.Types.ObjectId,
+    ref: 'Order'
+  },
   // Tailor's response
   declineReason: String,
   // Payment

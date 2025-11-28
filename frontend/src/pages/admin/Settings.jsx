@@ -1,5 +1,5 @@
 import { useState, useEffect, useRef } from 'react';
-import { FiSave, FiRefreshCw, FiDollarSign, FiUsers, FiStar, FiSettings, FiImage, FiUpload, FiX, FiSmartphone, FiCrop } from 'react-icons/fi';
+import { FiSave, FiRefreshCw, FiDollarSign, FiUsers, FiStar, FiSettings, FiImage, FiUpload, FiX, FiSmartphone, FiCrop, FiLink, FiCreditCard, FiMessageCircle, FiMail, FiMessageSquare, FiEye, FiEyeOff, FiCheck, FiAlertCircle } from 'react-icons/fi';
 import { settingsAPI } from '../../services/api';
 import ImageCropper from '../../components/ImageCropper';
 import './Admin.scss';
@@ -13,7 +13,13 @@ export default function AdminSettings() {
   const [cropperOpen, setCropperOpen] = useState(false);
   const [cropperTarget, setCropperTarget] = useState(null); // 'customer' or 'tailor'
   const [uploadingMobile, setUploadingMobile] = useState(false);
+  const [showSecrets, setShowSecrets] = useState({}); // Track which secret fields are visible
   const fileInputRef = useRef(null);
+
+  // Toggle visibility of a secret field
+  const toggleSecretVisibility = (field) => {
+    setShowSecrets(prev => ({ ...prev, [field]: !prev[field] }));
+  };
 
   useEffect(() => {
     fetchSettings();
@@ -223,6 +229,13 @@ export default function AdminSettings() {
           >
             <FiSmartphone />
             Mobile App
+          </button>
+          <button
+            className={`erp-tab ${activeTab === 'integrations' ? 'active' : ''}`}
+            onClick={() => setActiveTab('integrations')}
+          >
+            <FiLink />
+            Integrations
           </button>
         </div>
 
@@ -2009,6 +2022,659 @@ export default function AdminSettings() {
                           onChange={(e) => handleChange('mobile_tailor_splash_subheadline', e.target.value)}
                         />
                       </div>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            )}
+
+            {activeTab === 'integrations' && (
+              <div className="settings-section">
+                <h3>Integration Settings</h3>
+                <p className="section-description" style={{ color: 'var(--text-tertiary)', marginBottom: '24px' }}>
+                  Configure payment gateways and communication services for your platform
+                </p>
+
+                {/* Payment Gateways Section */}
+                <div style={{ borderTop: '3px solid var(--primary)', paddingTop: '32px', marginTop: '16px' }}>
+                  <h3 style={{ marginBottom: '8px', display: 'flex', alignItems: 'center', gap: '8px' }}>
+                    <FiCreditCard />
+                    Payment Gateways
+                  </h3>
+                  <p className="setting-description" style={{ color: 'var(--text-tertiary)', marginBottom: '24px' }}>
+                    Configure payment processing for your platform
+                  </p>
+
+                  {/* Stripe Settings */}
+                  <div style={{ marginBottom: '32px', padding: '24px', background: 'var(--bg-secondary)', borderRadius: '12px', border: '1px solid var(--border-color)' }}>
+                    <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '20px' }}>
+                      <div style={{ display: 'flex', alignItems: 'center', gap: '12px' }}>
+                        <div style={{ width: '48px', height: '48px', background: '#635BFF', borderRadius: '8px', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
+                          <span style={{ color: 'white', fontWeight: 'bold', fontSize: '18px' }}>S</span>
+                        </div>
+                        <div>
+                          <h4 style={{ margin: 0 }}>Stripe</h4>
+                          <p style={{ margin: 0, fontSize: '13px', color: 'var(--text-tertiary)' }}>Accept credit cards, Apple Pay, Google Pay</p>
+                        </div>
+                      </div>
+                      <label className="toggle-switch">
+                        <input
+                          type="checkbox"
+                          checked={settings.stripe_enabled || false}
+                          onChange={(e) => handleChange('stripe_enabled', e.target.checked)}
+                        />
+                        <span className="toggle-slider"></span>
+                      </label>
+                    </div>
+
+                    {settings.stripe_enabled && (
+                      <>
+                        <div className="row g-4">
+                          <div className="col-md-6">
+                            <div className="setting-item">
+                              <label>Mode</label>
+                              <select
+                                value={settings.stripe_mode || 'test'}
+                                onChange={(e) => handleChange('stripe_mode', e.target.value)}
+                              >
+                                <option value="test">Test Mode</option>
+                                <option value="live">Live Mode</option>
+                              </select>
+                            </div>
+                          </div>
+                        </div>
+
+                        {/* Test Keys */}
+                        <div style={{ marginTop: '24px', padding: '16px', background: settings.stripe_mode === 'test' ? 'rgba(92, 141, 106, 0.1)' : 'transparent', borderRadius: '8px', border: settings.stripe_mode === 'test' ? '2px solid var(--primary)' : '1px solid var(--border-color)' }}>
+                          <h5 style={{ marginBottom: '16px', display: 'flex', alignItems: 'center', gap: '8px' }}>
+                            Test Keys
+                            {settings.stripe_mode === 'test' && <span className="erp-badge badge-success" style={{ fontSize: '11px' }}>Active</span>}
+                          </h5>
+                          <div className="row g-3">
+                            <div className="col-md-6">
+                              <div className="setting-item">
+                                <label>Publishable Key</label>
+                                <input
+                                  type="text"
+                                  value={settings.stripe_test_publishable_key || ''}
+                                  onChange={(e) => handleChange('stripe_test_publishable_key', e.target.value)}
+                                  placeholder="pk_test_..."
+                                />
+                              </div>
+                            </div>
+                            <div className="col-md-6">
+                              <div className="setting-item">
+                                <label>Secret Key</label>
+                                <div style={{ display: 'flex', gap: '8px' }}>
+                                  <input
+                                    type={showSecrets.stripe_test_secret ? 'text' : 'password'}
+                                    value={settings.stripe_test_secret_key || ''}
+                                    onChange={(e) => handleChange('stripe_test_secret_key', e.target.value)}
+                                    placeholder="sk_test_..."
+                                    style={{ flex: 1 }}
+                                  />
+                                  <button
+                                    type="button"
+                                    className="btn-erp btn-erp-secondary"
+                                    onClick={() => toggleSecretVisibility('stripe_test_secret')}
+                                    style={{ padding: '8px 12px' }}
+                                  >
+                                    {showSecrets.stripe_test_secret ? <FiEyeOff /> : <FiEye />}
+                                  </button>
+                                </div>
+                              </div>
+                            </div>
+                            <div className="col-12">
+                              <div className="setting-item">
+                                <label>Webhook Secret</label>
+                                <div style={{ display: 'flex', gap: '8px' }}>
+                                  <input
+                                    type={showSecrets.stripe_test_webhook ? 'text' : 'password'}
+                                    value={settings.stripe_test_webhook_secret || ''}
+                                    onChange={(e) => handleChange('stripe_test_webhook_secret', e.target.value)}
+                                    placeholder="whsec_..."
+                                    style={{ flex: 1 }}
+                                  />
+                                  <button
+                                    type="button"
+                                    className="btn-erp btn-erp-secondary"
+                                    onClick={() => toggleSecretVisibility('stripe_test_webhook')}
+                                    style={{ padding: '8px 12px' }}
+                                  >
+                                    {showSecrets.stripe_test_webhook ? <FiEyeOff /> : <FiEye />}
+                                  </button>
+                                </div>
+                              </div>
+                            </div>
+                          </div>
+                        </div>
+
+                        {/* Live Keys */}
+                        <div style={{ marginTop: '16px', padding: '16px', background: settings.stripe_mode === 'live' ? 'rgba(92, 141, 106, 0.1)' : 'transparent', borderRadius: '8px', border: settings.stripe_mode === 'live' ? '2px solid var(--primary)' : '1px solid var(--border-color)' }}>
+                          <h5 style={{ marginBottom: '16px', display: 'flex', alignItems: 'center', gap: '8px' }}>
+                            Live Keys
+                            {settings.stripe_mode === 'live' && <span className="erp-badge badge-success" style={{ fontSize: '11px' }}>Active</span>}
+                          </h5>
+                          <div className="row g-3">
+                            <div className="col-md-6">
+                              <div className="setting-item">
+                                <label>Publishable Key</label>
+                                <input
+                                  type="text"
+                                  value={settings.stripe_live_publishable_key || ''}
+                                  onChange={(e) => handleChange('stripe_live_publishable_key', e.target.value)}
+                                  placeholder="pk_live_..."
+                                />
+                              </div>
+                            </div>
+                            <div className="col-md-6">
+                              <div className="setting-item">
+                                <label>Secret Key</label>
+                                <div style={{ display: 'flex', gap: '8px' }}>
+                                  <input
+                                    type={showSecrets.stripe_live_secret ? 'text' : 'password'}
+                                    value={settings.stripe_live_secret_key || ''}
+                                    onChange={(e) => handleChange('stripe_live_secret_key', e.target.value)}
+                                    placeholder="sk_live_..."
+                                    style={{ flex: 1 }}
+                                  />
+                                  <button
+                                    type="button"
+                                    className="btn-erp btn-erp-secondary"
+                                    onClick={() => toggleSecretVisibility('stripe_live_secret')}
+                                    style={{ padding: '8px 12px' }}
+                                  >
+                                    {showSecrets.stripe_live_secret ? <FiEyeOff /> : <FiEye />}
+                                  </button>
+                                </div>
+                              </div>
+                            </div>
+                            <div className="col-12">
+                              <div className="setting-item">
+                                <label>Webhook Secret</label>
+                                <div style={{ display: 'flex', gap: '8px' }}>
+                                  <input
+                                    type={showSecrets.stripe_live_webhook ? 'text' : 'password'}
+                                    value={settings.stripe_live_webhook_secret || ''}
+                                    onChange={(e) => handleChange('stripe_live_webhook_secret', e.target.value)}
+                                    placeholder="whsec_..."
+                                    style={{ flex: 1 }}
+                                  />
+                                  <button
+                                    type="button"
+                                    className="btn-erp btn-erp-secondary"
+                                    onClick={() => toggleSecretVisibility('stripe_live_webhook')}
+                                    style={{ padding: '8px 12px' }}
+                                  >
+                                    {showSecrets.stripe_live_webhook ? <FiEyeOff /> : <FiEye />}
+                                  </button>
+                                </div>
+                              </div>
+                            </div>
+                          </div>
+                        </div>
+                      </>
+                    )}
+                  </div>
+
+                  {/* Paystack Settings */}
+                  <div style={{ marginBottom: '32px', padding: '24px', background: 'var(--bg-secondary)', borderRadius: '12px', border: '1px solid var(--border-color)' }}>
+                    <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '20px' }}>
+                      <div style={{ display: 'flex', alignItems: 'center', gap: '12px' }}>
+                        <div style={{ width: '48px', height: '48px', background: '#00C3F7', borderRadius: '8px', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
+                          <span style={{ color: 'white', fontWeight: 'bold', fontSize: '18px' }}>P</span>
+                        </div>
+                        <div>
+                          <h4 style={{ margin: 0 }}>Paystack</h4>
+                          <p style={{ margin: 0, fontSize: '13px', color: 'var(--text-tertiary)' }}>Accept payments in Nigeria, Ghana, South Africa, Kenya</p>
+                        </div>
+                      </div>
+                      <label className="toggle-switch">
+                        <input
+                          type="checkbox"
+                          checked={settings.paystack_enabled || false}
+                          onChange={(e) => handleChange('paystack_enabled', e.target.checked)}
+                        />
+                        <span className="toggle-slider"></span>
+                      </label>
+                    </div>
+
+                    {settings.paystack_enabled && (
+                      <>
+                        <div className="row g-4">
+                          <div className="col-md-6">
+                            <div className="setting-item">
+                              <label>Mode</label>
+                              <select
+                                value={settings.paystack_mode || 'test'}
+                                onChange={(e) => handleChange('paystack_mode', e.target.value)}
+                              >
+                                <option value="test">Test Mode</option>
+                                <option value="live">Live Mode</option>
+                              </select>
+                            </div>
+                          </div>
+                        </div>
+
+                        {/* Test Keys */}
+                        <div style={{ marginTop: '24px', padding: '16px', background: settings.paystack_mode === 'test' ? 'rgba(92, 141, 106, 0.1)' : 'transparent', borderRadius: '8px', border: settings.paystack_mode === 'test' ? '2px solid var(--primary)' : '1px solid var(--border-color)' }}>
+                          <h5 style={{ marginBottom: '16px', display: 'flex', alignItems: 'center', gap: '8px' }}>
+                            Test Keys
+                            {settings.paystack_mode === 'test' && <span className="erp-badge badge-success" style={{ fontSize: '11px' }}>Active</span>}
+                          </h5>
+                          <div className="row g-3">
+                            <div className="col-md-6">
+                              <div className="setting-item">
+                                <label>Public Key</label>
+                                <input
+                                  type="text"
+                                  value={settings.paystack_test_public_key || ''}
+                                  onChange={(e) => handleChange('paystack_test_public_key', e.target.value)}
+                                  placeholder="pk_test_..."
+                                />
+                              </div>
+                            </div>
+                            <div className="col-md-6">
+                              <div className="setting-item">
+                                <label>Secret Key</label>
+                                <div style={{ display: 'flex', gap: '8px' }}>
+                                  <input
+                                    type={showSecrets.paystack_test_secret ? 'text' : 'password'}
+                                    value={settings.paystack_test_secret_key || ''}
+                                    onChange={(e) => handleChange('paystack_test_secret_key', e.target.value)}
+                                    placeholder="sk_test_..."
+                                    style={{ flex: 1 }}
+                                  />
+                                  <button
+                                    type="button"
+                                    className="btn-erp btn-erp-secondary"
+                                    onClick={() => toggleSecretVisibility('paystack_test_secret')}
+                                    style={{ padding: '8px 12px' }}
+                                  >
+                                    {showSecrets.paystack_test_secret ? <FiEyeOff /> : <FiEye />}
+                                  </button>
+                                </div>
+                              </div>
+                            </div>
+                          </div>
+                        </div>
+
+                        {/* Live Keys */}
+                        <div style={{ marginTop: '16px', padding: '16px', background: settings.paystack_mode === 'live' ? 'rgba(92, 141, 106, 0.1)' : 'transparent', borderRadius: '8px', border: settings.paystack_mode === 'live' ? '2px solid var(--primary)' : '1px solid var(--border-color)' }}>
+                          <h5 style={{ marginBottom: '16px', display: 'flex', alignItems: 'center', gap: '8px' }}>
+                            Live Keys
+                            {settings.paystack_mode === 'live' && <span className="erp-badge badge-success" style={{ fontSize: '11px' }}>Active</span>}
+                          </h5>
+                          <div className="row g-3">
+                            <div className="col-md-6">
+                              <div className="setting-item">
+                                <label>Public Key</label>
+                                <input
+                                  type="text"
+                                  value={settings.paystack_live_public_key || ''}
+                                  onChange={(e) => handleChange('paystack_live_public_key', e.target.value)}
+                                  placeholder="pk_live_..."
+                                />
+                              </div>
+                            </div>
+                            <div className="col-md-6">
+                              <div className="setting-item">
+                                <label>Secret Key</label>
+                                <div style={{ display: 'flex', gap: '8px' }}>
+                                  <input
+                                    type={showSecrets.paystack_live_secret ? 'text' : 'password'}
+                                    value={settings.paystack_live_secret_key || ''}
+                                    onChange={(e) => handleChange('paystack_live_secret_key', e.target.value)}
+                                    placeholder="sk_live_..."
+                                    style={{ flex: 1 }}
+                                  />
+                                  <button
+                                    type="button"
+                                    className="btn-erp btn-erp-secondary"
+                                    onClick={() => toggleSecretVisibility('paystack_live_secret')}
+                                    style={{ padding: '8px 12px' }}
+                                  >
+                                    {showSecrets.paystack_live_secret ? <FiEyeOff /> : <FiEye />}
+                                  </button>
+                                </div>
+                              </div>
+                            </div>
+                          </div>
+                        </div>
+                      </>
+                    )}
+                  </div>
+                </div>
+
+                {/* Communication Services Section */}
+                <div style={{ borderTop: '3px solid var(--primary)', paddingTop: '32px', marginTop: '32px' }}>
+                  <h3 style={{ marginBottom: '8px', display: 'flex', alignItems: 'center', gap: '8px' }}>
+                    <FiMessageCircle />
+                    Communication Services
+                  </h3>
+                  <p className="setting-description" style={{ color: 'var(--text-tertiary)', marginBottom: '24px' }}>
+                    Configure messaging and notification channels
+                  </p>
+
+                  {/* WhatsApp Settings */}
+                  <div style={{ marginBottom: '32px', padding: '24px', background: 'var(--bg-secondary)', borderRadius: '12px', border: '1px solid var(--border-color)' }}>
+                    <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '20px' }}>
+                      <div style={{ display: 'flex', alignItems: 'center', gap: '12px' }}>
+                        <div style={{ width: '48px', height: '48px', background: '#25D366', borderRadius: '8px', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
+                          <FiMessageCircle size={24} style={{ color: 'white' }} />
+                        </div>
+                        <div>
+                          <h4 style={{ margin: 0 }}>WhatsApp Business API</h4>
+                          <p style={{ margin: 0, fontSize: '13px', color: 'var(--text-tertiary)' }}>Send notifications and updates via WhatsApp</p>
+                        </div>
+                      </div>
+                      <label className="toggle-switch">
+                        <input
+                          type="checkbox"
+                          checked={settings.whatsapp_enabled || false}
+                          onChange={(e) => handleChange('whatsapp_enabled', e.target.checked)}
+                        />
+                        <span className="toggle-slider"></span>
+                      </label>
+                    </div>
+
+                    {settings.whatsapp_enabled && (
+                      <div className="row g-4">
+                        <div className="col-md-6">
+                          <div className="setting-item">
+                            <label>Phone Number ID</label>
+                            <p className="setting-description">From Meta Business Suite</p>
+                            <input
+                              type="text"
+                              value={settings.whatsapp_phone_number_id || ''}
+                              onChange={(e) => handleChange('whatsapp_phone_number_id', e.target.value)}
+                              placeholder="123456789012345"
+                            />
+                          </div>
+                        </div>
+                        <div className="col-md-6">
+                          <div className="setting-item">
+                            <label>Business Account ID</label>
+                            <p className="setting-description">WhatsApp Business Account ID</p>
+                            <input
+                              type="text"
+                              value={settings.whatsapp_business_account_id || ''}
+                              onChange={(e) => handleChange('whatsapp_business_account_id', e.target.value)}
+                              placeholder="123456789012345"
+                            />
+                          </div>
+                        </div>
+                        <div className="col-12">
+                          <div className="setting-item">
+                            <label>Access Token</label>
+                            <p className="setting-description">Permanent access token from Meta</p>
+                            <div style={{ display: 'flex', gap: '8px' }}>
+                              <input
+                                type={showSecrets.whatsapp_token ? 'text' : 'password'}
+                                value={settings.whatsapp_access_token || ''}
+                                onChange={(e) => handleChange('whatsapp_access_token', e.target.value)}
+                                placeholder="EAAxxxxxxx..."
+                                style={{ flex: 1 }}
+                              />
+                              <button
+                                type="button"
+                                className="btn-erp btn-erp-secondary"
+                                onClick={() => toggleSecretVisibility('whatsapp_token')}
+                                style={{ padding: '8px 12px' }}
+                              >
+                                {showSecrets.whatsapp_token ? <FiEyeOff /> : <FiEye />}
+                              </button>
+                            </div>
+                          </div>
+                        </div>
+                        <div className="col-md-6">
+                          <div className="setting-item">
+                            <label>Webhook Verify Token</label>
+                            <p className="setting-description">Custom token for webhook verification</p>
+                            <input
+                              type="text"
+                              value={settings.whatsapp_verify_token || ''}
+                              onChange={(e) => handleChange('whatsapp_verify_token', e.target.value)}
+                              placeholder="your-custom-verify-token"
+                            />
+                          </div>
+                        </div>
+                      </div>
+                    )}
+                  </div>
+
+                  {/* Amazon SES Settings */}
+                  <div style={{ marginBottom: '32px', padding: '24px', background: 'var(--bg-secondary)', borderRadius: '12px', border: '1px solid var(--border-color)' }}>
+                    <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '20px' }}>
+                      <div style={{ display: 'flex', alignItems: 'center', gap: '12px' }}>
+                        <div style={{ width: '48px', height: '48px', background: '#FF9900', borderRadius: '8px', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
+                          <FiMail size={24} style={{ color: 'white' }} />
+                        </div>
+                        <div>
+                          <h4 style={{ margin: 0 }}>Amazon SES</h4>
+                          <p style={{ margin: 0, fontSize: '13px', color: 'var(--text-tertiary)' }}>Send transactional emails via Amazon Simple Email Service</p>
+                        </div>
+                      </div>
+                      <label className="toggle-switch">
+                        <input
+                          type="checkbox"
+                          checked={settings.ses_enabled || false}
+                          onChange={(e) => handleChange('ses_enabled', e.target.checked)}
+                        />
+                        <span className="toggle-slider"></span>
+                      </label>
+                    </div>
+
+                    {settings.ses_enabled && (
+                      <div className="row g-4">
+                        <div className="col-md-4">
+                          <div className="setting-item">
+                            <label>AWS Region</label>
+                            <select
+                              value={settings.ses_region || 'us-east-1'}
+                              onChange={(e) => handleChange('ses_region', e.target.value)}
+                            >
+                              <option value="us-east-1">US East (N. Virginia)</option>
+                              <option value="us-east-2">US East (Ohio)</option>
+                              <option value="us-west-1">US West (N. California)</option>
+                              <option value="us-west-2">US West (Oregon)</option>
+                              <option value="eu-west-1">EU (Ireland)</option>
+                              <option value="eu-west-2">EU (London)</option>
+                              <option value="eu-central-1">EU (Frankfurt)</option>
+                              <option value="ap-south-1">Asia Pacific (Mumbai)</option>
+                              <option value="ap-southeast-1">Asia Pacific (Singapore)</option>
+                              <option value="ap-southeast-2">Asia Pacific (Sydney)</option>
+                              <option value="ap-northeast-1">Asia Pacific (Tokyo)</option>
+                              <option value="af-south-1">Africa (Cape Town)</option>
+                            </select>
+                          </div>
+                        </div>
+                        <div className="col-md-4">
+                          <div className="setting-item">
+                            <label>Access Key ID</label>
+                            <input
+                              type="text"
+                              value={settings.ses_access_key_id || ''}
+                              onChange={(e) => handleChange('ses_access_key_id', e.target.value)}
+                              placeholder="AKIAIOSFODNN7EXAMPLE"
+                            />
+                          </div>
+                        </div>
+                        <div className="col-md-4">
+                          <div className="setting-item">
+                            <label>Secret Access Key</label>
+                            <div style={{ display: 'flex', gap: '8px' }}>
+                              <input
+                                type={showSecrets.ses_secret ? 'text' : 'password'}
+                                value={settings.ses_secret_access_key || ''}
+                                onChange={(e) => handleChange('ses_secret_access_key', e.target.value)}
+                                placeholder="wJalrXUtnFEMI/K7MDENG/bPxRfiCYEXAMPLEKEY"
+                                style={{ flex: 1 }}
+                              />
+                              <button
+                                type="button"
+                                className="btn-erp btn-erp-secondary"
+                                onClick={() => toggleSecretVisibility('ses_secret')}
+                                style={{ padding: '8px 12px' }}
+                              >
+                                {showSecrets.ses_secret ? <FiEyeOff /> : <FiEye />}
+                              </button>
+                            </div>
+                          </div>
+                        </div>
+                        <div className="col-md-4">
+                          <div className="setting-item">
+                            <label>From Email</label>
+                            <p className="setting-description">Must be verified in SES</p>
+                            <input
+                              type="email"
+                              value={settings.ses_from_email || ''}
+                              onChange={(e) => handleChange('ses_from_email', e.target.value)}
+                              placeholder="noreply@yourdomain.com"
+                            />
+                          </div>
+                        </div>
+                        <div className="col-md-4">
+                          <div className="setting-item">
+                            <label>From Name</label>
+                            <input
+                              type="text"
+                              value={settings.ses_from_name || 'Tailor Connect'}
+                              onChange={(e) => handleChange('ses_from_name', e.target.value)}
+                              placeholder="Tailor Connect"
+                            />
+                          </div>
+                        </div>
+                        <div className="col-md-4">
+                          <div className="setting-item">
+                            <label>Reply-To Email</label>
+                            <input
+                              type="email"
+                              value={settings.ses_reply_to_email || ''}
+                              onChange={(e) => handleChange('ses_reply_to_email', e.target.value)}
+                              placeholder="support@yourdomain.com"
+                            />
+                          </div>
+                        </div>
+                      </div>
+                    )}
+                  </div>
+
+                  {/* Termii SMS Settings */}
+                  <div style={{ marginBottom: '32px', padding: '24px', background: 'var(--bg-secondary)', borderRadius: '12px', border: '1px solid var(--border-color)' }}>
+                    <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '20px' }}>
+                      <div style={{ display: 'flex', alignItems: 'center', gap: '12px' }}>
+                        <div style={{ width: '48px', height: '48px', background: '#1890FF', borderRadius: '8px', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
+                          <FiMessageSquare size={24} style={{ color: 'white' }} />
+                        </div>
+                        <div>
+                          <h4 style={{ margin: 0 }}>Termii</h4>
+                          <p style={{ margin: 0, fontSize: '13px', color: 'var(--text-tertiary)' }}>Send SMS notifications across Africa</p>
+                        </div>
+                      </div>
+                      <label className="toggle-switch">
+                        <input
+                          type="checkbox"
+                          checked={settings.termii_enabled || false}
+                          onChange={(e) => handleChange('termii_enabled', e.target.checked)}
+                        />
+                        <span className="toggle-slider"></span>
+                      </label>
+                    </div>
+
+                    {settings.termii_enabled && (
+                      <div className="row g-4">
+                        <div className="col-md-6">
+                          <div className="setting-item">
+                            <label>API Key</label>
+                            <div style={{ display: 'flex', gap: '8px' }}>
+                              <input
+                                type={showSecrets.termii_key ? 'text' : 'password'}
+                                value={settings.termii_api_key || ''}
+                                onChange={(e) => handleChange('termii_api_key', e.target.value)}
+                                placeholder="TLxxxxxxxxxxxxxxxxxxxxxxxx"
+                                style={{ flex: 1 }}
+                              />
+                              <button
+                                type="button"
+                                className="btn-erp btn-erp-secondary"
+                                onClick={() => toggleSecretVisibility('termii_key')}
+                                style={{ padding: '8px 12px' }}
+                              >
+                                {showSecrets.termii_key ? <FiEyeOff /> : <FiEye />}
+                              </button>
+                            </div>
+                          </div>
+                        </div>
+                        <div className="col-md-3">
+                          <div className="setting-item">
+                            <label>Sender ID</label>
+                            <p className="setting-description">Max 11 characters</p>
+                            <input
+                              type="text"
+                              value={settings.termii_sender_id || ''}
+                              onChange={(e) => handleChange('termii_sender_id', e.target.value.slice(0, 11))}
+                              placeholder="TailorConn"
+                              maxLength={11}
+                            />
+                          </div>
+                        </div>
+                        <div className="col-md-3">
+                          <div className="setting-item">
+                            <label>Channel</label>
+                            <select
+                              value={settings.termii_channel || 'generic'}
+                              onChange={(e) => handleChange('termii_channel', e.target.value)}
+                            >
+                              <option value="generic">Generic</option>
+                              <option value="dnd">DND (Do Not Disturb)</option>
+                              <option value="whatsapp">WhatsApp</option>
+                            </select>
+                          </div>
+                        </div>
+                      </div>
+                    )}
+                  </div>
+                </div>
+
+                {/* Status Summary */}
+                <div style={{ marginTop: '32px', padding: '20px', background: 'var(--bg-secondary)', borderRadius: '12px', border: '1px solid var(--border-color)' }}>
+                  <h4 style={{ marginBottom: '16px' }}>Integration Status</h4>
+                  <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(200px, 1fr))', gap: '12px' }}>
+                    <div style={{ display: 'flex', alignItems: 'center', gap: '8px', padding: '12px', background: 'var(--bg-primary)', borderRadius: '8px' }}>
+                      {settings.stripe_enabled ? <FiCheck style={{ color: 'var(--success)' }} /> : <FiAlertCircle style={{ color: 'var(--text-tertiary)' }} />}
+                      <span>Stripe</span>
+                      <span className={`erp-badge ${settings.stripe_enabled ? 'badge-success' : 'badge-secondary'}`} style={{ marginLeft: 'auto', fontSize: '11px' }}>
+                        {settings.stripe_enabled ? (settings.stripe_mode === 'live' ? 'Live' : 'Test') : 'Disabled'}
+                      </span>
+                    </div>
+                    <div style={{ display: 'flex', alignItems: 'center', gap: '8px', padding: '12px', background: 'var(--bg-primary)', borderRadius: '8px' }}>
+                      {settings.paystack_enabled ? <FiCheck style={{ color: 'var(--success)' }} /> : <FiAlertCircle style={{ color: 'var(--text-tertiary)' }} />}
+                      <span>Paystack</span>
+                      <span className={`erp-badge ${settings.paystack_enabled ? 'badge-success' : 'badge-secondary'}`} style={{ marginLeft: 'auto', fontSize: '11px' }}>
+                        {settings.paystack_enabled ? (settings.paystack_mode === 'live' ? 'Live' : 'Test') : 'Disabled'}
+                      </span>
+                    </div>
+                    <div style={{ display: 'flex', alignItems: 'center', gap: '8px', padding: '12px', background: 'var(--bg-primary)', borderRadius: '8px' }}>
+                      {settings.whatsapp_enabled ? <FiCheck style={{ color: 'var(--success)' }} /> : <FiAlertCircle style={{ color: 'var(--text-tertiary)' }} />}
+                      <span>WhatsApp</span>
+                      <span className={`erp-badge ${settings.whatsapp_enabled ? 'badge-success' : 'badge-secondary'}`} style={{ marginLeft: 'auto', fontSize: '11px' }}>
+                        {settings.whatsapp_enabled ? 'Active' : 'Disabled'}
+                      </span>
+                    </div>
+                    <div style={{ display: 'flex', alignItems: 'center', gap: '8px', padding: '12px', background: 'var(--bg-primary)', borderRadius: '8px' }}>
+                      {settings.ses_enabled ? <FiCheck style={{ color: 'var(--success)' }} /> : <FiAlertCircle style={{ color: 'var(--text-tertiary)' }} />}
+                      <span>Amazon SES</span>
+                      <span className={`erp-badge ${settings.ses_enabled ? 'badge-success' : 'badge-secondary'}`} style={{ marginLeft: 'auto', fontSize: '11px' }}>
+                        {settings.ses_enabled ? 'Active' : 'Disabled'}
+                      </span>
+                    </div>
+                    <div style={{ display: 'flex', alignItems: 'center', gap: '8px', padding: '12px', background: 'var(--bg-primary)', borderRadius: '8px' }}>
+                      {settings.termii_enabled ? <FiCheck style={{ color: 'var(--success)' }} /> : <FiAlertCircle style={{ color: 'var(--text-tertiary)' }} />}
+                      <span>Termii SMS</span>
+                      <span className={`erp-badge ${settings.termii_enabled ? 'badge-success' : 'badge-secondary'}`} style={{ marginLeft: 'auto', fontSize: '11px' }}>
+                        {settings.termii_enabled ? 'Active' : 'Disabled'}
+                      </span>
                     </div>
                   </div>
                 </div>

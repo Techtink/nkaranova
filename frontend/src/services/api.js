@@ -91,7 +91,24 @@ export const bookingsAPI = {
   getById: (id) => api.get(`/bookings/${id}`),
   updateStatus: (id, data) => api.put(`/bookings/${id}/status`, data),
   cancel: (id, reason) => api.put(`/bookings/${id}/cancel`, { reason }),
-  getStats: () => api.get('/bookings/stats')
+  getStats: () => api.get('/bookings/stats'),
+
+  // New booking flow endpoints
+  // Tailor actions
+  confirm: (id) => api.put(`/bookings/${id}/confirm`),
+  submitQuote: (id, quoteData) => api.post(`/bookings/${id}/quote`, quoteData),
+  getBookingsNeedingQuote: () => api.get('/bookings/needs-quote'),
+
+  // Customer actions
+  getPendingQuotes: () => api.get('/bookings/pending-quotes'),
+  acceptQuote: (id) => api.put(`/bookings/${id}/quote/accept`),
+  rejectQuote: (id, reason) => api.put(`/bookings/${id}/quote/reject`, { reason }),
+
+  // Payment
+  processPayment: (id, paymentData) => api.post(`/bookings/${id}/pay`, paymentData),
+
+  // Admin actions
+  markConsultationComplete: (id, notes) => api.put(`/bookings/${id}/consultation-complete`, { notes })
 };
 
 // Reviews API
@@ -134,6 +151,11 @@ export const adminAPI = {
   rejectTailor: (id, reason) => api.put(`/admin/tailors/${id}/approval`, { status: 'rejected', reason }),
   suspendTailor: (id, reason) => api.put(`/admin/tailors/${id}/approval`, { status: 'suspended', reason }),
   updateTailorApproval: (id, data) => api.put(`/admin/tailors/${id}/approval`, data),
+  // Bookings
+  getBookings: (params) => api.get('/admin/bookings', { params }),
+  getBookingStats: () => api.get('/admin/bookings/stats'),
+  getBookingsNeedingConsultation: (params) => api.get('/admin/bookings/needs-consultation', { params }),
+  markConsultationComplete: (id, notes) => api.put(`/admin/bookings/${id}/consultation-complete`, { notes }),
   // Works
   getWorks: (params) => api.get('/admin/works', { params }),
   getPendingWorks: (params) => api.get('/admin/works/pending', { params }),
@@ -157,6 +179,12 @@ export const adminAPI = {
   // Conversations
   getConversations: (params) => api.get('/admin/conversations', { params }),
   toggleConversationFlag: (id, reason) => api.put(`/admin/conversations/${id}/flag`, { reason }),
+  // Admin chat
+  getChatUsers: (params) => api.get('/admin/chat/users', { params }),
+  startConversationWithUser: (userId) => api.post(`/admin/conversations/user/${userId}`),
+  getConversation: (id) => api.get(`/admin/conversations/${id}`),
+  getConversationMessages: (id, params) => api.get(`/admin/conversations/${id}/messages`, { params }),
+  sendChatMessage: (id, content) => api.post(`/admin/conversations/${id}/messages`, { content }),
   // Team & Roles
   getTeamMembers: () => api.get('/admin/team'),
   addTeamMember: (data) => api.post('/admin/team', data),
@@ -271,7 +299,8 @@ export const ordersAPI = {
 
   // Admin endpoints
   getAdminOrders: (params) => api.get('/orders/admin', { params }),
-  getOverdueOrders: () => api.get('/orders/admin/overdue')
+  getOverdueOrders: () => api.get('/orders/admin/overdue'),
+  completeConsultation: (id, notes) => api.put(`/orders/${id}/complete-consultation`, { notes })
 };
 
 // Measurements API

@@ -16,15 +16,20 @@ import {
 } from 'react-native';
 import { Ionicons } from '@expo/vector-icons';
 import { useAuth } from '../context/AuthContext';
+import { settingsAPI } from '../services/api';
+import WeatherBackground from '../components/WeatherBackground';
+import { getWeatherForCurrentLocation, getMockWeather } from '../services/weatherService';
+import config from '../config/env';
 
 const { width, height } = Dimensions.get('window');
+
+// Default accent color (can be overridden by settings)
+const DEFAULT_ACCENT = '#6B8CAE';
 
 // Design colors matching the mockup
 const designColors = {
   dark: '#1a1a1a',
   darkHeader: '#2a2a2a',
-  accent: '#5c8d6a',
-  accentLight: '#6b9e7a',
   white: '#ffffff',
   lightGray: '#f5f5f5',
   textPrimary: '#1a1a1a',
@@ -40,6 +45,8 @@ export default function AuthScreen({ navigation, appType = 'customer' }) {
   const [loading, setLoading] = useState(false);
   const [showPassword, setShowPassword] = useState(false);
   const [rememberMe, setRememberMe] = useState(false);
+  const [accentColor, setAccentColor] = useState(DEFAULT_ACCENT);
+  const [weatherData, setWeatherData] = useState(null);
 
   // Form fields
   const [email, setEmail] = useState('');
@@ -49,6 +56,44 @@ export default function AuthScreen({ navigation, appType = 'customer' }) {
 
   // Animations
   const slideAnim = useRef(new Animated.Value(0)).current;
+
+  // Fetch accent color from settings
+  useEffect(() => {
+    const fetchSettings = async () => {
+      try {
+        const response = await settingsAPI.getMobileSettings();
+        if (response.data?.success && response.data?.data?.mobile_primary_color) {
+          setAccentColor(response.data.data.mobile_primary_color);
+        }
+      } catch (error) {
+        console.log('Failed to fetch accent color, using default');
+      }
+    };
+    fetchSettings();
+  }, []);
+
+  // Fetch weather data for animated background
+  useEffect(() => {
+    const fetchWeather = async () => {
+      try {
+        // If API key is configured, fetch real weather
+        if (config.openWeatherApiKey) {
+          const weather = await getWeatherForCurrentLocation();
+          if (weather) {
+            setWeatherData(weather);
+            return;
+          }
+        }
+        // Fallback to time-based display without weather API
+        // WeatherBackground will show sky gradients based on time
+        setWeatherData(null);
+      } catch (error) {
+        console.log('Weather fetch failed, using time-based display');
+        setWeatherData(null);
+      }
+    };
+    fetchWeather();
+  }, []);
 
   useEffect(() => {
     Animated.spring(slideAnim, {
@@ -129,33 +174,42 @@ export default function AuthScreen({ navigation, appType = 'customer' }) {
 
   return (
     <View style={styles.container}>
-      <StatusBar barStyle="light-content" backgroundColor={designColors.dark} />
+      <StatusBar barStyle="light-content" translucent backgroundColor="transparent" />
 
-      {/* Dark Header */}
-      <View style={styles.darkHeader}>
-        <TouchableOpacity
-          style={styles.backButton}
-          onPress={() => navigation.goBack()}
-        >
-          <Ionicons name="arrow-back" size={24} color={designColors.white} />
-        </TouchableOpacity>
+      {/* Full Screen Weather Background */}
+      <WeatherBackground
+        weatherId={weatherData?.weatherId}
+        containerHeight={height}
+        style={styles.weatherBackground}
+      />
 
-        <Text style={styles.headerTitle}>Go ahead and set up{'\n'}your account</Text>
-        <Text style={styles.headerSubtitle}>
-          Sign in-up to enjoy the best managing experience
-        </Text>
-      </View>
-
-      {/* White Content Area */}
+      {/* Content Overlay */}
       <KeyboardAvoidingView
         behavior={Platform.OS === 'ios' ? 'padding' : 'height'}
-        style={styles.whiteContainer}
+        style={styles.contentOverlay}
       >
-        <ScrollView
-          contentContainerStyle={styles.scrollContent}
-          showsVerticalScrollIndicator={false}
-          keyboardShouldPersistTaps="handled"
-        >
+        {/* Header Content */}
+        <View style={styles.headerContent}>
+          <TouchableOpacity
+            style={styles.backButton}
+            onPress={() => navigation.goBack()}
+          >
+            <Ionicons name="arrow-back" size={24} color={designColors.white} />
+          </TouchableOpacity>
+
+          <Text style={styles.headerTitle}>Go ahead and set up{'\n'}your account</Text>
+          <Text style={styles.headerSubtitle}>
+            Sign in-up to enjoy the best managing experience
+          </Text>
+        </View>
+
+        {/* White Form Container - slides up from below */}
+        <View style={styles.whiteContainer}>
+          <ScrollView
+            contentContainerStyle={styles.scrollContent}
+            showsVerticalScrollIndicator={false}
+            keyboardShouldPersistTaps="handled"
+          >
           {/* Tab Selector */}
           <View style={styles.tabContainer}>
             <Animated.View
@@ -268,20 +322,20 @@ export default function AuthScreen({ navigation, appType = 'customer' }) {
                   style={styles.checkboxRow}
                   onPress={() => setRememberMe(!rememberMe)}
                 >
-                  <View style={[styles.checkbox, rememberMe && styles.checkboxChecked]}>
+                  <View style={[styles.checkbox, rememberMe && [styles.checkboxChecked, { backgroundColor: accentColor, borderColor: accentColor }]]}>
                     {rememberMe && <Ionicons name="checkmark" size={12} color={designColors.white} />}
                   </View>
                   <Text style={styles.rememberText}>Remember me</Text>
                 </TouchableOpacity>
                 <TouchableOpacity onPress={handleForgotPassword}>
-                  <Text style={styles.forgotText}>Forgot Password?</Text>
+                  <Text style={[styles.forgotText, { color: accentColor }]}>Forgot Password?</Text>
                 </TouchableOpacity>
               </View>
             )}
 
             {/* Submit Button */}
             <TouchableOpacity
-              style={[styles.submitButton, loading && styles.submitButtonDisabled]}
+              style={[styles.submitButton, { backgroundColor: accentColor }, loading && styles.submitButtonDisabled]}
               onPress={activeTab === 'login' ? handleLogin : handleRegister}
               disabled={loading}
             >
@@ -320,11 +374,9 @@ export default function AuthScreen({ navigation, appType = 'customer' }) {
               </TouchableOpacity>
             </View>
           </View>
-        </ScrollView>
+          </ScrollView>
+        </View>
       </KeyboardAvoidingView>
-
-      {/* Home Indicator */}
-      <View style={styles.homeIndicator} />
     </View>
   );
 }
@@ -332,15 +384,26 @@ export default function AuthScreen({ navigation, appType = 'customer' }) {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: designColors.white
+    backgroundColor: designColors.dark
   },
-  darkHeader: {
-    backgroundColor: designColors.dark,
+  weatherBackground: {
+    position: 'absolute',
+    top: 0,
+    left: 0,
+    right: 0,
+    bottom: 0,
+    zIndex: 0
+  },
+  contentOverlay: {
+    flex: 1,
+    zIndex: 1,
+    justifyContent: 'flex-end'
+  },
+  headerContent: {
     paddingTop: Platform.OS === 'ios' ? 60 : 40,
     paddingHorizontal: 24,
-    paddingBottom: 40,
-    borderBottomLeftRadius: 0,
-    borderBottomRightRadius: 0
+    paddingBottom: 20,
+    zIndex: 10
   },
   backButton: {
     width: 40,
@@ -353,6 +416,7 @@ const styles = StyleSheet.create({
   },
   headerTitle: {
     fontSize: 28,
+    fontFamily: 'Montserrat-Bold',
     fontWeight: '700',
     color: designColors.white,
     lineHeight: 36,
@@ -360,19 +424,20 @@ const styles = StyleSheet.create({
   },
   headerSubtitle: {
     fontSize: 14,
-    color: designColors.textMuted,
+    fontFamily: 'Montserrat-Regular',
+    color: 'rgba(255,255,255,0.7)',
     lineHeight: 20
   },
   whiteContainer: {
-    flex: 1,
     backgroundColor: designColors.white,
     borderTopLeftRadius: 24,
     borderTopRightRadius: 24,
-    marginTop: -20
+    maxHeight: height * 0.92,
+    overflow: 'hidden'
   },
   scrollContent: {
     padding: 24,
-    paddingBottom: 40
+    paddingBottom: 50
   },
   tabContainer: {
     flexDirection: 'row',
@@ -403,10 +468,12 @@ const styles = StyleSheet.create({
   },
   tabText: {
     fontSize: 15,
+    fontFamily: 'Montserrat-Medium',
     fontWeight: '500',
     color: designColors.textMuted
   },
   tabTextActive: {
+    fontFamily: 'Montserrat-SemiBold',
     color: designColors.textPrimary,
     fontWeight: '600'
   },
@@ -432,11 +499,13 @@ const styles = StyleSheet.create({
   },
   inputLabel: {
     fontSize: 11,
+    fontFamily: 'Montserrat-Regular',
     color: designColors.textMuted,
     marginBottom: 2
   },
   input: {
     fontSize: 15,
+    fontFamily: 'Montserrat-Regular',
     color: designColors.textPrimary,
     padding: 0,
     height: 24
@@ -465,20 +534,22 @@ const styles = StyleSheet.create({
     alignItems: 'center'
   },
   checkboxChecked: {
-    backgroundColor: designColors.accent,
-    borderColor: designColors.accent
+    backgroundColor: DEFAULT_ACCENT,
+    borderColor: DEFAULT_ACCENT
   },
   rememberText: {
     fontSize: 13,
+    fontFamily: 'Montserrat-Regular',
     color: designColors.textSecondary
   },
   forgotText: {
     fontSize: 13,
-    color: designColors.accent,
+    fontFamily: 'Montserrat-Medium',
+    color: DEFAULT_ACCENT,
     fontWeight: '500'
   },
   submitButton: {
-    backgroundColor: designColors.accent,
+    backgroundColor: DEFAULT_ACCENT,
     borderRadius: 12,
     paddingVertical: 16,
     alignItems: 'center',
@@ -490,12 +561,13 @@ const styles = StyleSheet.create({
   submitButtonText: {
     color: designColors.white,
     fontSize: 16,
+    fontFamily: 'Montserrat-SemiBold',
     fontWeight: '600'
   },
   dividerContainer: {
     flexDirection: 'row',
     alignItems: 'center',
-    marginVertical: 24
+    marginVertical: 10
   },
   divider: {
     flex: 1,
@@ -504,6 +576,7 @@ const styles = StyleSheet.create({
   },
   dividerText: {
     fontSize: 13,
+    fontFamily: 'Montserrat-Regular',
     color: designColors.textMuted,
     marginHorizontal: 16
   },
@@ -525,15 +598,8 @@ const styles = StyleSheet.create({
   },
   socialButtonText: {
     fontSize: 14,
+    fontFamily: 'Montserrat-Medium',
     fontWeight: '500',
     color: designColors.textPrimary
-  },
-  homeIndicator: {
-    width: 134,
-    height: 5,
-    backgroundColor: designColors.dark,
-    borderRadius: 3,
-    alignSelf: 'center',
-    marginBottom: 8
   }
 });

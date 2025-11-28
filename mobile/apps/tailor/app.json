@@ -51,7 +51,8 @@
           "photosPermission": "Allow Tailor Connect Pro to access your photos to upload work images.",
           "cameraPermission": "Allow Tailor Connect Pro to access your camera to capture photos."
         }
-      ]
+      ],
+      "expo-font"
     ],
     "notification": {
       "icon": "./assets/notification-icon.png",

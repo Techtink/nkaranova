@@ -5,7 +5,7 @@ import { createBottomTabNavigator } from '@react-navigation/bottom-tabs';
 import { Ionicons } from '@expo/vector-icons';
 
 import { useAuth } from '../../../../shared/context/AuthContext';
-import { colors } from '../../../../shared/constants/theme';
+import { useTheme } from '../../../../shared/context/ThemeContext';
 
 // Auth/Onboarding Screens
 import OnboardingScreen from '../../../../shared/screens/OnboardingScreen';
@@ -39,10 +39,9 @@ import HelpSupportScreen from '../../../../shared/screens/HelpSupportScreen';
 const Stack = createNativeStackNavigator();
 const Tab = createBottomTabNavigator();
 
-// Design accent color
-const accentColor = '#5c8d6a';
-
 function MainTabs() {
+  const { colors } = useTheme();
+
   return (
     <Tab.Navigator
       screenOptions={({ route }) => ({
@@ -65,11 +64,16 @@ function MainTabs() {
 
           return <Ionicons name={iconName} size={size} color={color} />;
         },
-        tabBarActiveTintColor: accentColor,
+        tabBarActiveTintColor: colors.primary,
         tabBarInactiveTintColor: colors.textMuted,
+        tabBarStyle: {
+          backgroundColor: colors.cardBg,
+          borderTopColor: colors.border,
+          borderTopWidth: 1
+        },
         headerShown: true,
         headerStyle: {
-          backgroundColor: accentColor
+          backgroundColor: colors.headerBg
         },
         headerTintColor: colors.white
       })}
@@ -147,6 +151,7 @@ function AuthStack() {
 
 export default function AppNavigator() {
   const { isAuthenticated, loading, setNavigationRef } = useAuth();
+  const { colors } = useTheme();
   const navigationRef = useRef(null);
 
   useEffect(() => {
@@ -165,7 +170,7 @@ export default function AppNavigator() {
         <Stack.Navigator
           screenOptions={{
             headerStyle: {
-              backgroundColor: accentColor
+              backgroundColor: colors.headerBg
             },
             headerTintColor: colors.white,
             headerBackTitleVisible: false

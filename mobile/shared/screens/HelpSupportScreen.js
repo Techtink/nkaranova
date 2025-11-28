@@ -313,6 +313,7 @@ const styles = StyleSheet.create({
   },
   sectionTitle: {
     fontSize: fontSize.sm,
+    fontFamily: 'Montserrat-SemiBold',
     fontWeight: '600',
     color: colors.textSecondary,
     marginBottom: spacing.sm,
@@ -344,9 +345,11 @@ const styles = StyleSheet.create({
   },
   categoryText: {
     fontSize: fontSize.sm,
+    fontFamily: 'Montserrat-Regular',
     color: colors.textSecondary
   },
   categoryTextActive: {
+    fontFamily: 'Montserrat-Medium',
     color: colors.white
   },
   contactOption: {
@@ -368,11 +371,13 @@ const styles = StyleSheet.create({
   },
   contactTitle: {
     fontSize: fontSize.base,
+    fontFamily: 'Montserrat-Medium',
     fontWeight: '500',
     color: colors.textPrimary
   },
   contactSubtitle: {
     fontSize: fontSize.sm,
+    fontFamily: 'Montserrat-Regular',
     color: colors.textMuted,
     marginTop: spacing.xs
   },
@@ -392,12 +397,14 @@ const styles = StyleSheet.create({
   faqQuestion: {
     flex: 1,
     fontSize: fontSize.base,
+    fontFamily: 'Montserrat-Medium',
     fontWeight: '500',
     color: colors.textPrimary,
     marginRight: spacing.sm
   },
   faqAnswer: {
     fontSize: fontSize.sm,
+    fontFamily: 'Montserrat-Regular',
     color: colors.textSecondary,
     marginTop: spacing.sm,
     lineHeight: 20
@@ -408,6 +415,7 @@ const styles = StyleSheet.create({
   },
   emptyText: {
     fontSize: fontSize.sm,
+    fontFamily: 'Montserrat-Regular',
     color: colors.textMuted,
     marginTop: spacing.sm
   },
@@ -419,11 +427,13 @@ const styles = StyleSheet.create({
   linkText: {
     flex: 1,
     fontSize: fontSize.base,
+    fontFamily: 'Montserrat-Regular',
     color: colors.textPrimary,
     marginLeft: spacing.md
   },
   versionText: {
     fontSize: fontSize.sm,
+    fontFamily: 'Montserrat-Regular',
     color: colors.textMuted
   },
   footer: {
@@ -432,6 +442,7 @@ const styles = StyleSheet.create({
   },
   footerText: {
     fontSize: fontSize.sm,
+    fontFamily: 'Montserrat-Regular',
     color: colors.textMuted,
     textAlign: 'center',
     lineHeight: 20

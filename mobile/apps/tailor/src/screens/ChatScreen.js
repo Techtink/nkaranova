@@ -20,28 +20,57 @@ import { colors, spacing, fontSize, borderRadius } from '../../../../shared/cons
 const API_URL = 'http://localhost:5001/api';
 
 export default function ChatScreen({ route, navigation }) {
-  const { conversationId } = route.params;
+  const { conversationId, orderContext, recipientId, recipientName } = route.params;
   const { user } = useAuth();
   const [messages, setMessages] = useState([]);
   const [newMessage, setNewMessage] = useState('');
   const [loading, setLoading] = useState(true);
   const [sending, setSending] = useState(false);
   const [conversation, setConversation] = useState(null);
+  const [activeConversationId, setActiveConversationId] = useState(conversationId);
   const flatListRef = useRef(null);
   const socketRef = useRef(null);
 
+  // Format date for display
+  const formatOrderDate = (dateString) => {
+    if (!dateString) return '';
+    const date = new Date(dateString);
+    const months = ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'];
+    return `${date.getDate()} ${months[date.getMonth()]}, ${date.getFullYear()}`;
+  };
+
   useEffect(() => {
+    // Set navigation header with order context if available
+    if (orderContext) {
+      const acceptedDate = formatOrderDate(orderContext.acceptedAt);
+      navigation.setOptions({
+        headerTitle: () => (
+          <View style={{ alignItems: 'center' }}>
+            <Text style={{ fontSize: 16, fontWeight: '600', color: colors.textPrimary }}>
+              {orderContext.orderNumber}
+            </Text>
+            {acceptedDate && (
+              <Text style={{ fontSize: 12, color: colors.textMuted }}>
+                Accepted {acceptedDate}
+              </Text>
+            )}
+          </View>
+        )
+      });
+    }
+
     loadConversation();
-    setupSocket();
 
     return () => {
       if (socketRef.current) {
         socketRef.current.disconnect();
       }
     };
-  }, [conversationId]);
+  }, [conversationId, recipientId]);
 
-  const setupSocket = () => {
+  const setupSocket = (convId) => {
+    if (!convId || socketRef.current) return;
+
     const socketUrl = API_URL.replace('/api', '');
 
     socketRef.current = io(socketUrl, {
@@ -49,11 +78,11 @@ export default function ChatScreen({ route, navigation }) {
     });
 
     socketRef.current.on('connect', () => {
-      socketRef.current.emit('join:conversation', conversationId);
+      socketRef.current.emit('join:conversation', convId);
     });
 
     socketRef.current.on('new:message', (data) => {
-      if (data.conversationId === conversationId) {
+      if (data.conversationId === convId) {
         setMessages(prev => [...prev, data.message]);
       }
     });
@@ -61,21 +90,51 @@ export default function ChatScreen({ route, navigation }) {
 
   const loadConversation = async () => {
     try {
-      const [convRes, messagesRes] = await Promise.all([
-        conversationsAPI.getById(conversationId),
-        conversationsAPI.getMessages(conversationId)
-      ]);
-      setConversation(convRes.data.data);
+      let convId = conversationId;
+      let convData = null;
+
+      // If no conversationId but we have recipientId, start/get conversation first
+      if (!convId && recipientId) {
+        const startRes = await conversationsAPI.startWithUser(recipientId);
+        convData = startRes.data.data;
+        convId = convData._id;
+        setActiveConversationId(convId);
+        setConversation(convData);
+      }
+
+      if (!convId) {
+        console.error('No conversation ID available');
+        setLoading(false);
+        return;
+      }
+
+      // Load conversation details if not already loaded
+      if (!convData) {
+        const convRes = await conversationsAPI.getById(convId);
+        convData = convRes.data.data;
+        setConversation(convData);
+      }
+
+      // Load messages
+      const messagesRes = await conversationsAPI.getMessages(convId);
       setMessages(messagesRes.data.data);
 
-      await conversationsAPI.markAsRead(conversationId);
+      await conversationsAPI.markAsRead(convId);
 
-      const otherParticipant = convRes.data.data.participants?.find(
-        p => p._id !== user?._id
-      );
-      navigation.setOptions({
-        title: otherParticipant?.name || 'Chat'
-      });
+      // Set header title if no order context (order context is set in useEffect)
+      if (!orderContext) {
+        const otherParticipant = convData.participants?.find(
+          p => p._id !== user?._id
+        );
+        navigation.setOptions({
+          title: otherParticipant?.firstName
+            ? `${otherParticipant.firstName} ${otherParticipant.lastName || ''}`
+            : recipientName || 'Chat'
+        });
+      }
+
+      // Setup socket after we have a valid conversation ID
+      setupSocket(convId);
     } catch (error) {
       console.error('Error loading conversation:', error);
     } finally {
@@ -84,7 +143,8 @@ export default function ChatScreen({ route, navigation }) {
   };
 
   const sendMessage = async () => {
-    if (!newMessage.trim() || sending) return;
+    const convId = activeConversationId || conversationId;
+    if (!newMessage.trim() || sending || !convId) return;
 
     const messageContent = newMessage.trim();
     setNewMessage('');
@@ -100,7 +160,7 @@ export default function ChatScreen({ route, navigation }) {
     setMessages(prev => [...prev, tempMessage]);
 
     try {
-      await conversationsAPI.sendMessage(conversationId, { content: messageContent });
+      await conversationsAPI.sendMessage(convId, { content: messageContent });
       setMessages(prev =>
         prev.map(m => m._id === tempMessage._id ? { ...m, pending: false } : m)
       );

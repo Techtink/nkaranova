@@ -15,7 +15,10 @@ import {
   FiSun,
   FiMoon,
   FiLogOut,
-  FiHelpCircle
+  FiHelpCircle,
+  FiPackage,
+  FiMail,
+  FiCalendar
 } from 'react-icons/fi';
 import { useState } from 'react';
 import { useAuth } from '../../context/AuthContext';
@@ -28,7 +31,10 @@ const navItems = [
   { path: '/admin/works', icon: FiImage, label: 'Works' },
   { path: '/admin/reviews', icon: FiStar, label: 'Reviews' },
   { path: '/admin/verifications', icon: FiCheckCircle, label: 'Verifications' },
+  { path: '/admin/bookings', icon: FiCalendar, label: 'Bookings' },
+  { path: '/admin/orders', icon: FiPackage, label: 'Orders' },
   { path: '/admin/guest-chats', icon: FiMessageSquare, label: 'Guest Chats' },
+  { path: '/admin/chat', icon: FiMail, label: 'Messages' },
   { divider: true, label: 'Referral System' },
   { path: '/admin/referrals', icon: FiGift, label: 'Referrals' },
   { path: '/admin/featured', icon: FiAward, label: 'Featured Tailors' },

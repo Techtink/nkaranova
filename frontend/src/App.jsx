@@ -43,6 +43,9 @@ import AdminReferrals from './pages/admin/Referrals';
 import AdminFeaturedTailors from './pages/admin/FeaturedTailors';
 import AdminTeam from './pages/admin/Team';
 import AdminFAQs from './pages/admin/FAQs';
+import AdminOrders from './pages/admin/Orders';
+import AdminBookings from './pages/admin/Bookings';
+import AdminChat from './pages/admin/Chat';
 
 // Protected Route Component
 function ProtectedRoute({ children, roles }) {
@@ -171,10 +174,13 @@ export default function App() {
             <Route path="reviews" element={<AdminReviews />} />
             <Route path="verifications" element={<AdminVerifications />} />
             <Route path="guest-chats" element={<AdminGuestChats />} />
+            <Route path="chat" element={<AdminChat />} />
             <Route path="referrals" element={<AdminReferrals />} />
             <Route path="featured" element={<AdminFeaturedTailors />} />
             <Route path="team" element={<AdminTeam />} />
             <Route path="faqs" element={<AdminFAQs />} />
+            <Route path="bookings" element={<AdminBookings />} />
+            <Route path="orders" element={<AdminOrders />} />
             <Route path="settings" element={<AdminSettings />} />
           </Route>
 

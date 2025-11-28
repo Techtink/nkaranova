@@ -202,6 +202,7 @@ const styles = StyleSheet.create({
   },
   title: {
     fontSize: fontSize.xxl,
+    fontFamily: 'Montserrat-Bold',
     fontWeight: '700',
     color: colors.textPrimary,
     textAlign: 'center',
@@ -209,12 +210,14 @@ const styles = StyleSheet.create({
   },
   subtitle: {
     fontSize: fontSize.sm,
+    fontFamily: 'Montserrat-Regular',
     color: colors.textSecondary,
     textAlign: 'center',
     marginBottom: spacing.xl
   },
   instruction: {
     fontSize: fontSize.base,
+    fontFamily: 'Montserrat-Regular',
     color: colors.textSecondary,
     textAlign: 'center',
     marginBottom: spacing.lg
@@ -240,6 +243,7 @@ const styles = StyleSheet.create({
   },
   codeDigit: {
     fontSize: fontSize.xxl,
+    fontFamily: 'Montserrat-SemiBold',
     fontWeight: '600',
     color: colors.textPrimary
   },
@@ -256,6 +260,7 @@ const styles = StyleSheet.create({
     borderRadius: borderRadius.md,
     padding: spacing.md,
     fontSize: fontSize.xl,
+    fontFamily: 'Montserrat-SemiBold',
     textAlign: 'center',
     letterSpacing: 4,
     fontWeight: '600',
@@ -275,6 +280,7 @@ const styles = StyleSheet.create({
   buttonText: {
     color: colors.white,
     fontSize: fontSize.base,
+    fontFamily: 'Montserrat-SemiBold',
     fontWeight: '600'
   },
   linkButton: {
@@ -284,6 +290,7 @@ const styles = StyleSheet.create({
   linkText: {
     color: colors.primary,
     fontSize: fontSize.sm,
+    fontFamily: 'Montserrat-Medium',
     fontWeight: '500'
   },
   cancelButton: {
@@ -292,6 +299,7 @@ const styles = StyleSheet.create({
   },
   cancelText: {
     color: colors.textMuted,
-    fontSize: fontSize.sm
+    fontSize: fontSize.sm,
+    fontFamily: 'Montserrat-Regular'
   }
 });

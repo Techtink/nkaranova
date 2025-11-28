@@ -88,7 +88,21 @@ export const bookingsAPI = {
   getById: (id) => api.get(`/bookings/${id}`),
   updateStatus: (id, data) => api.put(`/bookings/${id}/status`, data),
   cancel: (id, reason) => api.put(`/bookings/${id}/cancel`, { reason }),
-  getStats: () => api.get('/bookings/stats')
+  getStats: () => api.get('/bookings/stats'),
+
+  // New booking flow endpoints
+  // Tailor actions
+  confirm: (id) => api.put(`/bookings/${id}/confirm`),
+  submitQuote: (id, quoteData) => api.post(`/bookings/${id}/quote`, quoteData),
+  getBookingsNeedingQuote: () => api.get('/bookings/needs-quote'),
+
+  // Customer actions
+  getPendingQuotes: () => api.get('/bookings/pending-quotes'),
+  acceptQuote: (id) => api.put(`/bookings/${id}/quote/accept`),
+  rejectQuote: (id, reason) => api.put(`/bookings/${id}/quote/reject`, { reason }),
+
+  // Payment
+  processPayment: (id, paymentData) => api.post(`/bookings/${id}/pay`, paymentData)
 };
 
 // Orders API
@@ -102,7 +116,7 @@ export const ordersAPI = {
 
   // Tailor endpoints
   getTailorOrders: (params) => api.get('/orders/tailor', { params }),
-  submitWorkPlan: (id, data) => api.put(`/orders/${id}/work-plan`, data),
+  submitWorkPlan: (id, data) => api.post(`/orders/${id}/work-plan`, data),
   completeStage: (id, stageIndex, data) => api.put(`/orders/${id}/stages/${stageIndex}/complete`, data),
   addStageNote: (id, stageIndex, data) => api.post(`/orders/${id}/stages/${stageIndex}/notes`, data),
   requestDelay: (id, data) => api.post(`/orders/${id}/delay`, data),
@@ -129,6 +143,7 @@ export const conversationsAPI = {
   getAll: (params) => api.get('/conversations', { params }),
   getUnreadCount: () => api.get('/conversations/unread'),
   startWithTailor: (username) => api.post(`/conversations/tailor/${username}`),
+  startWithUser: (userId) => api.post(`/conversations/user/${userId}`),
   getById: (id) => api.get(`/conversations/${id}`),
   getMessages: (id, params) => api.get(`/conversations/${id}/messages`, { params }),
   sendMessage: (id, data) => api.post(`/conversations/${id}/messages`, data),

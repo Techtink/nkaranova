@@ -12,7 +12,7 @@ const settingsSchema = new mongoose.Schema({
   },
   category: {
     type: String,
-    enum: ['referral', 'featured', 'general', 'payment', 'landing', 'order', 'mobile'],
+    enum: ['referral', 'featured', 'general', 'payment', 'landing', 'order', 'mobile', 'integrations'],
     required: true
   },
   description: String,
@@ -672,6 +672,174 @@ const defaultSettings = {
     value: '#5c8d6a',
     category: 'mobile',
     description: 'Primary accent color for mobile apps (hex)'
+  },
+
+  // ==========================================
+  // Integration Settings - Payment Gateways
+  // ==========================================
+
+  // Stripe Settings
+  stripe_enabled: {
+    value: false,
+    category: 'integrations',
+    description: 'Enable Stripe payment gateway'
+  },
+  stripe_mode: {
+    value: 'test',
+    category: 'integrations',
+    description: 'Stripe mode: test or live'
+  },
+  stripe_test_publishable_key: {
+    value: '',
+    category: 'integrations',
+    description: 'Stripe test publishable key'
+  },
+  stripe_test_secret_key: {
+    value: '',
+    category: 'integrations',
+    description: 'Stripe test secret key'
+  },
+  stripe_test_webhook_secret: {
+    value: '',
+    category: 'integrations',
+    description: 'Stripe test webhook signing secret'
+  },
+  stripe_live_publishable_key: {
+    value: '',
+    category: 'integrations',
+    description: 'Stripe live publishable key'
+  },
+  stripe_live_secret_key: {
+    value: '',
+    category: 'integrations',
+    description: 'Stripe live secret key'
+  },
+  stripe_live_webhook_secret: {
+    value: '',
+    category: 'integrations',
+    description: 'Stripe live webhook signing secret'
+  },
+
+  // Paystack Settings
+  paystack_enabled: {
+    value: false,
+    category: 'integrations',
+    description: 'Enable Paystack payment gateway'
+  },
+  paystack_mode: {
+    value: 'test',
+    category: 'integrations',
+    description: 'Paystack mode: test or live'
+  },
+  paystack_test_public_key: {
+    value: '',
+    category: 'integrations',
+    description: 'Paystack test public key'
+  },
+  paystack_test_secret_key: {
+    value: '',
+    category: 'integrations',
+    description: 'Paystack test secret key'
+  },
+  paystack_live_public_key: {
+    value: '',
+    category: 'integrations',
+    description: 'Paystack live public key'
+  },
+  paystack_live_secret_key: {
+    value: '',
+    category: 'integrations',
+    description: 'Paystack live secret key'
+  },
+
+  // ==========================================
+  // Integration Settings - Communication
+  // ==========================================
+
+  // WhatsApp Business API Settings
+  whatsapp_enabled: {
+    value: false,
+    category: 'integrations',
+    description: 'Enable WhatsApp Business API'
+  },
+  whatsapp_phone_number_id: {
+    value: '',
+    category: 'integrations',
+    description: 'WhatsApp Business phone number ID'
+  },
+  whatsapp_business_account_id: {
+    value: '',
+    category: 'integrations',
+    description: 'WhatsApp Business account ID'
+  },
+  whatsapp_access_token: {
+    value: '',
+    category: 'integrations',
+    description: 'WhatsApp API access token'
+  },
+  whatsapp_verify_token: {
+    value: '',
+    category: 'integrations',
+    description: 'WhatsApp webhook verify token'
+  },
+
+  // Amazon SES Email Settings
+  ses_enabled: {
+    value: false,
+    category: 'integrations',
+    description: 'Enable Amazon SES for email'
+  },
+  ses_region: {
+    value: 'us-east-1',
+    category: 'integrations',
+    description: 'AWS region for SES'
+  },
+  ses_access_key_id: {
+    value: '',
+    category: 'integrations',
+    description: 'AWS access key ID for SES'
+  },
+  ses_secret_access_key: {
+    value: '',
+    category: 'integrations',
+    description: 'AWS secret access key for SES'
+  },
+  ses_from_email: {
+    value: '',
+    category: 'integrations',
+    description: 'Verified sender email address'
+  },
+  ses_from_name: {
+    value: 'Tailor Connect',
+    category: 'integrations',
+    description: 'Sender display name'
+  },
+  ses_reply_to_email: {
+    value: '',
+    category: 'integrations',
+    description: 'Reply-to email address'
+  },
+
+  // Termii SMS Settings
+  termii_enabled: {
+    value: false,
+    category: 'integrations',
+    description: 'Enable Termii for SMS'
+  },
+  termii_api_key: {
+    value: '',
+    category: 'integrations',
+    description: 'Termii API key'
+  },
+  termii_sender_id: {
+    value: '',
+    category: 'integrations',
+    description: 'Termii sender ID (alphanumeric, max 11 chars)'
+  },
+  termii_channel: {
+    value: 'generic',
+    category: 'integrations',
+    description: 'Termii channel type: generic, dnd, or whatsapp'
   }
 };
 

@@ -270,6 +270,7 @@ const styles = StyleSheet.create({
   },
   headerTitleSmall: {
     fontSize: 14,
+    fontFamily: 'Montserrat-Regular',
     color: designColors.textMuted
   },
   content: {
@@ -291,11 +292,13 @@ const styles = StyleSheet.create({
   },
   codePreview: {
     fontSize: 12,
+    fontFamily: 'Montserrat-Regular',
     color: designColors.textMuted,
     letterSpacing: 4
   },
   title: {
     fontSize: 24,
+    fontFamily: 'Montserrat-Bold',
     fontWeight: '700',
     color: designColors.textPrimary,
     textAlign: 'center',
@@ -303,12 +306,14 @@ const styles = StyleSheet.create({
   },
   subtitle: {
     fontSize: 14,
+    fontFamily: 'Montserrat-Regular',
     color: designColors.textMuted,
     textAlign: 'center',
     lineHeight: 22,
     marginBottom: 32
   },
   emailLink: {
+    fontFamily: 'Montserrat-Medium',
     color: designColors.accent,
     textDecorationLine: 'underline'
   },
@@ -324,6 +329,7 @@ const styles = StyleSheet.create({
     borderRadius: 12,
     backgroundColor: designColors.inputBg,
     fontSize: 24,
+    fontFamily: 'Montserrat-SemiBold',
     fontWeight: '600',
     textAlign: 'center',
     color: designColors.textPrimary
@@ -339,6 +345,7 @@ const styles = StyleSheet.create({
   },
   resendText: {
     fontSize: 14,
+    fontFamily: 'Montserrat-Medium',
     color: designColors.accent,
     fontWeight: '500'
   },
@@ -358,6 +365,7 @@ const styles = StyleSheet.create({
   verifyButtonText: {
     color: designColors.white,
     fontSize: 16,
+    fontFamily: 'Montserrat-SemiBold',
     fontWeight: '600'
   },
   biometricButton: {
@@ -374,6 +382,7 @@ const styles = StyleSheet.create({
   },
   biometricText: {
     fontSize: 14,
+    fontFamily: 'Montserrat-Medium',
     fontWeight: '500',
     color: designColors.textPrimary
   },
@@ -389,6 +398,7 @@ const styles = StyleSheet.create({
   },
   dividerText: {
     fontSize: 13,
+    fontFamily: 'Montserrat-Regular',
     color: designColors.textMuted,
     marginHorizontal: 16
   },
@@ -410,6 +420,7 @@ const styles = StyleSheet.create({
   },
   socialButtonText: {
     fontSize: 14,
+    fontFamily: 'Montserrat-Medium',
     fontWeight: '500',
     color: designColors.textPrimary
   }

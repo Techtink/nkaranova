@@ -124,20 +124,17 @@ const orderSchema = new mongoose.Schema({
     ref: 'TailorProfile',
     required: true
   },
-  // Order status
+  // Order status - simplified since consultation happens in booking phase
   status: {
     type: String,
     enum: [
-      'awaiting_plan',      // Payment made, waiting for tailor to create plan
-      'plan_review',        // Plan submitted, waiting for customer approval
-      'plan_rejected',      // Customer rejected the plan, tailor needs to revise
-      'in_progress',        // Plan approved, work in progress
+      'in_progress',        // Work in progress (Design -> Sew -> Deliver)
       'ready',              // Work completed, ready for pickup/delivery
       'completed',          // Order delivered and confirmed
       'cancelled',          // Order cancelled
       'disputed'            // Under dispute
     ],
-    default: 'awaiting_plan'
+    default: 'in_progress'
   },
   statusHistory: [{
     status: String,
@@ -262,85 +259,67 @@ orderSchema.pre('save', function(next) {
   next();
 });
 
-// Method to submit work plan
-orderSchema.methods.submitWorkPlan = function(stages, userId) {
-  // Calculate total estimated days
-  const totalDays = stages.reduce((sum, stage) => sum + stage.estimatedDays, 0);
+// Static method to create order from a paid booking
+orderSchema.statics.createFromBooking = async function(booking, userId) {
+  const { quote } = booking;
 
-  // Set order for stages
-  const orderedStages = stages.map((stage, index) => ({
-    ...stage,
-    order: index,
-    status: 'pending'
-  }));
+  // Create 3 stages: Design -> Sew -> Deliver
+  const stages = [
+    {
+      name: 'Design',
+      description: 'Design phase - patterns and preparation',
+      estimatedDays: quote.estimatedDays?.design || 3,
+      order: 0,
+      status: 'in_progress',
+      startedAt: new Date(),
+      notes: []
+    },
+    {
+      name: 'Sew',
+      description: 'Sewing and assembly',
+      estimatedDays: quote.estimatedDays?.sew || 7,
+      order: 1,
+      status: 'pending',
+      notes: []
+    },
+    {
+      name: 'Deliver',
+      description: 'Final fitting and delivery',
+      estimatedDays: quote.estimatedDays?.deliver || 2,
+      order: 2,
+      status: 'pending',
+      notes: []
+    }
+  ];
 
-  // Calculate estimated completion date
+  const totalDays = stages.reduce((sum, s) => sum + s.estimatedDays, 0);
   const estimatedCompletion = new Date();
   estimatedCompletion.setDate(estimatedCompletion.getDate() + totalDays);
 
-  this.workPlan = {
-    submittedAt: new Date(),
-    stages: orderedStages,
-    totalEstimatedDays: totalDays,
-    estimatedCompletion,
-    revisionHistory: []
-  };
-
-  this.status = 'plan_review';
-  this.statusHistory.push({
-    status: 'plan_review',
-    changedAt: new Date(),
-    changedBy: userId,
-    note: 'Work plan submitted for review'
-  });
-
-  return this;
-};
-
-// Method to approve work plan
-orderSchema.methods.approveWorkPlan = function(userId) {
-  if (this.status !== 'plan_review') {
-    throw new Error('Can only approve plans that are pending review');
-  }
-
-  this.workPlan.approvedAt = new Date();
-  this.status = 'in_progress';
-  this.workStartedAt = new Date();
-
-  // Start first stage
-  if (this.workPlan.stages.length > 0) {
-    this.workPlan.stages[0].status = 'in_progress';
-    this.workPlan.stages[0].startedAt = new Date();
-  }
-
-  this.statusHistory.push({
+  const order = new this({
+    booking: booking._id,
+    customer: booking.customer,
+    tailor: booking.tailor,
     status: 'in_progress',
-    changedAt: new Date(),
-    changedBy: userId,
-    note: 'Work plan approved, work started'
+    workPlan: {
+      submittedAt: new Date(),
+      approvedAt: new Date(),
+      stages,
+      totalEstimatedDays: totalDays,
+      estimatedCompletion
+    },
+    currentStage: 0,
+    planDeadline: new Date(Date.now() + 7 * 24 * 60 * 60 * 1000), // 7 days
+    workStartedAt: new Date(),
+    statusHistory: [{
+      status: 'in_progress',
+      changedAt: new Date(),
+      changedBy: userId,
+      note: 'Order created from paid booking, design phase started'
+    }]
   });
 
-  return this;
-};
-
-// Method to reject work plan
-orderSchema.methods.rejectWorkPlan = function(reason, userId) {
-  if (this.status !== 'plan_review') {
-    throw new Error('Can only reject plans that are pending review');
-  }
-
-  this.workPlan.rejectedAt = new Date();
-  this.workPlan.rejectionReason = reason;
-  this.status = 'plan_rejected';
-
-  this.statusHistory.push({
-    status: 'plan_rejected',
-    changedAt: new Date(),
-    changedBy: userId,
-    note: `Work plan rejected: ${reason}`
-  });
-
-  return this;
+  return order;
 };
 
 // Method to complete a stage

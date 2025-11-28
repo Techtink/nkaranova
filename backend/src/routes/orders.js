@@ -15,7 +15,8 @@ import {
   cancelOrder,
   getOrderStats,
   getAdminOrders,
-  getOverdueOrders
+  getOverdueOrders,
+  completeConsultation
 } from '../controllers/orderController.js';
 import { protect, authorize } from '../middleware/auth.js';
 
@@ -42,6 +43,7 @@ router.post('/:id/delay-request', authorize('tailor'), requestDelay);
 // Admin routes
 router.get('/admin', authorize('admin'), getAdminOrders);
 router.get('/admin/overdue', authorize('admin'), getOverdueOrders);
+router.put('/:id/complete-consultation', authorize('admin'), completeConsultation);
 
 // Shared routes
 router.post('/', createOrder);

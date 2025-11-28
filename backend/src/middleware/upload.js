@@ -1,25 +1,32 @@
 import multer from 'multer';
 import path from 'path';
+import { fileURLToPath } from 'url';
 import { v4 as uuidv4 } from 'uuid';
+
+// Get directory name for ES modules
+const __filename = fileURLToPath(import.meta.url);
+const __dirname = path.dirname(__filename);
+
+// Base upload directory (relative to backend root)
+const uploadsBase = path.join(__dirname, '..', '..', 'uploads');
 
 // Storage configuration
 const storage = multer.diskStorage({
   destination: (req, file, cb) => {
-    let uploadPath = 'uploads/';
+    let subDir = 'misc';
 
     // Organize by type
     if (file.fieldname === 'profilePhoto') {
-      uploadPath += 'profiles/';
+      subDir = 'profiles';
     } else if (file.fieldname === 'workImages') {
-      uploadPath += 'works/';
+      subDir = 'works';
     } else if (file.fieldname === 'verificationDocs') {
-      uploadPath += 'verification/';
+      subDir = 'verification';
     } else if (file.fieldname === 'heroImage') {
-      uploadPath += 'landing/';
-    } else {
-      uploadPath += 'misc/';
+      subDir = 'landing';
     }
 
+    const uploadPath = path.join(uploadsBase, subDir);
     cb(null, uploadPath);
   },
   filename: (req, file, cb) => {

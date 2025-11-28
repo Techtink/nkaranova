@@ -13,6 +13,10 @@ import {
   updateVerification,
   getAllConversations,
   toggleConversationFlag,
+  // Booking management
+  getAdminBookings,
+  getAdminBookingStats,
+  getBookingsNeedingConsultation,
   // Team & Roles
   getTeamMembers,
   addTeamMember,
@@ -23,6 +27,14 @@ import {
   updateRole,
   deleteRole
 } from '../controllers/adminController.js';
+import { markConsultationComplete } from '../controllers/bookingController.js';
+import {
+  adminStartConversationWithUser,
+  getAdminChatUsers,
+  getConversation,
+  getMessages,
+  sendMessage
+} from '../controllers/conversationController.js';
 import { protect, authorize, requirePermission } from '../middleware/auth.js';
 
 const router = express.Router();
@@ -56,9 +68,22 @@ router.get('/verifications', getPendingVerifications);
 router.get('/verifications/pending', getPendingVerifications);
 router.put('/verifications/:id', requirePermission('manage_verifications'), updateVerification);
 
+// Booking management - requires manage_bookings permission (or general admin access)
+router.get('/bookings', getAdminBookings);
+router.get('/bookings/stats', getAdminBookingStats);
+router.get('/bookings/needs-consultation', getBookingsNeedingConsultation);
+router.put('/bookings/:id/consultation-complete', markConsultationComplete);
+
 // Conversations - all admins can view, flagging requires permission
 router.get('/conversations', getAllConversations);
 router.put('/conversations/:id/flag', toggleConversationFlag);
+
+// Admin chat with users
+router.get('/chat/users', getAdminChatUsers);
+router.post('/conversations/user/:userId', adminStartConversationWithUser);
+router.get('/conversations/:id', getConversation);
+router.get('/conversations/:id/messages', getMessages);
+router.post('/conversations/:id/messages', sendMessage);
 
 // Team management - requires manage_team permission
 router.get('/team', requirePermission('manage_team'), getTeamMembers);

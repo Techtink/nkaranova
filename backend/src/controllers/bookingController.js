@@ -1,4 +1,5 @@
 import Booking from '../models/Booking.js';
+import Order from '../models/Order.js';
 import TailorProfile from '../models/TailorProfile.js';
 import TailorAvailability from '../models/TailorAvailability.js';
 import User from '../models/User.js';
@@ -452,6 +453,363 @@ export const getBookingStats = async (req, res, next) => {
         upcomingBookings
       }
     });
+  } catch (error) {
+    next(error);
+  }
+};
+
+// ============================================================
+// NEW BOOKING FLOW ENDPOINTS
+// Flow: pending → confirmed → consultation_done → quote_submitted → quote_accepted → paid → converted
+// ============================================================
+
+// @desc    Tailor confirms booking (accepts consultation)
+// @route   PUT /api/bookings/:id/confirm
+// @access  Private/Tailor
+export const confirmBooking = async (req, res, next) => {
+  try {
+    const tailor = await TailorProfile.findOne({ user: req.user._id });
+    if (!tailor) {
+      return res.status(404).json({ success: false, message: 'Tailor profile not found' });
+    }
+
+    const booking = await Booking.findOne({
+      _id: req.params.id,
+      tailor: tailor._id,
+      status: 'pending'
+    }).populate('customer', 'firstName lastName email');
+
+    if (!booking) {
+      return res.status(404).json({ success: false, message: 'Pending booking not found' });
+    }
+
+    booking.status = 'confirmed';
+    booking.statusHistory.push({
+      status: 'confirmed',
+      changedBy: req.user._id,
+      note: 'Tailor confirmed - consultation scheduled'
+    });
+
+    await booking.save();
+
+    // TODO: Send email notification to customer
+    // await emailService.sendBookingConfirmed(booking, booking.customer, tailor);
+
+    res.status(200).json({ success: true, data: booking });
+  } catch (error) {
+    next(error);
+  }
+};
+
+// @desc    Admin marks consultation as complete
+// @route   PUT /api/bookings/:id/consultation-complete
+// @access  Private/Admin
+export const markConsultationComplete = async (req, res, next) => {
+  try {
+    const { notes, measurementsTaken } = req.body;
+
+    const booking = await Booking.findOne({
+      _id: req.params.id,
+      status: 'confirmed'
+    }).populate('customer', 'firstName lastName email')
+      .populate({
+        path: 'tailor',
+        populate: { path: 'user', select: 'firstName lastName email' }
+      });
+
+    if (!booking) {
+      return res.status(404).json({ success: false, message: 'Confirmed booking not found' });
+    }
+
+    booking.status = 'consultation_done';
+    booking.consultation = {
+      completedAt: new Date(),
+      completedBy: req.user._id,
+      notes: notes || '',
+      measurementsTaken: measurementsTaken || false
+    };
+    booking.statusHistory.push({
+      status: 'consultation_done',
+      changedBy: req.user._id,
+      note: notes || 'Consultation completed'
+    });
+
+    await booking.save();
+
+    // TODO: Send email notification to tailor to submit quote
+    // await emailService.sendConsultationComplete(booking);
+
+    res.status(200).json({ success: true, data: booking });
+  } catch (error) {
+    next(error);
+  }
+};
+
+// @desc    Tailor submits quote
+// @route   POST /api/bookings/:id/quote
+// @access  Private/Tailor
+export const submitQuote = async (req, res, next) => {
+  try {
+    const { items, laborCost, materialCost, estimatedDays, notes, validDays } = req.body;
+
+    const tailor = await TailorProfile.findOne({ user: req.user._id });
+    if (!tailor) {
+      return res.status(404).json({ success: false, message: 'Tailor profile not found' });
+    }
+
+    const booking = await Booking.findOne({
+      _id: req.params.id,
+      tailor: tailor._id,
+      status: 'consultation_done'
+    }).populate('customer', 'firstName lastName email');
+
+    if (!booking) {
+      return res.status(404).json({
+        success: false,
+        message: 'Booking not found or consultation not yet completed'
+      });
+    }
+
+    // Calculate total amount
+    const itemsTotal = items?.reduce((sum, item) => sum + (item.unitPrice * (item.quantity || 1)), 0) || 0;
+    const totalAmount = itemsTotal + (laborCost || 0) + (materialCost || 0);
+    const totalEstimatedDays = (estimatedDays?.design || 3) + (estimatedDays?.sew || 7) + (estimatedDays?.deliver || 2);
+
+    // Set validity period (default 7 days)
+    const validUntil = new Date();
+    validUntil.setDate(validUntil.getDate() + (validDays || 7));
+
+    booking.quote = {
+      submittedAt: new Date(),
+      submittedBy: req.user._id,
+      items: items || [],
+      laborCost: laborCost || 0,
+      materialCost: materialCost || 0,
+      totalAmount,
+      currency: 'NGN',
+      estimatedDays: {
+        design: estimatedDays?.design || 3,
+        sew: estimatedDays?.sew || 7,
+        deliver: estimatedDays?.deliver || 2
+      },
+      totalEstimatedDays,
+      notes: notes || '',
+      validUntil,
+      customerResponse: { status: 'pending' }
+    };
+
+    booking.status = 'quote_submitted';
+    booking.statusHistory.push({
+      status: 'quote_submitted',
+      changedBy: req.user._id,
+      note: `Quote submitted: ${totalAmount} NGN`
+    });
+
+    await booking.save();
+
+    // TODO: Send email notification to customer about quote
+    // await emailService.sendQuoteToCustomer(booking);
+
+    res.status(200).json({ success: true, data: booking });
+  } catch (error) {
+    next(error);
+  }
+};
+
+// @desc    Customer accepts quote
+// @route   PUT /api/bookings/:id/quote/accept
+// @access  Private/Customer
+export const acceptQuote = async (req, res, next) => {
+  try {
+    const booking = await Booking.findOne({
+      _id: req.params.id,
+      customer: req.user._id,
+      status: 'quote_submitted'
+    }).populate({
+      path: 'tailor',
+      populate: { path: 'user', select: 'firstName lastName email' }
+    });
+
+    if (!booking) {
+      return res.status(404).json({ success: false, message: 'Booking with quote not found' });
+    }
+
+    // Check if quote is still valid
+    if (booking.quote.validUntil && new Date() > booking.quote.validUntil) {
+      return res.status(400).json({ success: false, message: 'Quote has expired' });
+    }
+
+    booking.quote.customerResponse = {
+      status: 'accepted',
+      respondedAt: new Date()
+    };
+    booking.status = 'quote_accepted';
+    booking.statusHistory.push({
+      status: 'quote_accepted',
+      changedBy: req.user._id,
+      note: 'Customer accepted the quote'
+    });
+
+    await booking.save();
+
+    // TODO: Send email to tailor about acceptance
+    // await emailService.sendQuoteAccepted(booking);
+
+    res.status(200).json({ success: true, data: booking });
+  } catch (error) {
+    next(error);
+  }
+};
+
+// @desc    Customer rejects quote
+// @route   PUT /api/bookings/:id/quote/reject
+// @access  Private/Customer
+export const rejectQuote = async (req, res, next) => {
+  try {
+    const { reason } = req.body;
+
+    const booking = await Booking.findOne({
+      _id: req.params.id,
+      customer: req.user._id,
+      status: 'quote_submitted'
+    }).populate({
+      path: 'tailor',
+      populate: { path: 'user', select: 'firstName lastName email' }
+    });
+
+    if (!booking) {
+      return res.status(404).json({ success: false, message: 'Booking with quote not found' });
+    }
+
+    booking.quote.customerResponse = {
+      status: 'rejected',
+      respondedAt: new Date(),
+      rejectionReason: reason || ''
+    };
+    // Go back to consultation_done so tailor can submit a revised quote
+    booking.status = 'consultation_done';
+    booking.statusHistory.push({
+      status: 'consultation_done',
+      changedBy: req.user._id,
+      note: `Quote rejected: ${reason || 'No reason provided'}`
+    });
+
+    await booking.save();
+
+    // TODO: Send email to tailor about rejection
+    // await emailService.sendQuoteRejected(booking, reason);
+
+    res.status(200).json({ success: true, data: booking });
+  } catch (error) {
+    next(error);
+  }
+};
+
+// @desc    Process payment for booking (creates order after payment)
+// @route   POST /api/bookings/:id/pay
+// @access  Private/Customer
+export const processPayment = async (req, res, next) => {
+  try {
+    const booking = await Booking.findOne({
+      _id: req.params.id,
+      customer: req.user._id,
+      status: 'quote_accepted'
+    }).populate({
+      path: 'tailor',
+      populate: { path: 'user', select: 'firstName lastName email' }
+    });
+
+    if (!booking) {
+      return res.status(404).json({ success: false, message: 'Booking not ready for payment' });
+    }
+
+    // For now, simulate payment success (TODO: integrate actual payment gateway)
+    // In production, this would create a Stripe payment intent and handle confirmation
+
+    booking.status = 'paid';
+    booking.paymentStatus = 'held';
+    booking.price = {
+      amount: booking.quote.totalAmount,
+      currency: booking.quote.currency
+    };
+    booking.statusHistory.push({
+      status: 'paid',
+      changedBy: req.user._id,
+      note: `Payment received: ${booking.quote.totalAmount} ${booking.quote.currency}`
+    });
+
+    await booking.save();
+
+    // Create order from the paid booking
+    const order = await Order.createFromBooking(booking, req.user._id);
+    await order.save();
+
+    // Link order to booking and mark as converted
+    booking.order = order._id;
+    booking.status = 'converted';
+    booking.statusHistory.push({
+      status: 'converted',
+      changedBy: req.user._id,
+      note: `Order created: ${order._id}`
+    });
+
+    await booking.save();
+
+    // TODO: Send email notifications
+    // await emailService.sendOrderCreated(order, booking);
+
+    res.status(200).json({
+      success: true,
+      data: {
+        booking,
+        order
+      }
+    });
+  } catch (error) {
+    next(error);
+  }
+};
+
+// @desc    Get bookings pending quote (for customer)
+// @route   GET /api/bookings/pending-quotes
+// @access  Private/Customer
+export const getPendingQuotes = async (req, res, next) => {
+  try {
+    const bookings = await Booking.find({
+      customer: req.user._id,
+      status: 'quote_submitted'
+    })
+      .sort({ 'quote.submittedAt': -1 })
+      .populate({
+        path: 'tailor',
+        select: 'username businessName profilePhoto',
+        populate: { path: 'user', select: 'firstName lastName' }
+      });
+
+    res.status(200).json({ success: true, data: bookings });
+  } catch (error) {
+    next(error);
+  }
+};
+
+// @desc    Get bookings needing quote (for tailor)
+// @route   GET /api/bookings/needs-quote
+// @access  Private/Tailor
+export const getBookingsNeedingQuote = async (req, res, next) => {
+  try {
+    const tailor = await TailorProfile.findOne({ user: req.user._id });
+    if (!tailor) {
+      return res.status(404).json({ success: false, message: 'Tailor profile not found' });
+    }
+
+    const bookings = await Booking.find({
+      tailor: tailor._id,
+      status: 'consultation_done'
+    })
+      .sort({ 'consultation.completedAt': -1 })
+      .populate('customer', 'firstName lastName email avatar');
+
+    res.status(200).json({ success: true, data: bookings });
   } catch (error) {
     next(error);
   }

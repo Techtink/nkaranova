@@ -13,14 +13,14 @@ import {
 import { Ionicons } from '@expo/vector-icons';
 import { LinearGradient } from 'expo-linear-gradient';
 import { settingsAPI } from '../services/api';
+import config from '../config/env';
 
 const { width, height } = Dimensions.get('window');
 
-// Design colors
+// Default design colors (can be overridden by settings)
+const DEFAULT_ACCENT = '#6B8CAE';
 const designColors = {
   dark: '#1a1a1a',
-  accent: '#5c8d6a',
-  accentLight: '#6b9e7a',
   white: '#ffffff',
   textMuted: 'rgba(255,255,255,0.7)'
 };
@@ -104,7 +104,14 @@ export default function OnboardingScreen({
     const settingsKey = appType === 'tailor' ? 'mobile_tailor_splash_image' : 'mobile_customer_splash_image';
     const settingsImage = settings?.[settingsKey];
     if (settingsImage) {
-      return { uri: settingsImage };
+      // If it's already a full URL, use as-is
+      if (settingsImage.startsWith('http')) {
+        return { uri: settingsImage };
+      }
+      // Handle relative URLs by prepending the base URL
+      // Ensure path has leading slash
+      const path = settingsImage.startsWith('/') ? settingsImage : `/${settingsImage}`;
+      return { uri: `${config.imageBaseUrl}${path}` };
     }
     // Fall back to default
     return { uri: DEFAULT_BG_IMAGE };
@@ -124,7 +131,22 @@ export default function OnboardingScreen({
   // Get app name from settings or prop
   const displayAppName = settings?.mobile_app_name || appName;
 
+  // Get accent color from settings or use default
+  const accentColor = settings?.mobile_primary_color || DEFAULT_ACCENT;
+
   const bgSource = getSplashImage();
+
+  // Show loading state while fetching settings to prevent default image flash
+  if (loadingSettings) {
+    return (
+      <View style={styles.container}>
+        <StatusBar barStyle="light-content" translucent backgroundColor="transparent" />
+        <View style={styles.loadingContainer}>
+          <ActivityIndicator size="large" color={DEFAULT_ACCENT} />
+        </View>
+      </View>
+    );
+  }
 
   return (
     <View style={styles.container}>
@@ -136,17 +158,17 @@ export default function OnboardingScreen({
         style={styles.backgroundImage}
         resizeMode="cover"
       >
-        {/* Dark Gradient Overlay - darker at bottom */}
+        {/* Dark Gradient Overlay - only dark at bottom where text is */}
         <LinearGradient
           colors={[
-            'rgba(0,0,0,0.2)',
-            'rgba(0,0,0,0.3)',
+            'transparent',
+            'transparent',
+            'rgba(0,0,0,0.1)',
             'rgba(0,0,0,0.5)',
-            'rgba(0,0,0,0.7)',
             'rgba(0,0,0,0.85)',
             'rgba(0,0,0,0.95)'
           ]}
-          locations={[0, 0.2, 0.4, 0.6, 0.75, 1]}
+          locations={[0, 0.4, 0.55, 0.7, 0.85, 1]}
           style={styles.gradientOverlay}
         >
           {/* Spacer to push content to bottom */}
@@ -178,7 +200,7 @@ export default function OnboardingScreen({
             </Text>
 
             <TouchableOpacity
-              style={styles.getStartedButton}
+              style={[styles.getStartedButton, { backgroundColor: accentColor }]}
               onPress={handleGetStarted}
               activeOpacity={0.8}
             >
@@ -192,7 +214,7 @@ export default function OnboardingScreen({
               onPress={handleGetStarted}
             >
               <Text style={styles.loginLinkText}>
-                Already have an account? <Text style={styles.loginLinkBold}>Sign In</Text>
+                Already have an account? <Text style={[styles.loginLinkBold, { color: accentColor }]}>Sign In</Text>
               </Text>
             </TouchableOpacity>
           </Animated.View>
@@ -209,6 +231,11 @@ const styles = StyleSheet.create({
   container: {
     flex: 1,
     backgroundColor: designColors.dark
+  },
+  loadingContainer: {
+    flex: 1,
+    justifyContent: 'center',
+    alignItems: 'center'
   },
   backgroundImage: {
     flex: 1,
@@ -235,6 +262,7 @@ const styles = StyleSheet.create({
   },
   logoText: {
     fontSize: 24,
+    fontFamily: 'Montserrat-Bold',
     fontWeight: '700',
     color: designColors.white,
     letterSpacing: 0.5
@@ -248,6 +276,7 @@ const styles = StyleSheet.create({
   },
   headline: {
     fontSize: 38,
+    fontFamily: 'Montserrat-Bold',
     fontWeight: '800',
     color: designColors.white,
     lineHeight: 46,
@@ -255,12 +284,13 @@ const styles = StyleSheet.create({
   },
   subheadline: {
     fontSize: 16,
+    fontFamily: 'Montserrat-Regular',
     color: designColors.textMuted,
     lineHeight: 24,
     marginBottom: 32
   },
   getStartedButton: {
-    backgroundColor: designColors.accent,
+    backgroundColor: DEFAULT_ACCENT, // Will be overridden by dynamic accentColor
     borderRadius: 14,
     paddingVertical: 18,
     paddingHorizontal: 24,
@@ -272,6 +302,7 @@ const styles = StyleSheet.create({
   getStartedText: {
     color: designColors.white,
     fontSize: 17,
+    fontFamily: 'Montserrat-SemiBold',
     fontWeight: '600'
   },
   loginLink: {
@@ -280,10 +311,12 @@ const styles = StyleSheet.create({
   },
   loginLinkText: {
     fontSize: 14,
+    fontFamily: 'Montserrat-Regular',
     color: designColors.textMuted
   },
   loginLinkBold: {
-    color: designColors.white,
+    color: DEFAULT_ACCENT, // Will be overridden by dynamic accentColor
+    fontFamily: 'Montserrat-SemiBold',
     fontWeight: '600'
   },
   homeIndicator: {
