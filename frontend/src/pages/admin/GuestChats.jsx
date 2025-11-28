@@ -162,17 +162,16 @@ export default function AdminGuestChats() {
   }
 
   return (
-    <div className="admin-page admin-chat-page page">
-      <div className="container">
-        <div className="page-header">
-          <div>
-            <h1>Guest Chats</h1>
-            <p>Respond to visitor inquiries</p>
-          </div>
-          <button className="refresh-btn" onClick={fetchConversations}>
-            <FiRefreshCw /> Refresh
-          </button>
+    <div className="admin-page guest-chats-page">
+      <div className="guest-chats-header">
+        <div>
+          <h1>Guest Chats</h1>
+          <p>Respond to visitor inquiries</p>
         </div>
+        <button className="refresh-btn" onClick={fetchConversations}>
+          <FiRefreshCw /> Refresh
+        </button>
+      </div>
 
         <div className="chat-layout">
           {/* Conversations List */}
@@ -288,7 +287,6 @@ export default function AdminGuestChats() {
             )}
           </div>
         </div>
-      </div>
     </div>
   );
 }
