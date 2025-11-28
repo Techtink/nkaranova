@@ -1463,16 +1463,16 @@
 
   // Left Panel - Users List
   .users-panel {
-    background: #f8fafc;
-    border-right: 1px solid $border-color;
+    background: var(--bg-secondary);
+    border-right: 1px solid var(--border-color);
     display: flex;
     flex-direction: column;
     overflow: hidden;
 
     .users-panel-header {
       padding: 20px 16px 16px;
-      border-bottom: 1px solid $border-color;
-      background: white;
+      border-bottom: 1px solid var(--border-color);
+      background: var(--card-bg);
 
       .header-title {
         display: flex;
@@ -1484,16 +1484,16 @@
           margin: 0;
           font-size: 18px;
           font-weight: 600;
-          color: $text-primary;
+          color: var(--text-primary);
         }
 
         .filter-select select {
           padding: 6px 10px;
           font-size: 12px;
-          border: 1px solid $border-color;
+          border: 1px solid var(--border-color);
           border-radius: $radius-sm;
-          background: white;
-          color: $text-secondary;
+          background: var(--card-bg);
+          color: var(--text-secondary);
           cursor: pointer;
 
           &:focus {
@@ -1511,7 +1511,7 @@
           left: 12px;
           top: 50%;
           transform: translateY(-50%);
-          color: $text-secondary;
+          color: var(--text-secondary);
           display: flex;
           align-items: center;
         }
@@ -1521,20 +1521,20 @@
           height: 38px;
           padding: 0 12px 0 38px;
           font-size: 14px;
-          border: 1px solid $border-color;
-          background: #f8fafc;
-          color: $text-primary;
+          border: 1px solid var(--border-color);
+          background: var(--bg-secondary);
+          color: var(--text-primary);
           border-radius: $radius-md;
           transition: all 0.2s;
 
           &:focus {
             outline: none;
             border-color: $primary;
-            background: white;
+            background: var(--card-bg);
           }
 
           &::placeholder {
-            color: $text-secondary;
+            color: var(--text-secondary);
           }
         }
       }
@@ -1547,7 +1547,7 @@
       .empty-list {
         padding: 3rem 1rem;
         text-align: center;
-        color: $text-secondary;
+        color: var(--text-secondary);
 
         svg {
           width: 40px;
@@ -1568,15 +1568,15 @@
         gap: 12px;
         padding: 12px 16px;
         cursor: pointer;
-        border-bottom: 1px solid rgba($border-color, 0.5);
+        border-bottom: 1px solid var(--border-color);
         transition: background 0.15s;
 
         &:hover {
-          background: white;
+          background: var(--card-bg);
         }
 
         &.active {
-          background: white;
+          background: var(--card-bg);
           border-left: 3px solid $primary;
           padding-left: 13px;
         }
@@ -1613,7 +1613,7 @@
             display: block;
             font-weight: 500;
             font-size: 14px;
-            color: $text-primary;
+            color: var(--text-primary);
             margin-bottom: 2px;
             white-space: nowrap;
             overflow: hidden;
@@ -1623,7 +1623,7 @@
           .user-meta {
             display: block;
             font-size: 12px;
-            color: $text-secondary;
+            color: var(--text-secondary);
             white-space: nowrap;
             overflow: hidden;
             text-overflow: ellipsis;
@@ -1635,8 +1635,8 @@
 
   // Middle Panel - User Details
   .user-details-panel {
-    background: white;
-    border-right: 1px solid $border-color;
+    background: var(--card-bg);
+    border-right: 1px solid var(--border-color);
     display: flex;
     flex-direction: column;
     overflow-y: auto;
@@ -1649,7 +1649,7 @@
       justify-content: center;
       padding: 2rem;
       text-align: center;
-      color: $text-secondary;
+      color: var(--text-secondary);
 
       svg {
         width: 48px;
@@ -1661,7 +1661,7 @@
       h3 {
         margin: 0 0 0.5rem;
         font-size: 16px;
-        color: $text-primary;
+        color: var(--text-primary);
       }
 
       p {
@@ -1675,8 +1675,8 @@
       display: flex;
       align-items: center;
       gap: 16px;
-      border-bottom: 1px solid $border-color;
-      background: linear-gradient(180deg, #f8fafc 0%, white 100%);
+      border-bottom: 1px solid var(--border-color);
+      background: var(--bg-secondary);
 
       .profile-avatar {
         width: 44px;
@@ -1712,13 +1712,13 @@
           margin: 0 0 4px;
           font-size: 15px;
           font-weight: 500;
-          color: $text-primary;
+          color: var(--text-primary);
         }
 
         .user-subtitle {
           margin: 0;
           font-size: 13px;
-          color: $text-secondary;
+          color: var(--text-secondary);
         }
       }
     }
@@ -1733,7 +1733,7 @@
           margin: 0 0 10px;
           font-size: 12px;
           font-weight: 600;
-          color: $text-secondary;
+          color: var(--text-secondary);
           text-transform: uppercase;
           letter-spacing: 0.5px;
         }
@@ -1761,7 +1761,7 @@
 
           .no-data {
             font-size: 13px;
-            color: $text-secondary;
+            color: var(--text-secondary);
             font-style: italic;
           }
         }
@@ -1772,7 +1772,7 @@
         align-items: flex-start;
         gap: 12px;
         padding: 12px 0;
-        border-bottom: 1px solid rgba($border-color, 0.5);
+        border-bottom: 1px solid var(--border-color);
 
         &:last-child {
           border-bottom: none;
@@ -1781,7 +1781,7 @@
         .detail-icon {
           width: 18px;
           height: 18px;
-          color: $text-secondary;
+          color: var(--text-secondary);
           flex-shrink: 0;
           margin-top: 2px;
         }
@@ -1794,7 +1794,7 @@
             display: block;
             font-size: 11px;
             font-weight: 500;
-            color: $text-secondary;
+            color: var(--text-secondary);
             text-transform: uppercase;
             letter-spacing: 0.3px;
             margin-bottom: 2px;
@@ -1803,7 +1803,7 @@
           .detail-value {
             display: block;
             font-size: 14px;
-            color: $text-primary;
+            color: var(--text-primary);
             word-break: break-word;
           }
         }
@@ -1813,7 +1813,7 @@
 
   // Right Panel - Chat Window
   .chat-window-panel {
-    background: #f8fafc;
+    background: var(--bg-secondary);
     display: flex;
     flex-direction: column;
     overflow: hidden;
@@ -1826,7 +1826,7 @@
       justify-content: center;
       padding: 2rem;
       text-align: center;
-      color: $text-secondary;
+      color: var(--text-secondary);
 
       svg {
         width: 56px;
@@ -1838,7 +1838,7 @@
       h3 {
         margin: 0 0 0.5rem;
         font-size: 16px;
-        color: $text-primary;
+        color: var(--text-primary);
       }
 
       p {
@@ -1852,14 +1852,14 @@
       align-items: center;
       justify-content: space-between;
       padding: 16px 20px;
-      background: white;
-      border-bottom: 1px solid $border-color;
+      background: var(--card-bg);
+      border-bottom: 1px solid var(--border-color);
 
       h2 {
         margin: 0;
         font-size: 16px;
         font-weight: 600;
-        color: $text-primary;
+        color: var(--text-primary);
       }
 
       .new-message-btn {
@@ -1902,7 +1902,7 @@
         align-items: center;
         justify-content: center;
         text-align: center;
-        color: $text-secondary;
+        color: var(--text-secondary);
 
         svg {
           width: 48px;
@@ -1914,7 +1914,7 @@
         p {
           margin: 0 0 4px;
           font-size: 15px;
-          color: $text-primary;
+          color: var(--text-primary);
         }
 
         span {
@@ -1932,8 +1932,8 @@
           padding: 4px 12px;
           font-size: 11px;
           font-weight: 500;
-          color: $text-secondary;
-          background: white;
+          color: var(--text-secondary);
+          background: var(--card-bg);
           border-radius: 12px;
           box-shadow: 0 1px 3px rgba(0, 0, 0, 0.08);
         }
@@ -1964,13 +1964,13 @@
           align-self: flex-start;
 
           .message-bubble {
-            background: white;
-            color: $text-primary;
+            background: var(--card-bg);
+            color: var(--text-primary);
             border-radius: 16px 16px 16px 4px;
             box-shadow: 0 1px 3px rgba(0, 0, 0, 0.08);
 
             .message-time {
-              color: $text-secondary;
+              color: var(--text-secondary);
             }
           }
         }
@@ -2022,26 +2022,27 @@
       display: flex;
       gap: 12px;
       padding: 16px 20px;
-      background: white;
-      border-top: 1px solid $border-color;
+      background: var(--card-bg);
+      border-top: 1px solid var(--border-color);
 
       input {
         flex: 1;
         padding: 12px 16px;
         font-size: 14px;
-        border: 1px solid $border-color;
+        border: 1px solid var(--border-color);
         border-radius: 24px;
-        background: #f8fafc;
+        background: var(--bg-secondary);
+        color: var(--text-primary);
         transition: all 0.2s;
 
         &:focus {
           outline: none;
           border-color: $primary;
-          background: white;
+          background: var(--card-bg);
         }
 
         &::placeholder {
-          color: $text-secondary;
+          color: var(--text-secondary);
         }
       }
 
@@ -2065,7 +2066,7 @@
         }
 
         &:disabled {
-          background: $gray-300;
+          background: var(--text-muted);
           cursor: not-allowed;
         }
 
@@ -2092,21 +2093,21 @@
     justify-content: space-between;
     align-items: center;
     padding: 20px 24px;
-    background: white;
-    border-bottom: 1px solid $border-color;
+    background: var(--card-bg);
+    border-bottom: 1px solid var(--border-color);
     flex-shrink: 0;
 
     h1 {
       margin: 0 0 4px;
       font-size: 20px;
       font-weight: 600;
-      color: $text-primary;
+      color: var(--text-primary);
     }
 
     p {
       margin: 0;
       font-size: 13px;
-      color: $text-secondary;
+      color: var(--text-secondary);
     }
 
     .refresh-btn {
@@ -2116,16 +2117,16 @@
       padding: 8px 16px;
       font-size: 13px;
       font-weight: 500;
-      background: white;
-      border: 1px solid $border-color;
+      background: var(--card-bg);
+      border: 1px solid var(--border-color);
       border-radius: $radius-md;
-      color: $text-secondary;
+      color: var(--text-secondary);
       cursor: pointer;
       transition: all 0.2s;
 
       &:hover {
-        background: $gray-50;
-        color: $text-primary;
+        background: var(--bg-hover);
+        color: var(--text-primary);
       }
 
       svg {
@@ -2148,24 +2149,25 @@
   }
 
   .conversations-panel {
-    background: #f8fafc;
-    border-right: 1px solid $border-color;
+    background: var(--bg-secondary);
+    border-right: 1px solid var(--border-color);
     display: flex;
     flex-direction: column;
     overflow: hidden;
 
     .panel-header {
       padding: 16px;
-      border-bottom: 1px solid $border-color;
-      background: white;
+      border-bottom: 1px solid var(--border-color);
+      background: var(--card-bg);
 
       select {
         width: 100%;
         padding: 10px 12px;
         font-size: 13px;
-        border: 1px solid $border-color;
+        border: 1px solid var(--border-color);
         border-radius: $radius-md;
-        background: white;
+        background: var(--card-bg);
+        color: var(--text-primary);
         cursor: pointer;
 
         &:focus {
@@ -2183,7 +2185,7 @@
     .empty-list {
       padding: 3rem 1rem;
       text-align: center;
-      color: $text-secondary;
+      color: var(--text-secondary);
 
       svg {
         width: 40px;
@@ -2204,21 +2206,21 @@
       gap: 12px;
       padding: 14px 16px;
       cursor: pointer;
-      border-bottom: 1px solid rgba($border-color, 0.5);
+      border-bottom: 1px solid var(--border-color);
       transition: background 0.15s;
 
       &:hover {
-        background: white;
+        background: var(--card-bg);
       }
 
       &.active {
-        background: white;
+        background: var(--card-bg);
         border-left: 3px solid $primary;
         padding-left: 13px;
       }
 
       &.unread {
-        background: #f0f9ff;
+        background: var(--bg-hover);
       }
 
       .conv-avatar {
@@ -2251,12 +2253,12 @@
           .conv-name {
             font-weight: 500;
             font-size: 14px;
-            color: $text-primary;
+            color: var(--text-primary);
           }
 
           .conv-time {
             font-size: 11px;
-            color: $text-secondary;
+            color: var(--text-secondary);
           }
         }
 
@@ -2272,12 +2274,12 @@
 
             &.waiting { background: $warning; }
             &.active { background: $success; }
-            &.closed { background: $gray-400; }
+            &.closed { background: var(--text-muted); }
           }
 
           .status-text {
             font-size: 12px;
-            color: $text-secondary;
+            color: var(--text-secondary);
             text-transform: capitalize;
           }
 
@@ -2303,7 +2305,7 @@
   .chat-panel {
     display: flex;
     flex-direction: column;
-    background: white;
+    background: var(--card-bg);
     overflow: hidden;
 
     .no-chat-selected {
@@ -2313,7 +2315,7 @@
       align-items: center;
       justify-content: center;
       text-align: center;
-      color: $text-secondary;
+      color: var(--text-secondary);
 
       svg {
         width: 56px;
@@ -2325,7 +2327,7 @@
       h3 {
         margin: 0 0 0.5rem;
         font-size: 18px;
-        color: $text-primary;
+        color: var(--text-primary);
       }
 
       p {
@@ -2339,7 +2341,7 @@
       justify-content: space-between;
       align-items: center;
       padding: 16px 20px;
-      border-bottom: 1px solid $border-color;
+      border-bottom: 1px solid var(--border-color);
 
       .chat-user-info {
         display: flex;
@@ -2366,7 +2368,7 @@
           margin: 0 0 2px;
           font-size: 15px;
           font-weight: 500;
-          color: $text-primary;
+          color: var(--text-primary);
         }
 
         .status {
@@ -2375,7 +2377,7 @@
 
           &.waiting { color: $warning; }
           &.active { color: $success; }
-          &.closed { color: $text-secondary; }
+          &.closed { color: var(--text-secondary); }
         }
       }
 
@@ -2413,7 +2415,7 @@
       display: flex;
       flex-direction: column;
       gap: 12px;
-      background: #f8fafc;
+      background: var(--bg-secondary);
     }
 
     .message {
@@ -2439,8 +2441,8 @@
         align-self: flex-start;
 
         .message-content {
-          background: white;
-          color: $text-primary;
+          background: var(--card-bg);
+          color: var(--text-primary);
           border-radius: 16px 16px 16px 4px;
           box-shadow: $shadow-sm;
         }
@@ -2468,26 +2470,27 @@
       display: flex;
       gap: 12px;
       padding: 16px 20px;
-      background: white;
-      border-top: 1px solid $border-color;
+      background: var(--card-bg);
+      border-top: 1px solid var(--border-color);
 
       input {
         flex: 1;
         padding: 12px 16px;
         font-size: 14px;
-        border: 1px solid $border-color;
+        border: 1px solid var(--border-color);
         border-radius: 24px;
-        background: #f8fafc;
+        background: var(--bg-secondary);
+        color: var(--text-primary);
         transition: all 0.2s;
 
         &:focus {
           outline: none;
           border-color: $primary;
-          background: white;
+          background: var(--card-bg);
         }
 
         &::placeholder {
-          color: $text-secondary;
+          color: var(--text-secondary);
         }
       }
 
@@ -2510,7 +2513,7 @@
         }
 
         &:disabled {
-          background: $gray-300;
+          background: var(--text-muted);
           cursor: not-allowed;
         }
 
