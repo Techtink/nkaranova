@@ -7,9 +7,11 @@ import { Ionicons } from '@expo/vector-icons';
 import { useAuth } from '../../../../shared/context/AuthContext';
 import { colors } from '../../../../shared/constants/theme';
 
-// Auth Screens
-import LoginScreen from '../screens/LoginScreen';
-import RegisterScreen from '../screens/RegisterScreen';
+// Auth/Onboarding Screens
+import OnboardingScreen from '../../../../shared/screens/OnboardingScreen';
+import AuthScreen from '../../../../shared/screens/AuthScreen';
+import VerificationCodeScreen from '../../../../shared/screens/VerificationCodeScreen';
+import TwoFactorScreen from '../../../../shared/screens/TwoFactorScreen';
 
 // Main Screens
 import HomeScreen from '../screens/HomeScreen';
@@ -23,9 +25,18 @@ import EditProfileScreen from '../screens/EditProfileScreen';
 import BookingsScreen from '../screens/BookingsScreen';
 import OrdersScreen from '../screens/OrdersScreen';
 import BookAppointmentScreen from '../screens/BookAppointmentScreen';
+import FavoritesScreen from '../screens/FavoritesScreen';
+
+// Shared Screens
+import NotificationsScreen from '../../../../shared/screens/NotificationsScreen';
+import ChangePasswordScreen from '../../../../shared/screens/ChangePasswordScreen';
+import HelpSupportScreen from '../../../../shared/screens/HelpSupportScreen';
 
 const Stack = createNativeStackNavigator();
 const Tab = createBottomTabNavigator();
+
+// Design accent color
+const accentColor = '#5c8d6a';
 
 function MainTabs() {
   return (
@@ -48,11 +59,11 @@ function MainTabs() {
 
           return <Ionicons name={iconName} size={size} color={color} />;
         },
-        tabBarActiveTintColor: colors.primary,
+        tabBarActiveTintColor: accentColor,
         tabBarInactiveTintColor: colors.textMuted,
         headerShown: true,
         headerStyle: {
-          backgroundColor: colors.primary
+          backgroundColor: accentColor
         },
         headerTintColor: colors.white
       })}
@@ -93,8 +104,32 @@ function AuthStack() {
         headerShown: false
       }}
     >
-      <Stack.Screen name="Login" component={LoginScreen} />
-      <Stack.Screen name="Register" component={RegisterScreen} />
+      <Stack.Screen name="Onboarding">
+        {(props) => (
+          <OnboardingScreen
+            {...props}
+            appName="Tailor Connect"
+            appType="customer"
+          />
+        )}
+      </Stack.Screen>
+      <Stack.Screen
+        name="Auth"
+        options={{
+          animation: 'slide_from_bottom'
+        }}
+      >
+        {(props) => <AuthScreen {...props} appType="customer" />}
+      </Stack.Screen>
+      <Stack.Screen
+        name="VerificationCode"
+        component={VerificationCodeScreen}
+      />
+      <Stack.Screen
+        name="TwoFactor"
+        component={TwoFactorScreen}
+        options={{ gestureEnabled: false }}
+      />
     </Stack.Navigator>
   );
 }
@@ -119,7 +154,7 @@ export default function AppNavigator() {
         <Stack.Navigator
           screenOptions={{
             headerStyle: {
-              backgroundColor: colors.primary
+              backgroundColor: accentColor
             },
             headerTintColor: colors.white,
             headerBackTitleVisible: false
@@ -164,6 +199,26 @@ export default function AppNavigator() {
             name="EditProfile"
             component={EditProfileScreen}
             options={{ title: 'Edit Profile' }}
+          />
+          <Stack.Screen
+            name="Favorites"
+            component={FavoritesScreen}
+            options={{ title: 'My Favorites' }}
+          />
+          <Stack.Screen
+            name="Notifications"
+            component={NotificationsScreen}
+            options={{ title: 'Notifications' }}
+          />
+          <Stack.Screen
+            name="ChangePassword"
+            component={ChangePasswordScreen}
+            options={{ title: 'Change Password' }}
+          />
+          <Stack.Screen
+            name="Support"
+            component={HelpSupportScreen}
+            options={{ title: 'Help & Support' }}
           />
         </Stack.Navigator>
       ) : (

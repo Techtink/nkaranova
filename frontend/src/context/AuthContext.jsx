@@ -33,9 +33,35 @@ export function AuthProvider({ children }) {
 
   const login = async (email, password) => {
     const response = await authAPI.login({ email, password });
+
+    // Check if 2FA is required
+    if (response.data.requires2FA) {
+      return {
+        requires2FA: true,
+        userId: response.data.userId
+      };
+    }
+
     const { token, user: userData } = response.data;
 
     localStorage.setItem('token', token);
+    localStorage.setItem('user', JSON.stringify(userData));
+    setUser(userData);
+
+    // If tailor, fetch profile
+    if (userData.role === 'tailor') {
+      const meResponse = await authAPI.getMe();
+      setTailorProfile(meResponse.data.tailorProfile);
+    }
+
+    return userData;
+  };
+
+  const loginWith2FA = async (userId, token) => {
+    const response = await authAPI.validate2FA({ userId, token });
+    const { token: authToken, user: userData } = response.data;
+
+    localStorage.setItem('token', authToken);
     localStorage.setItem('user', JSON.stringify(userData));
     setUser(userData);
 
@@ -95,6 +121,7 @@ export function AuthProvider({ children }) {
     isTailor: user?.role === 'tailor',
     isCustomer: user?.role === 'customer',
     login,
+    loginWith2FA,
     register,
     logout,
     updateUser,

@@ -15,6 +15,10 @@ import { colors, spacing, fontSize, borderRadius, shadows } from '../../../../sh
 export default function ProfileScreen({ navigation }) {
   const { user, logout } = useAuth();
 
+  const showComingSoon = (feature) => {
+    Alert.alert('Coming Soon', `${feature} will be available in a future update.`);
+  };
+
   const handleLogout = () => {
     Alert.alert(
       'Logout',

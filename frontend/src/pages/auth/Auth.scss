@@ -151,3 +151,73 @@
     color: $text-muted;
   }
 }
+
+// Two-Factor Authentication styles
+.twofa-icon {
+  width: 64px;
+  height: 64px;
+  margin: 0 auto $spacing-md;
+  background: linear-gradient(135deg, $primary 0%, $secondary 100%);
+  border-radius: 50%;
+  @include flex-center;
+
+  svg {
+    width: 32px;
+    height: 32px;
+    color: $white;
+  }
+}
+
+.twofa-input-container {
+  display: flex;
+  justify-content: center;
+  margin: $spacing-lg 0;
+}
+
+.twofa-input {
+  width: 200px;
+  padding: $spacing-md;
+  font-size: 24px;
+  font-weight: 600;
+  text-align: center;
+  letter-spacing: 8px;
+  border: 2px solid $gray-300;
+  border-radius: $radius-lg;
+  background: var(--bg-secondary, $white);
+  color: var(--text-primary, $text-primary);
+  transition: border-color $transition-base;
+
+  &:focus {
+    outline: none;
+    border-color: $primary;
+  }
+
+  &::placeholder {
+    color: $gray-300;
+    letter-spacing: 8px;
+  }
+}
+
+.back-link {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: $spacing-xs;
+  margin-top: $spacing-md;
+  padding: $spacing-sm;
+  font-size: $text-sm;
+  color: $text-secondary;
+  background: none;
+  border: none;
+  cursor: pointer;
+  transition: color $transition-base;
+
+  &:hover {
+    color: $primary;
+  }
+
+  svg {
+    width: 16px;
+    height: 16px;
+  }
+}

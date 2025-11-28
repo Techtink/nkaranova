@@ -14,7 +14,8 @@ import {
   FiX,
   FiSun,
   FiMoon,
-  FiLogOut
+  FiLogOut,
+  FiHelpCircle
 } from 'react-icons/fi';
 import { useState } from 'react';
 import { useAuth } from '../../context/AuthContext';
@@ -33,6 +34,7 @@ const navItems = [
   { path: '/admin/featured', icon: FiAward, label: 'Featured Tailors' },
   { divider: true, label: 'Settings' },
   { path: '/admin/team', icon: FiShield, label: 'Team & Roles' },
+  { path: '/admin/faqs', icon: FiHelpCircle, label: 'FAQs' },
   { path: '/admin/settings', icon: FiSettings, label: 'Platform Settings' }
 ];
 

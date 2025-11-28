@@ -47,7 +47,14 @@ export const authAPI = {
   logout: () => api.post('/auth/logout'),
   getMe: () => api.get('/auth/me'),
   updatePassword: (data) => api.put('/auth/password', data),
-  updateDetails: (data) => api.put('/auth/details', data)
+  updateDetails: (data) => api.put('/auth/details', data),
+  // 2FA
+  setup2FA: () => api.post('/auth/2fa/setup'),
+  verify2FA: (token) => api.post('/auth/2fa/verify', { token }),
+  disable2FA: (data) => api.post('/auth/2fa/disable', data),
+  validate2FA: (data) => api.post('/auth/2fa/validate', data),
+  get2FAStatus: () => api.get('/auth/2fa/status'),
+  regenerateBackupCodes: (password) => api.post('/auth/2fa/backup-codes', { password })
 };
 
 // Tailors API
@@ -318,6 +325,45 @@ export const uploadsAPI = {
     });
   },
   deleteFile: (type, filename) => api.delete(`/uploads/${type}/${filename}`)
+};
+
+// Currency API
+export const currencyAPI = {
+  getSupportedCurrencies: () => api.get('/currency/supported'),
+  getExchangeRates: () => api.get('/currency/rates'),
+  convert: (amount, from, to) => api.post('/currency/convert', { amount, from, to }),
+  convertBatch: (amounts, from, to) => api.post('/currency/convert-batch', { amounts, from, to }),
+  format: (amount, currency) => api.get('/currency/format', { params: { amount, currency } })
+};
+
+// FAQ API
+export const faqAPI = {
+  // Public
+  getAll: (params) => api.get('/faqs', { params }),
+  getCategories: () => api.get('/faqs/categories'),
+  getById: (id) => api.get(`/faqs/${id}`),
+  // Admin
+  getAdmin: (params) => api.get('/faqs/admin', { params }),
+  create: (data) => api.post('/faqs', data),
+  update: (id, data) => api.put(`/faqs/${id}`, data),
+  delete: (id) => api.delete(`/faqs/${id}`),
+  reorder: (items) => api.put('/faqs/reorder', { items })
+};
+
+// Verification API (Face + Liveness)
+export const verificationAPI = {
+  // Liveness detection
+  startLivenessSession: (numChallenges) => api.post('/verification/liveness/start', { numChallenges }),
+  verifyLivenessChallenge: (sessionId, challengeIndex, frame) =>
+    api.post('/verification/liveness/verify', { sessionId, challengeIndex, frame }),
+  getLivenessSession: (sessionId) => api.get(`/verification/liveness/${sessionId}`),
+  // Face matching
+  compareFaceWithID: (idImage, selfieImage) =>
+    api.post('/verification/face-match', { idImage, selfieImage }),
+  // Status & requirements
+  getRequirements: () => api.get('/verification/requirements'),
+  getStatus: () => api.get('/verification/status'),
+  submitVerification: (documents) => api.post('/verification/submit', { documents })
 };
 
 // Legacy file upload helper (for backwards compatibility)

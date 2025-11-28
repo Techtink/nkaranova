@@ -18,11 +18,13 @@ const router = express.Router();
 router.get('/featured', getFeaturedWorks);
 router.get('/categories', getCategories);
 router.get('/', getWorks);
-router.get('/:id', getWork);
 
-// Protected tailor routes
+// Protected tailor routes - /me must come before /:id to avoid matching "me" as an ID
 router.get('/me', protect, authorize('tailor'), getMyWorks);
 router.post('/', protect, authorize('tailor'), createWork);
+
+// These routes with :id param must come after /me
+router.get('/:id', getWork);
 router.put('/:id', protect, authorize('tailor'), updateWork);
 router.delete('/:id', protect, authorize('tailor'), deleteWork);
 

@@ -144,9 +144,9 @@
 
 // Card
 @mixin card {
-  background: $white;
+  background: var(--card-bg);
   border-radius: $radius-lg;
-  box-shadow: $shadow-md;
+  box-shadow: var(--shadow-md);
 }
 
 // Truncate text

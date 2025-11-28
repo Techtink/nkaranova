@@ -29,6 +29,7 @@ import TailorSettings from './pages/tailor/Settings';
 import TailorReferrals from './pages/tailor/Referrals';
 import TailorMeasurements from './pages/tailor/Measurements';
 import TailorOrders from './pages/tailor/Orders';
+import TailorVerification from './pages/tailor/Verification';
 
 // Admin Pages
 import AdminDashboard from './pages/admin/Dashboard';
@@ -41,6 +42,7 @@ import AdminSettings from './pages/admin/Settings';
 import AdminReferrals from './pages/admin/Referrals';
 import AdminFeaturedTailors from './pages/admin/FeaturedTailors';
 import AdminTeam from './pages/admin/Team';
+import AdminFAQs from './pages/admin/FAQs';
 
 // Protected Route Component
 function ProtectedRoute({ children, roles }) {
@@ -151,6 +153,7 @@ export default function App() {
             <Route path="measurements" element={<TailorMeasurements />} />
             <Route path="settings" element={<TailorSettings />} />
             <Route path="referrals" element={<TailorReferrals />} />
+            <Route path="verification" element={<TailorVerification />} />
           </Route>
 
           {/* Admin Routes with Layout */}
@@ -171,6 +174,7 @@ export default function App() {
             <Route path="referrals" element={<AdminReferrals />} />
             <Route path="featured" element={<AdminFeaturedTailors />} />
             <Route path="team" element={<AdminTeam />} />
+            <Route path="faqs" element={<AdminFAQs />} />
             <Route path="settings" element={<AdminSettings />} />
           </Route>
 

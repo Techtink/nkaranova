@@ -178,12 +178,124 @@ export default function Settings() {
     currency: user?.preferences?.currency || 'NGN'
   });
 
+  // 2FA state
+  const [twoFactorState, setTwoFactorState] = useState({
+    enabled: user?.twoFactorEnabled || false,
+    setupMode: false,
+    qrCode: null,
+    secret: null,
+    verificationCode: '',
+    backupCodes: [],
+    showBackupCodes: false,
+    disablePassword: '',
+    backupCodesRemaining: 0
+  });
+
   // Load measurement profiles
   useEffect(() => {
     if (activeTab === 'measurements') {
       loadMeasurementProfiles();
     }
   }, [activeTab]);
+
+  // Load 2FA status when security tab is opened
+  useEffect(() => {
+    if (activeTab === 'security') {
+      load2FAStatus();
+    }
+  }, [activeTab]);
+
+  const load2FAStatus = async () => {
+    try {
+      const response = await authAPI.get2FAStatus();
+      setTwoFactorState(prev => ({
+        ...prev,
+        enabled: response.data.data.enabled,
+        backupCodesRemaining: response.data.data.backupCodesRemaining
+      }));
+    } catch (error) {
+      console.error('Error loading 2FA status:', error);
+    }
+  };
+
+  // 2FA Functions
+  const handleSetup2FA = async () => {
+    setSaving(true);
+    try {
+      const response = await authAPI.setup2FA();
+      setTwoFactorState(prev => ({
+        ...prev,
+        setupMode: true,
+        qrCode: response.data.data.qrCode,
+        secret: response.data.data.secret
+      }));
+    } catch (error) {
+      toast.error(error.response?.data?.message || 'Failed to setup 2FA');
+    } finally {
+      setSaving(false);
+    }
+  };
+
+  const handleVerify2FA = async () => {
+    if (!twoFactorState.verificationCode || twoFactorState.verificationCode.length !== 6) {
+      toast.error('Please enter a valid 6-digit code');
+      return;
+    }
+
+    setSaving(true);
+    try {
+      const response = await authAPI.verify2FA(twoFactorState.verificationCode);
+      setTwoFactorState(prev => ({
+        ...prev,
+        enabled: true,
+        setupMode: false,
+        qrCode: null,
+        secret: null,
+        verificationCode: '',
+        backupCodes: response.data.data.backupCodes,
+        showBackupCodes: true,
+        backupCodesRemaining: response.data.data.backupCodes.length
+      }));
+      toast.success('Two-Factor Authentication enabled!');
+    } catch (error) {
+      toast.error(error.response?.data?.message || 'Invalid verification code');
+    } finally {
+      setSaving(false);
+    }
+  };
+
+  const handleDisable2FA = async () => {
+    if (!twoFactorState.disablePassword) {
+      toast.error('Please enter your password');
+      return;
+    }
+
+    setSaving(true);
+    try {
+      await authAPI.disable2FA({ password: twoFactorState.disablePassword });
+      setTwoFactorState(prev => ({
+        ...prev,
+        enabled: false,
+        disablePassword: '',
+        backupCodesRemaining: 0
+      }));
+      toast.success('Two-Factor Authentication disabled');
+    } catch (error) {
+      toast.error(error.response?.data?.message || 'Failed to disable 2FA');
+    } finally {
+      setSaving(false);
+    }
+  };
+
+  const handleCancelSetup = () => {
+    setTwoFactorState(prev => ({
+      ...prev,
+      setupMode: false,
+      qrCode: null,
+      secret: null,
+      verificationCode: ''
+    }));
+  };
 
   const loadMeasurementProfiles = async () => {
     setLoadingProfiles(true);
@@ -635,20 +747,129 @@ export default function Settings() {
 
               <div className="card-section">
                 <h3>Two-Factor Authentication</h3>
-                <div className="toggle-row">
-                  <div className="toggle-info">
-                    <h4>Enable 2FA</h4>
-                    <p>Add an additional layer of security to your account during login.</p>
+
+                {/* 2FA Not Enabled - Show Setup Button */}
+                {!twoFactorState.enabled && !twoFactorState.setupMode && (
+                  <div className="twofa-setup">
+                    <div className="toggle-info">
+                      <h4>Enable 2FA</h4>
+                      <p>Add an additional layer of security to your account using an authenticator app like Google Authenticator or Authy.</p>
+                    </div>
+                    <button
+                      className="btn btn-primary"
+                      onClick={handleSetup2FA}
+                      disabled={saving}
+                    >
+                      {saving ? 'Setting up...' : 'Setup 2FA'}
+                    </button>
                   </div>
-                  <label className="toggle-switch">
-                    <input
-                      type="checkbox"
-                      checked={preferences.twoFactorAuth}
-                      onChange={() => handlePreferenceToggle('twoFactorAuth')}
-                    />
-                    <span className="toggle-slider"></span>
-                  </label>
-                </div>
+                )}
+
+                {/* 2FA Setup Mode - Show QR Code */}
+                {twoFactorState.setupMode && (
+                  <div className="twofa-setup-mode">
+                    <div className="setup-instructions">
+                      <h4>Scan QR Code</h4>
+                      <p>Scan this QR code with your authenticator app (Google Authenticator, Authy, etc.)</p>
+                    </div>
+
+                    {twoFactorState.qrCode && (
+                      <div className="qr-code-container">
+                        <img src={twoFactorState.qrCode} alt="2FA QR Code" />
+                      </div>
+                    )}
+
+                    <div className="manual-entry">
+                      <p>Or enter this code manually:</p>
+                      <code className="secret-code">{twoFactorState.secret}</code>
+                    </div>
+
+                    <div className="form-group">
+                      <label>Enter verification code from your app</label>
+                      <input
+                        type="text"
+                        value={twoFactorState.verificationCode}
+                        onChange={(e) => setTwoFactorState(prev => ({
+                          ...prev,
+                          verificationCode: e.target.value.replace(/\D/g, '').slice(0, 6)
+                        }))}
+                        placeholder="Enter 6-digit code"
+                        maxLength={6}
+                      />
+                    </div>
+
+                    <div className="form-actions">
+                      <button
+                        className="btn btn-outline"
+                        onClick={handleCancelSetup}
+                      >
+                        Cancel
+                      </button>
+                      <button
+                        className="btn btn-primary"
+                        onClick={handleVerify2FA}
+                        disabled={saving || twoFactorState.verificationCode.length !== 6}
+                      >
+                        {saving ? 'Verifying...' : 'Verify & Enable'}
+                      </button>
+                    </div>
+                  </div>
+                )}
+
+                {/* Show Backup Codes After Setup */}
+                {twoFactorState.showBackupCodes && twoFactorState.backupCodes.length > 0 && (
+                  <div className="backup-codes-modal">
+                    <div className="backup-codes-content">
+                      <h4>Save Your Backup Codes</h4>
+                      <p className="warning">Store these codes in a safe place. You can use them to access your account if you lose your authenticator device.</p>
+
+                      <div className="codes-grid">
+                        {twoFactorState.backupCodes.map((code, index) => (
+                          <code key={index} className="backup-code">{code}</code>
+                        ))}
+                      </div>
+
+                      <button
+                        className="btn btn-primary"
+                        onClick={() => setTwoFactorState(prev => ({ ...prev, showBackupCodes: false, backupCodes: [] }))}
+                      >
+                        I've Saved My Codes
+                      </button>
+                    </div>
+                  </div>
+                )}
+
+                {/* 2FA Enabled - Show Status and Disable Option */}
+                {twoFactorState.enabled && !twoFactorState.setupMode && !twoFactorState.showBackupCodes && (
+                  <div className="twofa-enabled">
+                    <div className="status-badge success">
+                      <FiCheck /> 2FA is enabled
+                    </div>
+                    <p className="backup-info">
+                      Backup codes remaining: {twoFactorState.backupCodesRemaining}
+                    </p>
+
+                    <div className="disable-section">
+                      <h4>Disable Two-Factor Authentication</h4>
+                      <p>Enter your password to disable 2FA. This will make your account less secure.</p>
+                      <div className="form-group">
+                        <input
+                          type="password"
+                          value={twoFactorState.disablePassword}
+                          onChange={(e) => setTwoFactorState(prev => ({ ...prev, disablePassword: e.target.value }))}
+                          placeholder="Enter your password"
+                        />
+                      </div>
+                      <button
+                        className="btn btn-danger"
+                        onClick={handleDisable2FA}
+                        disabled={saving || !twoFactorState.disablePassword}
+                      >
+                        {saving ? 'Disabling...' : 'Disable 2FA'}
+                      </button>
+                    </div>
+                  </div>
+                )}
               </div>
 
               <div className="card-section danger-zone">

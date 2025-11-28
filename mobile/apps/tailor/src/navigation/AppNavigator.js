@@ -7,8 +7,11 @@ import { Ionicons } from '@expo/vector-icons';
 import { useAuth } from '../../../../shared/context/AuthContext';
 import { colors } from '../../../../shared/constants/theme';
 
-// Auth Screens
-import LoginScreen from '../screens/LoginScreen';
+// Auth/Onboarding Screens
+import OnboardingScreen from '../../../../shared/screens/OnboardingScreen';
+import AuthScreen from '../../../../shared/screens/AuthScreen';
+import VerificationCodeScreen from '../../../../shared/screens/VerificationCodeScreen';
+import TwoFactorScreen from '../../../../shared/screens/TwoFactorScreen';
 
 // Main Screens
 import DashboardScreen from '../screens/DashboardScreen';
@@ -23,10 +26,21 @@ import ChatScreen from '../screens/ChatScreen';
 import AddWorkScreen from '../screens/AddWorkScreen';
 import AvailabilityScreen from '../screens/AvailabilityScreen';
 import VerificationScreen from '../screens/VerificationScreen';
+import LivenessCheckScreen from '../screens/LivenessCheckScreen';
 import EditProfileScreen from '../screens/EditProfileScreen';
+import PricingScreen from '../screens/PricingScreen';
+import PaymentSettingsScreen from '../screens/PaymentSettingsScreen';
+
+// Shared Screens
+import NotificationsScreen from '../../../../shared/screens/NotificationsScreen';
+import ChangePasswordScreen from '../../../../shared/screens/ChangePasswordScreen';
+import HelpSupportScreen from '../../../../shared/screens/HelpSupportScreen';
 
 const Stack = createNativeStackNavigator();
 const Tab = createBottomTabNavigator();
+
+// Design accent color
+const accentColor = '#5c8d6a';
 
 function MainTabs() {
   return (
@@ -51,11 +65,11 @@ function MainTabs() {
 
           return <Ionicons name={iconName} size={size} color={color} />;
         },
-        tabBarActiveTintColor: colors.primary,
+        tabBarActiveTintColor: accentColor,
         tabBarInactiveTintColor: colors.textMuted,
         headerShown: true,
         headerStyle: {
-          backgroundColor: colors.primary
+          backgroundColor: accentColor
         },
         headerTintColor: colors.white
       })}
@@ -101,7 +115,32 @@ function AuthStack() {
         headerShown: false
       }}
     >
-      <Stack.Screen name="Login" component={LoginScreen} />
+      <Stack.Screen name="Onboarding">
+        {(props) => (
+          <OnboardingScreen
+            {...props}
+            appName="Tailor Connect"
+            appType="tailor"
+          />
+        )}
+      </Stack.Screen>
+      <Stack.Screen
+        name="Auth"
+        options={{
+          animation: 'slide_from_bottom'
+        }}
+      >
+        {(props) => <AuthScreen {...props} appType="tailor" />}
+      </Stack.Screen>
+      <Stack.Screen
+        name="VerificationCode"
+        component={VerificationCodeScreen}
+      />
+      <Stack.Screen
+        name="TwoFactor"
+        component={TwoFactorScreen}
+        options={{ gestureEnabled: false }}
+      />
     </Stack.Navigator>
   );
 }
@@ -126,7 +165,7 @@ export default function AppNavigator() {
         <Stack.Navigator
           screenOptions={{
             headerStyle: {
-              backgroundColor: colors.primary
+              backgroundColor: accentColor
             },
             headerTintColor: colors.white,
             headerBackTitleVisible: false
@@ -158,9 +197,43 @@ export default function AppNavigator() {
             options={{ title: 'Verification' }}
           />
           <Stack.Screen
+            name="LivenessCheck"
+            component={LivenessCheckScreen}
+            options={{
+              title: 'Liveness Check',
+              headerShown: false,
+              presentation: 'fullScreenModal'
+            }}
+          />
+          <Stack.Screen
             name="EditProfile"
             component={EditProfileScreen}
             options={{ title: 'Edit Profile' }}
+          />
+          <Stack.Screen
+            name="Pricing"
+            component={PricingScreen}
+            options={{ title: 'Pricing' }}
+          />
+          <Stack.Screen
+            name="PaymentSettings"
+            component={PaymentSettingsScreen}
+            options={{ title: 'Payment Settings' }}
+          />
+          <Stack.Screen
+            name="Notifications"
+            component={NotificationsScreen}
+            options={{ title: 'Notifications' }}
+          />
+          <Stack.Screen
+            name="ChangePassword"
+            component={ChangePasswordScreen}
+            options={{ title: 'Change Password' }}
+          />
+          <Stack.Screen
+            name="Support"
+            component={HelpSupportScreen}
+            options={{ title: 'Help & Support' }}
           />
         </Stack.Navigator>
       ) : (

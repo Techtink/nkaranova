@@ -12,7 +12,8 @@ import {
   FiMoon,
   FiLogOut,
   FiEdit3,
-  FiPackage
+  FiPackage,
+  FiShield
 } from 'react-icons/fi';
 import { useState } from 'react';
 import { useAuth } from '../../context/AuthContext';
@@ -29,6 +30,7 @@ const navItems = [
   { divider: true, label: 'Earn More' },
   { path: '/tailor/referrals', icon: FiGift, label: 'Referrals' },
   { divider: true, label: 'Account' },
+  { path: '/tailor/verification', icon: FiShield, label: 'Verification' },
   { path: '/tailor/settings', icon: FiSettings, label: 'Settings' }
 ];
 

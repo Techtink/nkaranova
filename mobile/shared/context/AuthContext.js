@@ -1,6 +1,6 @@
 import { createContext, useState, useContext, useEffect, useRef } from 'react';
 import * as SecureStore from 'expo-secure-store';
-import { authAPI } from '../services/api';
+import { authAPI, twoFactorAPI } from '../services/api';
 import notificationService from '../services/notifications';
 
 const AuthContext = createContext(null);
@@ -10,6 +10,7 @@ export function AuthProvider({ children, requiredRole }) {
   const [loading, setLoading] = useState(true);
   const [isAuthenticated, setIsAuthenticated] = useState(false);
   const [pushToken, setPushToken] = useState(null);
+  const [pending2FA, setPending2FA] = useState(null); // { userId, email } when 2FA is required
   const navigationRef = useRef(null);
 
   useEffect(() => {
@@ -64,7 +65,18 @@ export function AuthProvider({ children, requiredRole }) {
 
   const login = async (email, password) => {
     const response = await authAPI.login({ email, password });
-    const { token, user: userData } = response.data;
+    const data = response.data;
+
+    // Check if 2FA is required
+    if (data.requires2FA) {
+      setPending2FA({
+        userId: data.userId,
+        email: email
+      });
+      return { requires2FA: true };
+    }
+
+    const { token, user: userData } = data;
 
     // Check if user has the required role for this app
     if (requiredRole && userData.role !== requiredRole) {
@@ -78,6 +90,34 @@ export function AuthProvider({ children, requiredRole }) {
     setIsAuthenticated(true);
 
     return userData;
+  };
+
+  const verify2FA = async (code, isBackupCode = false) => {
+    if (!pending2FA) {
+      throw new Error('No pending 2FA verification');
+    }
+
+    const response = await twoFactorAPI.validate(pending2FA.userId, code, isBackupCode);
+    const { token, user: userData } = response.data;
+
+    // Check if user has the required role for this app
+    if (requiredRole && userData.role !== requiredRole) {
+      setPending2FA(null);
+      throw new Error(`This app is for ${requiredRole}s only`);
+    }
+
+    await SecureStore.setItemAsync('token', token);
+    await SecureStore.setItemAsync('user', JSON.stringify(userData));
+
+    setPending2FA(null);
+    setUser(userData);
+    setIsAuthenticated(true);
+
+    return userData;
+  };
+
+  const cancel2FA = () => {
+    setPending2FA(null);
   };
 
   const register = async (userData) => {
@@ -121,7 +161,10 @@ export function AuthProvider({ children, requiredRole }) {
         loading,
         isAuthenticated,
         pushToken,
+        pending2FA,
         login,
+        verify2FA,
+        cancel2FA,
         register,
         logout,
         updateUser,

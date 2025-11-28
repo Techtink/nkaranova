@@ -12,7 +12,7 @@ const settingsSchema = new mongoose.Schema({
   },
   category: {
     type: String,
-    enum: ['referral', 'featured', 'general', 'payment', 'landing', 'order'],
+    enum: ['referral', 'featured', 'general', 'payment', 'landing', 'order', 'mobile'],
     required: true
   },
   description: String,
@@ -630,6 +630,48 @@ const defaultSettings = {
     value: true,
     category: 'order',
     description: 'Send notification to admin when tailor requests delay'
+  },
+
+  // Mobile App Settings
+  mobile_customer_splash_image: {
+    value: 'https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?w=800&q=80',
+    category: 'mobile',
+    description: 'Customer app splash/onboarding background image URL'
+  },
+  mobile_customer_splash_headline: {
+    value: 'Find Your Perfect\nTailor Today',
+    category: 'mobile',
+    description: 'Customer app splash screen headline'
+  },
+  mobile_customer_splash_subheadline: {
+    value: 'Discover skilled tailors near you. Book appointments, get custom fits, and look your best.',
+    category: 'mobile',
+    description: 'Customer app splash screen subheadline'
+  },
+  mobile_tailor_splash_image: {
+    value: 'https://images.unsplash.com/photo-1558618666-fcd25c85cd64?w=800&q=80',
+    category: 'mobile',
+    description: 'Tailor app splash/onboarding background image URL'
+  },
+  mobile_tailor_splash_headline: {
+    value: 'Grow Your Tailoring\nBusiness',
+    category: 'mobile',
+    description: 'Tailor app splash screen headline'
+  },
+  mobile_tailor_splash_subheadline: {
+    value: 'Manage your tailoring business, connect with customers, and grow your brand.',
+    category: 'mobile',
+    description: 'Tailor app splash screen subheadline'
+  },
+  mobile_app_name: {
+    value: 'Tailor Connect',
+    category: 'mobile',
+    description: 'App name displayed on splash screens'
+  },
+  mobile_primary_color: {
+    value: '#5c8d6a',
+    category: 'mobile',
+    description: 'Primary accent color for mobile apps (hex)'
   }
 };
 

@@ -1,3 +1,4 @@
+import mongoose from 'mongoose';
 import Work from '../models/Work.js';
 import TailorProfile from '../models/TailorProfile.js';
 import { paginationResult } from '../utils/helpers.js';
@@ -78,6 +79,14 @@ export const getWorks = async (req, res, next) => {
 // @access  Public
 export const getWork = async (req, res, next) => {
   try {
+    // Validate ObjectId to prevent CastError
+    if (!mongoose.Types.ObjectId.isValid(req.params.id)) {
+      return res.status(400).json({
+        success: false,
+        message: 'Invalid work ID format'
+      });
+    }
+
     const work = await Work.findOne({
       _id: req.params.id,
       approvalStatus: 'approved'

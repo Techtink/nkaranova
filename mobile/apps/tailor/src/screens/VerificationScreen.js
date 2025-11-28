@@ -11,40 +11,32 @@ import {
 } from 'react-native';
 import { Ionicons } from '@expo/vector-icons';
 import * as ImagePicker from 'expo-image-picker';
-import { tailorsAPI, uploadFile } from '../../../../shared/services/api';
+import { verificationAPI, uploadFile } from '../../../../shared/services/api';
 import { colors, spacing, fontSize, borderRadius, shadows } from '../../../../shared/constants/theme';
 
-const requiredDocuments = [
-  {
-    key: 'governmentId',
-    title: 'Government ID',
-    description: 'Passport, Driver\'s License, or National ID',
-    icon: 'card-outline'
-  },
-  {
-    key: 'businessProof',
-    title: 'Business Proof',
-    description: 'Business registration, tax certificate, or shop license',
-    icon: 'business-outline'
-  },
-  {
-    key: 'workSample',
-    title: 'Work Sample',
-    description: 'Photo of your tailoring work or workshop',
-    icon: 'images-outline'
-  }
-];
+const STEPS = {
+  LIVENESS: 'liveness',
+  DOCUMENTS: 'documents',
+  REVIEW: 'review'
+};
 
 export default function VerificationScreen({ navigation }) {
   const [loading, setLoading] = useState(true);
   const [submitting, setSubmitting] = useState(false);
   const [uploading, setUploading] = useState(null);
   const [verificationStatus, setVerificationStatus] = useState(null);
-  const [documents, setDocuments] = useState({
-    governmentId: null,
-    businessProof: null,
-    workSample: null
-  });
+  const [currentStep, setCurrentStep] = useState(STEPS.LIVENESS);
+
+  // Liveness state
+  const [livenessComplete, setLivenessComplete] = useState(false);
+  const [selfieImage, setSelfieImage] = useState(null);
+  const [livenessSessionId, setLivenessSessionId] = useState(null);
+
+  // Documents state
+  const [idDocument, setIdDocument] = useState(null);
+
+  // Face match state
+  const [faceMatchResult, setFaceMatchResult] = useState(null);
 
   useEffect(() => {
     loadVerificationStatus();
@@ -52,21 +44,34 @@ export default function VerificationScreen({ navigation }) {
 
   const loadVerificationStatus = async () => {
     try {
-      const response = await tailorsAPI.getMyProfile();
-      const tailor = response.data.data;
-      setVerificationStatus(tailor.verificationStatus);
-
-      if (tailor.verificationDocuments) {
-        setDocuments(tailor.verificationDocuments);
+      const response = await verificationAPI.getStatus();
+      if (response.data.success) {
+        setVerificationStatus(response.data.data?.status || 'not_started');
       }
     } catch (error) {
-      console.error('Error loading verification status:', error);
+      // If endpoint doesn't exist, assume not started
+      setVerificationStatus('not_started');
     } finally {
       setLoading(false);
     }
   };
 
-  const pickDocument = async (docKey) => {
+  const handleLivenessComplete = (result) => {
+    if (result.success) {
+      setLivenessComplete(true);
+      setSelfieImage(result.selfieFrame);
+      setLivenessSessionId(result.sessionId);
+      setCurrentStep(STEPS.DOCUMENTS);
+    }
+  };
+
+  const startLivenessCheck = () => {
+    navigation.navigate('LivenessCheck', {
+      onComplete: handleLivenessComplete
+    });
+  };
+
+  const pickIDDocument = async () => {
     const permissionResult = await ImagePicker.requestMediaLibraryPermissionsAsync();
 
     if (!permissionResult.granted) {
@@ -77,54 +82,68 @@ export default function VerificationScreen({ navigation }) {
     const result = await ImagePicker.launchImageLibraryAsync({
       mediaTypes: ImagePicker.MediaTypeOptions.Images,
       allowsEditing: true,
-      quality: 0.8
+      quality: 0.8,
+      base64: true
     });
 
     if (!result.canceled && result.assets[0]) {
-      uploadDocument(docKey, result.assets[0].uri);
+      setIdDocument({
+        uri: result.assets[0].uri,
+        base64: result.assets[0].base64
+      });
     }
   };
 
-  const uploadDocument = async (docKey, uri) => {
-    setUploading(docKey);
-    try {
-      const response = await uploadFile(uri, 'verification');
-      setDocuments(prev => ({
-        ...prev,
-        [docKey]: response.url
-      }));
-    } catch (error) {
-      Alert.alert('Error', 'Failed to upload document');
-    } finally {
-      setUploading(null);
-    }
-  };
-
-  const removeDocument = (docKey) => {
-    setDocuments(prev => ({
-      ...prev,
-      [docKey]: null
-    }));
-  };
-
-  const handleSubmit = async () => {
-    const missingDocs = requiredDocuments.filter(doc => !documents[doc.key]);
-    if (missingDocs.length > 0) {
-      Alert.alert(
-        'Missing Documents',
-        `Please upload: ${missingDocs.map(d => d.title).join(', ')}`
-      );
+  const handleFaceMatch = async () => {
+    if (!idDocument?.base64 || !selfieImage) {
+      Alert.alert('Error', 'Please complete all verification steps');
       return;
     }
 
     setSubmitting(true);
     try {
-      await tailorsAPI.submitVerification(documents);
-      Alert.alert(
-        'Verification Submitted',
-        'Your documents have been submitted for review. We\'ll notify you once verified.',
-        [{ text: 'OK', onPress: () => navigation.goBack() }]
+      const response = await verificationAPI.compareFaceWithID(
+        idDocument.base64,
+        selfieImage
       );
+
+      if (response.data.success) {
+        setFaceMatchResult(response.data.data);
+        if (response.data.data.matched) {
+          setCurrentStep(STEPS.REVIEW);
+        } else {
+          Alert.alert(
+            'Face Match Failed',
+            'The face in your selfie does not match your ID. Please try again with clearer photos.',
+            [{ text: 'OK' }]
+          );
+        }
+      }
+    } catch (error) {
+      Alert.alert('Error', error.response?.data?.message || 'Face comparison failed');
+    } finally {
+      setSubmitting(false);
+    }
+  };
+
+  const handleSubmit = async () => {
+    setSubmitting(true);
+    try {
+      const documents = {
+        idDocument: idDocument.base64,
+        selfie: selfieImage,
+        livenessSessionId
+      };
+
+      const response = await verificationAPI.submitVerification(documents);
+
+      if (response.data.success) {
+        Alert.alert(
+          'Verification Submitted',
+          'Your verification is being reviewed. This usually takes 1-2 business days.',
+          [{ text: 'OK', onPress: () => navigation.goBack() }]
+        );
+      }
     } catch (error) {
       Alert.alert('Error', error.response?.data?.message || 'Failed to submit verification');
     } finally {
@@ -170,120 +189,227 @@ export default function VerificationScreen({ navigation }) {
     );
   }
 
-  const DocumentCard = ({ doc }) => {
-    const isUploading = uploading === doc.key;
-    const isUploaded = !!documents[doc.key];
-
-    return (
-      <View style={styles.documentCard}>
-        <View style={styles.documentInfo}>
-          <View style={[styles.documentIcon, isUploaded && styles.documentIconUploaded]}>
-            <Ionicons
-              name={isUploaded ? 'checkmark' : doc.icon}
-              size={24}
-              color={isUploaded ? colors.white : colors.primary}
-            />
-          </View>
-          <View style={styles.documentText}>
-            <Text style={styles.documentTitle}>{doc.title}</Text>
-            <Text style={styles.documentDesc}>{doc.description}</Text>
-          </View>
-        </View>
-
-        {isUploaded ? (
-          <View style={styles.uploadedContainer}>
-            <Image source={{ uri: documents[doc.key] }} style={styles.thumbnail} />
-            <TouchableOpacity
-              style={styles.removeButton}
-              onPress={() => removeDocument(doc.key)}
-            >
-              <Ionicons name="close" size={16} color={colors.white} />
-            </TouchableOpacity>
-          </View>
-        ) : (
-          <TouchableOpacity
-            style={styles.uploadButton}
-            onPress={() => pickDocument(doc.key)}
-            disabled={isUploading}
-          >
-            {isUploading ? (
-              <ActivityIndicator size="small" color={colors.primary} />
-            ) : (
-              <>
-                <Ionicons name="cloud-upload-outline" size={20} color={colors.primary} />
-                <Text style={styles.uploadButtonText}>Upload</Text>
-              </>
-            )}
-          </TouchableOpacity>
-        )}
-      </View>
-    );
-  };
-
   return (
     <View style={styles.container}>
       <ScrollView>
-        {/* Header */}
-        <View style={styles.header}>
-          <Ionicons name="shield-checkmark-outline" size={48} color={colors.primary} />
-          <Text style={styles.headerTitle}>Get Verified</Text>
-          <Text style={styles.headerText}>
-            Verified tailors get more visibility and customer trust. Upload the following documents to get verified.
-          </Text>
+        {/* Progress Steps */}
+        <View style={styles.progressContainer}>
+          <View style={styles.progressStep}>
+            <View style={[
+              styles.progressCircle,
+              currentStep === STEPS.LIVENESS && styles.progressCircleActive,
+              livenessComplete && styles.progressCircleComplete
+            ]}>
+              {livenessComplete ? (
+                <Ionicons name="checkmark" size={16} color={colors.white} />
+              ) : (
+                <Text style={styles.progressNumber}>1</Text>
+              )}
+            </View>
+            <Text style={styles.progressLabel}>Liveness</Text>
+          </View>
+
+          <View style={[styles.progressLine, livenessComplete && styles.progressLineComplete]} />
+
+          <View style={styles.progressStep}>
+            <View style={[
+              styles.progressCircle,
+              currentStep === STEPS.DOCUMENTS && styles.progressCircleActive,
+              currentStep === STEPS.REVIEW && styles.progressCircleComplete
+            ]}>
+              {currentStep === STEPS.REVIEW ? (
+                <Ionicons name="checkmark" size={16} color={colors.white} />
+              ) : (
+                <Text style={styles.progressNumber}>2</Text>
+              )}
+            </View>
+            <Text style={styles.progressLabel}>Documents</Text>
+          </View>
+
+          <View style={[styles.progressLine, currentStep === STEPS.REVIEW && styles.progressLineComplete]} />
+
+          <View style={styles.progressStep}>
+            <View style={[
+              styles.progressCircle,
+              currentStep === STEPS.REVIEW && styles.progressCircleActive
+            ]}>
+              <Text style={styles.progressNumber}>3</Text>
+            </View>
+            <Text style={styles.progressLabel}>Submit</Text>
+          </View>
         </View>
 
-        {/* Rejected notice */}
-        {verificationStatus === 'rejected' && (
-          <View style={styles.rejectedNotice}>
-            <Ionicons name="warning-outline" size={20} color={colors.error} />
-            <Text style={styles.rejectedText}>
-              Your previous submission was rejected. Please resubmit with valid documents.
-            </Text>
+        {/* Step 1: Liveness Check */}
+        {currentStep === STEPS.LIVENESS && (
+          <View style={styles.stepContainer}>
+            <View style={styles.stepHeader}>
+              <Ionicons name="scan-outline" size={48} color={colors.primary} />
+              <Text style={styles.stepTitle}>Face Verification</Text>
+              <Text style={styles.stepDescription}>
+                Complete a quick face scan to prove you're a real person. You'll be asked to perform simple actions like turning your head.
+              </Text>
+            </View>
+
+            <View style={styles.requirementsBox}>
+              <Text style={styles.requirementsTitle}>Tips for best results:</Text>
+              <View style={styles.requirementItem}>
+                <Ionicons name="checkmark-circle" size={18} color={colors.success} />
+                <Text style={styles.requirementText}>Good lighting on your face</Text>
+              </View>
+              <View style={styles.requirementItem}>
+                <Ionicons name="checkmark-circle" size={18} color={colors.success} />
+                <Text style={styles.requirementText}>Remove glasses or hats</Text>
+              </View>
+              <View style={styles.requirementItem}>
+                <Ionicons name="checkmark-circle" size={18} color={colors.success} />
+                <Text style={styles.requirementText}>Face the camera directly</Text>
+              </View>
+            </View>
+
+            <TouchableOpacity style={styles.primaryButton} onPress={startLivenessCheck}>
+              <Ionicons name="camera" size={20} color={colors.white} />
+              <Text style={styles.primaryButtonText}>Start Face Scan</Text>
+            </TouchableOpacity>
           </View>
         )}
 
-        {/* Documents */}
-        <View style={styles.documentsSection}>
-          <Text style={styles.sectionTitle}>Required Documents</Text>
-          {requiredDocuments.map((doc) => (
-            <DocumentCard key={doc.key} doc={doc} />
-          ))}
-        </View>
+        {/* Step 2: ID Document */}
+        {currentStep === STEPS.DOCUMENTS && (
+          <View style={styles.stepContainer}>
+            <View style={styles.stepHeader}>
+              <Ionicons name="card-outline" size={48} color={colors.primary} />
+              <Text style={styles.stepTitle}>Upload ID Document</Text>
+              <Text style={styles.stepDescription}>
+                Upload a clear photo of your government-issued ID (Passport, National ID, or Driver's License).
+              </Text>
+            </View>
 
-        {/* Benefits */}
-        <View style={styles.benefitsSection}>
-          <Text style={styles.sectionTitle}>Benefits of Verification</Text>
-          <View style={styles.benefitItem}>
-            <Ionicons name="checkmark-circle" size={20} color={colors.success} />
-            <Text style={styles.benefitText}>Verification badge on your profile</Text>
+            {/* Selfie Preview */}
+            <View style={styles.previewSection}>
+              <Text style={styles.previewLabel}>Your Selfie</Text>
+              {selfieImage && (
+                <View style={styles.imagePreview}>
+                  <Image
+                    source={{ uri: `data:image/jpeg;base64,${selfieImage}` }}
+                    style={styles.previewImage}
+                  />
+                  <View style={styles.checkBadge}>
+                    <Ionicons name="checkmark" size={12} color={colors.white} />
+                  </View>
+                </View>
+              )}
+            </View>
+
+            {/* ID Document Upload */}
+            <View style={styles.previewSection}>
+              <Text style={styles.previewLabel}>ID Document</Text>
+              {idDocument ? (
+                <View style={styles.imagePreview}>
+                  <Image source={{ uri: idDocument.uri }} style={styles.previewImage} />
+                  <TouchableOpacity style={styles.changeButton} onPress={pickIDDocument}>
+                    <Text style={styles.changeButtonText}>Change</Text>
+                  </TouchableOpacity>
+                </View>
+              ) : (
+                <TouchableOpacity style={styles.uploadArea} onPress={pickIDDocument}>
+                  <Ionicons name="cloud-upload-outline" size={32} color={colors.primary} />
+                  <Text style={styles.uploadText}>Tap to upload ID</Text>
+                </TouchableOpacity>
+              )}
+            </View>
+
+            <TouchableOpacity
+              style={[styles.primaryButton, !idDocument && styles.buttonDisabled]}
+              onPress={handleFaceMatch}
+              disabled={!idDocument || submitting}
+            >
+              {submitting ? (
+                <ActivityIndicator color={colors.white} />
+              ) : (
+                <>
+                  <Ionicons name="scan" size={20} color={colors.white} />
+                  <Text style={styles.primaryButtonText}>Verify Face Match</Text>
+                </>
+              )}
+            </TouchableOpacity>
           </View>
-          <View style={styles.benefitItem}>
-            <Ionicons name="checkmark-circle" size={20} color={colors.success} />
-            <Text style={styles.benefitText}>Higher ranking in search results</Text>
+        )}
+
+        {/* Step 3: Review & Submit */}
+        {currentStep === STEPS.REVIEW && (
+          <View style={styles.stepContainer}>
+            <View style={styles.stepHeader}>
+              <Ionicons name="shield-checkmark-outline" size={48} color={colors.primary} />
+              <Text style={styles.stepTitle}>Review & Submit</Text>
+              <Text style={styles.stepDescription}>
+                Review your verification details before submitting.
+              </Text>
+            </View>
+
+            <View style={styles.reviewCard}>
+              <View style={styles.reviewItem}>
+                <View style={styles.reviewIcon}>
+                  <Ionicons name="scan-outline" size={20} color={colors.success} />
+                </View>
+                <View style={styles.reviewContent}>
+                  <Text style={styles.reviewTitle}>Liveness Check</Text>
+                  <Text style={styles.reviewStatus}>Passed</Text>
+                </View>
+                <Ionicons name="checkmark-circle" size={24} color={colors.success} />
+              </View>
+
+              <View style={styles.reviewDivider} />
+
+              <View style={styles.reviewItem}>
+                <View style={styles.reviewIcon}>
+                  <Ionicons name="person-outline" size={20} color={colors.success} />
+                </View>
+                <View style={styles.reviewContent}>
+                  <Text style={styles.reviewTitle}>Face Match</Text>
+                  <Text style={styles.reviewStatus}>
+                    {faceMatchResult?.confidence?.toFixed(1)}% confidence
+                  </Text>
+                </View>
+                <Ionicons name="checkmark-circle" size={24} color={colors.success} />
+              </View>
+
+              <View style={styles.reviewDivider} />
+
+              <View style={styles.reviewImages}>
+                <Image
+                  source={{ uri: `data:image/jpeg;base64,${selfieImage}` }}
+                  style={styles.reviewImage}
+                />
+                <Image source={{ uri: idDocument.uri }} style={styles.reviewImage} />
+              </View>
+            </View>
+
+            <View style={styles.noticeBox}>
+              <Ionicons name="information-circle" size={20} color={colors.warning} />
+              <Text style={styles.noticeText}>
+                By submitting, you confirm that all information is accurate. Verification typically takes 1-2 business days.
+              </Text>
+            </View>
+
+            <TouchableOpacity
+              style={styles.primaryButton}
+              onPress={handleSubmit}
+              disabled={submitting}
+            >
+              {submitting ? (
+                <ActivityIndicator color={colors.white} />
+              ) : (
+                <>
+                  <Ionicons name="send" size={20} color={colors.white} />
+                  <Text style={styles.primaryButtonText}>Submit Verification</Text>
+                </>
+              )}
+            </TouchableOpacity>
           </View>
-          <View style={styles.benefitItem}>
-            <Ionicons name="checkmark-circle" size={20} color={colors.success} />
-            <Text style={styles.benefitText}>Increased customer trust</Text>
-          </View>
-        </View>
+        )}
 
         <View style={styles.bottomPadding} />
       </ScrollView>
-
-      {/* Submit Button */}
-      <View style={styles.footer}>
-        <TouchableOpacity
-          style={[styles.submitButton, submitting && styles.submitButtonDisabled]}
-          onPress={handleSubmit}
-          disabled={submitting}
-        >
-          {submitting ? (
-            <ActivityIndicator color={colors.white} />
-          ) : (
-            <Text style={styles.submitButtonText}>Submit for Verification</Text>
-          )}
-        </TouchableOpacity>
-      </View>
     </View>
   );
 }
@@ -325,160 +451,238 @@ const styles = StyleSheet.create({
     marginTop: spacing.md,
     lineHeight: 22
   },
-  header: {
-    backgroundColor: colors.white,
-    padding: spacing.xl,
+  progressContainer: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    justifyContent: 'center',
+    paddingVertical: spacing.lg,
+    paddingHorizontal: spacing.md,
+    backgroundColor: colors.white
+  },
+  progressStep: {
     alignItems: 'center'
   },
-  headerTitle: {
-    fontSize: fontSize.xxl,
+  progressCircle: {
+    width: 32,
+    height: 32,
+    borderRadius: 16,
+    backgroundColor: colors.border,
+    justifyContent: 'center',
+    alignItems: 'center'
+  },
+  progressCircleActive: {
+    backgroundColor: colors.primary
+  },
+  progressCircleComplete: {
+    backgroundColor: colors.success
+  },
+  progressNumber: {
+    fontSize: fontSize.sm,
+    fontWeight: '600',
+    color: colors.textMuted
+  },
+  progressLabel: {
+    fontSize: fontSize.xs,
+    color: colors.textMuted,
+    marginTop: spacing.xs
+  },
+  progressLine: {
+    flex: 1,
+    height: 2,
+    backgroundColor: colors.border,
+    marginHorizontal: spacing.sm
+  },
+  progressLineComplete: {
+    backgroundColor: colors.success
+  },
+  stepContainer: {
+    padding: spacing.md
+  },
+  stepHeader: {
+    alignItems: 'center',
+    backgroundColor: colors.white,
+    padding: spacing.lg,
+    borderRadius: borderRadius.lg,
+    marginBottom: spacing.md
+  },
+  stepTitle: {
+    fontSize: fontSize.xl,
     fontWeight: '700',
     color: colors.textPrimary,
     marginTop: spacing.md
   },
-  headerText: {
+  stepDescription: {
     fontSize: fontSize.sm,
     color: colors.textSecondary,
     textAlign: 'center',
     marginTop: spacing.sm,
     lineHeight: 20
   },
-  rejectedNotice: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    backgroundColor: colors.error + '10',
+  requirementsBox: {
+    backgroundColor: colors.white,
     padding: spacing.md,
-    margin: spacing.md,
-    borderRadius: borderRadius.md,
-    gap: spacing.sm
-  },
-  rejectedText: {
-    flex: 1,
-    fontSize: fontSize.sm,
-    color: colors.error
-  },
-  documentsSection: {
-    padding: spacing.md
-  },
-  sectionTitle: {
-    fontSize: fontSize.base,
-    fontWeight: '600',
-    color: colors.textPrimary,
+    borderRadius: borderRadius.lg,
     marginBottom: spacing.md
   },
-  documentCard: {
-    backgroundColor: colors.white,
-    borderRadius: borderRadius.lg,
-    padding: spacing.md,
-    marginBottom: spacing.sm,
-    ...shadows.sm
+  requirementsTitle: {
+    fontSize: fontSize.sm,
+    fontWeight: '600',
+    color: colors.textPrimary,
+    marginBottom: spacing.sm
   },
-  documentInfo: {
+  requirementItem: {
     flexDirection: 'row',
-    alignItems: 'center'
+    alignItems: 'center',
+    gap: spacing.sm,
+    marginTop: spacing.xs
   },
-  documentIcon: {
-    width: 48,
-    height: 48,
-    borderRadius: 24,
-    backgroundColor: colors.primary + '20',
+  requirementText: {
+    fontSize: fontSize.sm,
+    color: colors.textSecondary
+  },
+  previewSection: {
+    backgroundColor: colors.white,
+    padding: spacing.md,
+    borderRadius: borderRadius.lg,
+    marginBottom: spacing.md
+  },
+  previewLabel: {
+    fontSize: fontSize.sm,
+    fontWeight: '600',
+    color: colors.textSecondary,
+    marginBottom: spacing.sm,
+    textTransform: 'uppercase'
+  },
+  imagePreview: {
+    position: 'relative',
+    borderRadius: borderRadius.md,
+    overflow: 'hidden'
+  },
+  previewImage: {
+    width: '100%',
+    height: 200,
+    borderRadius: borderRadius.md
+  },
+  checkBadge: {
+    position: 'absolute',
+    top: spacing.sm,
+    right: spacing.sm,
+    width: 24,
+    height: 24,
+    borderRadius: 12,
+    backgroundColor: colors.success,
     justifyContent: 'center',
     alignItems: 'center'
   },
-  documentIconUploaded: {
-    backgroundColor: colors.success
+  changeButton: {
+    position: 'absolute',
+    bottom: spacing.sm,
+    right: spacing.sm,
+    paddingVertical: spacing.xs,
+    paddingHorizontal: spacing.sm,
+    backgroundColor: 'rgba(0, 0, 0, 0.7)',
+    borderRadius: borderRadius.sm
   },
-  documentText: {
+  changeButtonText: {
+    color: colors.white,
+    fontSize: fontSize.xs,
+    fontWeight: '600'
+  },
+  uploadArea: {
+    height: 150,
+    borderWidth: 2,
+    borderStyle: 'dashed',
+    borderColor: colors.border,
+    borderRadius: borderRadius.md,
+    justifyContent: 'center',
+    alignItems: 'center',
+    backgroundColor: colors.bgSecondary
+  },
+  uploadText: {
+    fontSize: fontSize.sm,
+    color: colors.textMuted,
+    marginTop: spacing.sm
+  },
+  primaryButton: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    justifyContent: 'center',
+    backgroundColor: colors.primary,
+    padding: spacing.md,
+    borderRadius: borderRadius.md,
+    gap: spacing.sm
+  },
+  primaryButtonText: {
+    color: colors.white,
+    fontSize: fontSize.base,
+    fontWeight: '600'
+  },
+  buttonDisabled: {
+    opacity: 0.5
+  },
+  reviewCard: {
+    backgroundColor: colors.white,
+    borderRadius: borderRadius.lg,
+    padding: spacing.md,
+    marginBottom: spacing.md
+  },
+  reviewItem: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    paddingVertical: spacing.sm
+  },
+  reviewIcon: {
+    width: 40,
+    height: 40,
+    borderRadius: 20,
+    backgroundColor: colors.success + '20',
+    justifyContent: 'center',
+    alignItems: 'center'
+  },
+  reviewContent: {
     flex: 1,
     marginLeft: spacing.md
   },
-  documentTitle: {
+  reviewTitle: {
     fontSize: fontSize.base,
     fontWeight: '600',
     color: colors.textPrimary
   },
-  documentDesc: {
+  reviewStatus: {
     fontSize: fontSize.sm,
-    color: colors.textMuted,
-    marginTop: spacing.xs
+    color: colors.success,
+    marginTop: 2
   },
-  uploadedContainer: {
+  reviewDivider: {
+    height: 1,
+    backgroundColor: colors.border,
+    marginVertical: spacing.sm
+  },
+  reviewImages: {
     flexDirection: 'row',
-    alignItems: 'center',
-    marginTop: spacing.md
+    gap: spacing.sm,
+    marginTop: spacing.sm
   },
-  thumbnail: {
-    width: 80,
-    height: 80,
+  reviewImage: {
+    flex: 1,
+    height: 100,
     borderRadius: borderRadius.md
   },
-  removeButton: {
-    position: 'absolute',
-    top: -8,
-    left: 72,
-    width: 24,
-    height: 24,
-    borderRadius: 12,
-    backgroundColor: colors.error,
-    justifyContent: 'center',
-    alignItems: 'center'
-  },
-  uploadButton: {
+  noticeBox: {
     flexDirection: 'row',
-    alignItems: 'center',
-    justifyContent: 'center',
-    backgroundColor: colors.primary + '10',
-    padding: spacing.sm,
+    backgroundColor: colors.warning + '15',
+    padding: spacing.md,
     borderRadius: borderRadius.md,
-    marginTop: spacing.md,
-    gap: spacing.xs
-  },
-  uploadButtonText: {
-    fontSize: fontSize.sm,
-    color: colors.primary,
-    fontWeight: '600'
-  },
-  benefitsSection: {
-    backgroundColor: colors.white,
-    padding: spacing.lg,
-    margin: spacing.md,
-    borderRadius: borderRadius.lg
-  },
-  benefitItem: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    marginTop: spacing.sm,
+    marginBottom: spacing.md,
     gap: spacing.sm
   },
-  benefitText: {
+  noticeText: {
+    flex: 1,
     fontSize: fontSize.sm,
-    color: colors.textSecondary
+    color: colors.textSecondary,
+    lineHeight: 20
   },
   bottomPadding: {
-    height: 100
-  },
-  footer: {
-    position: 'absolute',
-    bottom: 0,
-    left: 0,
-    right: 0,
-    backgroundColor: colors.white,
-    padding: spacing.md,
-    borderTopWidth: 1,
-    borderTopColor: colors.border
-  },
-  submitButton: {
-    backgroundColor: colors.primary,
-    padding: spacing.md,
-    borderRadius: borderRadius.md,
-    alignItems: 'center'
-  },
-  submitButtonDisabled: {
-    opacity: 0.6
-  },
-  submitButtonText: {
-    color: colors.white,
-    fontSize: fontSize.base,
-    fontWeight: '600'
+    height: spacing.xl
   }
 });

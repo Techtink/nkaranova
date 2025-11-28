@@ -27,7 +27,12 @@ export default function LoginScreen({ navigation }) {
 
     setLoading(true);
     try {
-      await login(email, password);
+      const result = await login(email, password);
+
+      // If 2FA is required, navigate to 2FA screen
+      if (result?.requires2FA) {
+        navigation.navigate('TwoFactor');
+      }
     } catch (error) {
       Alert.alert(
         'Login Failed',

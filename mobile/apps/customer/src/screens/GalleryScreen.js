@@ -152,8 +152,10 @@ export default function GalleryScreen({ navigation }) {
             {selectedWork?.description && (
               <Text style={styles.modalDescription}>{selectedWork.description}</Text>
             )}
-            {selectedWork?.price && (
-              <Text style={styles.modalPrice}>${selectedWork.price}</Text>
+            {selectedWork?.price?.amount && (
+              <Text style={styles.modalPrice}>
+                {selectedWork.price.currency || '$'}{selectedWork.price.amount}
+              </Text>
             )}
 
             <TouchableOpacity

@@ -198,6 +198,26 @@ export const getPublicLandingSettings = async (req, res) => {
   }
 };
 
+// @desc    Get public mobile app settings
+// @route   GET /api/settings/public/mobile
+// @access  Public
+export const getPublicMobileSettings = async (req, res) => {
+  try {
+    const mobileSettings = await Settings.getByCategory('mobile');
+
+    res.json({
+      success: true,
+      data: mobileSettings
+    });
+  } catch (error) {
+    console.error('Get public mobile settings error:', error);
+    res.status(500).json({
+      success: false,
+      message: 'Server error'
+    });
+  }
+};
+
 // @desc    Upload hero image
 // @route   POST /api/settings/upload-hero
 // @access  Private (Admin)

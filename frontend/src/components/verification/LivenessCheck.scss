@@ -1,0 +1,349 @@
+@import '../../styles/variables';
+@import '../../styles/mixins';
+
+.liveness-check {
+  max-width: 500px;
+  margin: 0 auto;
+  padding: $spacing-lg;
+  background: var(--card-bg);
+  border-radius: 12px;
+  border: 1px solid var(--border-color);
+}
+
+.liveness-header {
+  text-align: center;
+  margin-bottom: $spacing-lg;
+
+  h2 {
+    font-size: $text-xl;
+    font-weight: 600;
+    color: var(--text-primary);
+    margin: 0 0 $spacing-xs 0;
+  }
+
+  p {
+    font-size: $text-sm;
+    color: var(--text-secondary);
+    margin: 0;
+  }
+}
+
+.progress-bar {
+  display: flex;
+  gap: $spacing-xs;
+  margin-bottom: $spacing-lg;
+
+  .progress-step {
+    flex: 1;
+    height: 4px;
+    background: var(--border-color);
+    border-radius: 2px;
+    transition: all 0.3s ease;
+
+    &.active {
+      background: $primary;
+      animation: pulse 1.5s infinite;
+    }
+
+    &.completed {
+      background: $success;
+    }
+  }
+}
+
+@keyframes pulse {
+  0%, 100% { opacity: 1; }
+  50% { opacity: 0.6; }
+}
+
+.liveness-content {
+  position: relative;
+  margin-bottom: $spacing-lg;
+}
+
+.idle-state {
+  text-align: center;
+  padding: $spacing-xl;
+
+  .camera-placeholder {
+    width: 120px;
+    height: 120px;
+    margin: 0 auto $spacing-lg;
+    background: var(--bg-secondary);
+    border-radius: 50%;
+    @include flex-center;
+
+    svg {
+      width: 48px;
+      height: 48px;
+      color: var(--text-muted);
+    }
+  }
+
+  p {
+    font-size: $text-sm;
+    color: var(--text-secondary);
+    margin-bottom: $spacing-lg;
+    max-width: 300px;
+    margin-left: auto;
+    margin-right: auto;
+  }
+}
+
+.camera-container {
+  position: relative;
+  border-radius: 12px;
+  overflow: hidden;
+  background: #000;
+  aspect-ratio: 4/3;
+
+  .camera-feed {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    transform: scaleX(-1); // Mirror for selfie view
+  }
+}
+
+.face-guide {
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+  @include flex-center;
+
+  .oval-guide {
+    width: 60%;
+    height: 75%;
+    border: 3px dashed rgba(255, 255, 255, 0.5);
+    border-radius: 50%;
+    background: transparent;
+  }
+}
+
+.challenge-overlay {
+  position: absolute;
+  bottom: 0;
+  left: 0;
+  right: 0;
+  padding: $spacing-lg;
+  background: linear-gradient(transparent, rgba(0, 0, 0, 0.8));
+  text-align: center;
+
+  .challenge-icon {
+    width: 48px;
+    height: 48px;
+    margin: 0 auto $spacing-sm;
+    background: $primary;
+    border-radius: 50%;
+    @include flex-center;
+
+    svg {
+      width: 24px;
+      height: 24px;
+      color: white;
+    }
+  }
+
+  .challenge-instruction {
+    font-size: $text-base;
+    font-weight: 600;
+    color: white;
+    margin: 0;
+    text-shadow: 0 1px 2px rgba(0, 0, 0, 0.5);
+  }
+
+  .countdown {
+    font-size: 48px;
+    font-weight: 700;
+    color: white;
+    margin-top: $spacing-md;
+    text-shadow: 0 2px 4px rgba(0, 0, 0, 0.5);
+    animation: countdownPulse 1s ease-in-out infinite;
+  }
+}
+
+@keyframes countdownPulse {
+  0%, 100% { transform: scale(1); }
+  50% { transform: scale(1.1); }
+}
+
+.verifying-overlay {
+  position: absolute;
+  inset: 0;
+  background: rgba(0, 0, 0, 0.7);
+  @include flex-center;
+  flex-direction: column;
+  gap: $spacing-md;
+
+  .spinner {
+    width: 48px;
+    height: 48px;
+    border: 4px solid rgba(255, 255, 255, 0.2);
+    border-top-color: $primary;
+    border-radius: 50%;
+    animation: spin 0.8s linear infinite;
+  }
+
+  p {
+    color: white;
+    font-weight: 500;
+  }
+}
+
+@keyframes spin {
+  to { transform: rotate(360deg); }
+}
+
+.feedback-message {
+  position: absolute;
+  top: $spacing-md;
+  left: $spacing-md;
+  right: $spacing-md;
+  padding: $spacing-sm $spacing-md;
+  background: rgba(239, 68, 68, 0.9);
+  color: white;
+  border-radius: 8px;
+  display: flex;
+  align-items: center;
+  gap: $spacing-sm;
+  font-size: $text-sm;
+
+  svg {
+    flex-shrink: 0;
+  }
+}
+
+.completed-state,
+.failed-state {
+  text-align: center;
+  padding: $spacing-xl;
+
+  .success-icon,
+  .error-icon {
+    width: 80px;
+    height: 80px;
+    margin: 0 auto $spacing-lg;
+    border-radius: 50%;
+    @include flex-center;
+
+    svg {
+      width: 48px;
+      height: 48px;
+    }
+  }
+
+  .success-icon {
+    background: rgba($success, 0.1);
+
+    svg {
+      color: $success;
+    }
+  }
+
+  .error-icon {
+    background: rgba($error, 0.1);
+
+    svg {
+      color: $error;
+    }
+  }
+
+  h3 {
+    font-size: $text-lg;
+    font-weight: 600;
+    color: var(--text-primary);
+    margin: 0 0 $spacing-xs 0;
+  }
+
+  p {
+    font-size: $text-sm;
+    color: var(--text-secondary);
+    margin: 0 0 $spacing-lg 0;
+  }
+}
+
+.error-message {
+  display: flex;
+  align-items: center;
+  gap: $spacing-sm;
+  padding: $spacing-sm $spacing-md;
+  background: rgba($error, 0.1);
+  color: $error;
+  border-radius: 8px;
+  font-size: $text-sm;
+  margin-top: $spacing-md;
+
+  svg {
+    flex-shrink: 0;
+  }
+}
+
+.liveness-actions {
+  display: flex;
+  gap: $spacing-sm;
+  justify-content: center;
+
+  .btn {
+    min-width: 140px;
+  }
+}
+
+// Button styles (if not globally defined)
+.btn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: $spacing-xs;
+  padding: 12px 24px;
+  font-size: $text-sm;
+  font-weight: 500;
+  border-radius: 8px;
+  cursor: pointer;
+  transition: all 0.2s;
+
+  &:disabled {
+    opacity: 0.5;
+    cursor: not-allowed;
+  }
+
+  &.btn-primary {
+    background: $primary;
+    color: white;
+    border: none;
+
+    &:hover:not(:disabled) {
+      background: darken($primary, 10%);
+    }
+  }
+
+  &.btn-outline {
+    background: transparent;
+    color: var(--text-primary);
+    border: 1px solid var(--border-color);
+
+    &:hover:not(:disabled) {
+      background: var(--bg-secondary);
+    }
+  }
+}
+
+// Mobile responsiveness
+@include mobile {
+  .liveness-check {
+    padding: $spacing-md;
+    border-radius: 0;
+    border: none;
+  }
+
+  .camera-container {
+    border-radius: 8px;
+  }
+
+  .liveness-actions {
+    flex-direction: column;
+
+    .btn {
+      width: 100%;
+    }
+  }
+}

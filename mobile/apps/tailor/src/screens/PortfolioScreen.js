@@ -79,7 +79,7 @@ export default function PortfolioScreen({ navigation }) {
   const WorkCard = ({ work }) => (
     <TouchableOpacity
       style={styles.card}
-      onPress={() => navigation.navigate('EditWork', { workId: work._id })}
+      onPress={() => Alert.alert('Edit Work', 'Work editing will be available in a future update.')}
     >
       <Image
         source={{ uri: work.images?.[0] || 'https://via.placeholder.com/200' }}
@@ -94,7 +94,9 @@ export default function PortfolioScreen({ navigation }) {
         <Text style={styles.workTitle} numberOfLines={1}>{work.title}</Text>
         <Text style={styles.workCategory}>{work.category}</Text>
         <View style={styles.cardFooter}>
-          <Text style={styles.workPrice}>${work.price || 'N/A'}</Text>
+          <Text style={styles.workPrice}>
+            {work.price?.amount ? `${work.price.currency || '$'}${work.price.amount}` : 'N/A'}
+          </Text>
           <TouchableOpacity
             style={styles.deleteButton}
             onPress={() => handleDeleteWork(work._id)}

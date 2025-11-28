@@ -45,6 +45,10 @@ export default function ProfileScreen({ navigation }) {
     );
   };
 
+  const showComingSoon = (feature) => {
+    Alert.alert('Coming Soon', `${feature} will be available in a future update.`);
+  };
+
   const MenuItem = ({ icon, label, onPress, danger, badge }) => (
     <TouchableOpacity style={styles.menuItem} onPress={onPress}>
       <View style={styles.menuLeft}>

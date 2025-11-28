@@ -49,6 +49,7 @@ export const authAPI = {
   logout: () => api.post('/auth/logout'),
   getMe: () => api.get('/auth/me'),
   updatePassword: (data) => api.put('/auth/password', data),
+  changePassword: (currentPassword, newPassword) => api.put('/auth/password', { currentPassword, newPassword }),
   updateDetails: (data) => api.put('/auth/details', data)
 };
 
@@ -56,8 +57,10 @@ export const authAPI = {
 export const tailorsAPI = {
   getAll: (params) => api.get('/tailors', { params }),
   getFeatured: () => api.get('/tailors/featured'),
+  getById: (id) => api.get(`/tailors/id/${id}`),
   getByUsername: (username) => api.get(`/tailors/${username}`),
   getMyProfile: () => api.get('/tailors/me/profile'),
+  updateProfile: (data) => api.put('/tailors/me/profile', data),
   updateMyProfile: (data) => api.put('/tailors/me/profile', data),
   getAvailability: (username) => api.get(`/tailors/${username}/availability`),
   updateMyAvailability: (data) => api.put('/tailors/me/availability', data),
@@ -147,6 +150,50 @@ export const paymentsAPI = {
   getStatus: () => api.get('/payments/status'),
   createBookingPayment: (bookingId) => api.post(`/payments/booking/${bookingId}`),
   confirmPayment: (bookingId) => api.post(`/payments/confirm/${bookingId}`)
+};
+
+// Verification API (Liveness & Face Match)
+export const verificationAPI = {
+  getRequirements: () => api.get('/verification/requirements'),
+  getStatus: () => api.get('/verification/status'),
+  startLivenessSession: (numChallenges = 3) => api.post('/verification/liveness/start', { numChallenges }),
+  verifyLivenessChallenge: (sessionId, challengeIndex, frame) =>
+    api.post('/verification/liveness/verify', { sessionId, challengeIndex, frame }),
+  getLivenessSession: (sessionId) => api.get(`/verification/liveness/${sessionId}`),
+  compareFaceWithID: (idImage, selfieImage) =>
+    api.post('/verification/face-match', { idImage, selfieImage }),
+  submitVerification: (documents) => api.post('/verification/submit', { documents })
+};
+
+// Two-Factor Authentication API
+export const twoFactorAPI = {
+  setup: () => api.post('/auth/2fa/setup'),
+  verify: (token) => api.post('/auth/2fa/verify', { token }),
+  disable: (token) => api.post('/auth/2fa/disable', { token }),
+  validate: (userId, token, isBackupCode = false) =>
+    api.post('/auth/2fa/validate', { userId, token, isBackupCode }),
+  getBackupCodes: () => api.get('/auth/2fa/backup-codes'),
+  regenerateBackupCodes: () => api.post('/auth/2fa/regenerate-backup')
+};
+
+// FAQ API
+export const faqAPI = {
+  getAll: (params) => api.get('/faqs', { params }),
+  getCategories: () => api.get('/faqs/categories'),
+  getById: (id) => api.get(`/faqs/${id}`)
+};
+
+// Settings API (Public endpoints)
+export const settingsAPI = {
+  getMobileSettings: () => api.get('/settings/public/mobile')
+};
+
+// Currency API
+export const currencyAPI = {
+  getSupportedCurrencies: () => api.get('/currency/supported'),
+  getExchangeRates: () => api.get('/currency/rates'),
+  convert: (amount, from, to) => api.post('/currency/convert', { amount, from, to }),
+  convertBatch: (amounts) => api.post('/currency/convert-batch', { amounts })
 };
 
 // File upload helper for React Native

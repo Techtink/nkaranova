@@ -53,8 +53,36 @@ const userSchema = new mongoose.Schema({
     personalizedRecommendations: {
       type: Boolean,
       default: true
+    },
+    language: {
+      type: String,
+      default: 'en'
+    },
+    timezone: {
+      type: String,
+      default: 'UTC'
+    },
+    currency: {
+      type: String,
+      default: 'USD'
     }
   },
+  // Two-Factor Authentication
+  twoFactorEnabled: {
+    type: Boolean,
+    default: false
+  },
+  twoFactorSecret: {
+    type: String,
+    select: false
+  },
+  twoFactorBackupCodes: [{
+    code: String,
+    used: {
+      type: Boolean,
+      default: false
+    }
+  }],
   browsingHistory: [{
     tailorId: {
       type: mongoose.Schema.Types.ObjectId,

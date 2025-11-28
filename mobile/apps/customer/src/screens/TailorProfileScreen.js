@@ -84,14 +84,16 @@ export default function TailorProfileScreen({ route, navigation }) {
   const WorkCard = ({ work }) => (
     <TouchableOpacity
       style={styles.workCard}
-      onPress={() => navigation.navigate('WorkDetail', { workId: work._id })}
+      onPress={() => Alert.alert(work.title, work.description || 'No description available')}
     >
       <Image
         source={{ uri: work.images?.[0] || 'https://via.placeholder.com/150' }}
         style={styles.workImage}
       />
       <Text style={styles.workTitle} numberOfLines={1}>{work.title}</Text>
-      <Text style={styles.workPrice}>${work.price || 'Contact for price'}</Text>
+      <Text style={styles.workPrice}>
+        {work.price?.amount ? `${work.price.currency || '$'}${work.price.amount}` : 'Contact for price'}
+      </Text>
     </TouchableOpacity>
   );
 

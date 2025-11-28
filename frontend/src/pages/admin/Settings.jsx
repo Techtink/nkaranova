@@ -1,5 +1,5 @@
 import { useState, useEffect, useRef } from 'react';
-import { FiSave, FiRefreshCw, FiDollarSign, FiUsers, FiStar, FiSettings, FiImage, FiUpload, FiX } from 'react-icons/fi';
+import { FiSave, FiRefreshCw, FiDollarSign, FiUsers, FiStar, FiSettings, FiImage, FiUpload, FiX, FiSmartphone } from 'react-icons/fi';
 import { settingsAPI } from '../../services/api';
 import './Admin.scss';
 
@@ -173,6 +173,13 @@ export default function AdminSettings() {
           >
             <FiImage />
             Landing Page
+          </button>
+          <button
+            className={`erp-tab ${activeTab === 'mobile' ? 'active' : ''}`}
+            onClick={() => setActiveTab('mobile')}
+          >
+            <FiSmartphone />
+            Mobile App
           </button>
         </div>
 
@@ -1703,6 +1710,163 @@ export default function AdminSettings() {
                             placeholder="#D4A574,#8B7355,#2C2C2C,#E8E4DC"
                           />
                         </div>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            )}
+
+            {activeTab === 'mobile' && (
+              <div className="settings-section">
+                <h3>Mobile App Settings</h3>
+                <p className="section-description" style={{ color: 'var(--text-tertiary)', marginBottom: '24px' }}>
+                  Configure splash screen and onboarding for the mobile apps
+                </p>
+
+                {/* General Mobile Settings */}
+                <div className="row g-4">
+                  <div className="col-md-6">
+                    <div className="setting-item">
+                      <label>App Name</label>
+                      <p className="setting-description">Display name shown in the mobile apps</p>
+                      <input
+                        type="text"
+                        value={settings.mobile_app_name || 'Tailor Connect'}
+                        onChange={(e) => handleChange('mobile_app_name', e.target.value)}
+                      />
+                    </div>
+                  </div>
+
+                  <div className="col-md-6">
+                    <div className="setting-item">
+                      <label>Primary Color</label>
+                      <p className="setting-description">Main accent color for the mobile apps (hex)</p>
+                      <div style={{ display: 'flex', gap: '8px', alignItems: 'center' }}>
+                        <input
+                          type="text"
+                          value={settings.mobile_primary_color || '#5c8d6a'}
+                          onChange={(e) => handleChange('mobile_primary_color', e.target.value)}
+                          style={{ flex: 1 }}
+                        />
+                        <input
+                          type="color"
+                          value={settings.mobile_primary_color || '#5c8d6a'}
+                          onChange={(e) => handleChange('mobile_primary_color', e.target.value)}
+                          style={{ width: '40px', height: '40px', padding: '2px', cursor: 'pointer' }}
+                        />
+                      </div>
+                    </div>
+                  </div>
+                </div>
+
+                {/* Customer App Section */}
+                <div style={{ borderTop: '3px solid var(--primary)', paddingTop: '32px', marginTop: '32px' }}>
+                  <h3 style={{ marginBottom: '8px' }}>Customer App - Onboarding Screen</h3>
+                  <p className="setting-description" style={{ color: 'var(--text-tertiary)', marginBottom: '24px' }}>
+                    Customize the splash/onboarding screen for the Customer mobile app
+                  </p>
+
+                  <div className="row g-4">
+                    <div className="col-12">
+                      <div className="setting-item">
+                        <label>Background Image URL</label>
+                        <p className="setting-description">Full-screen background image for the customer onboarding screen</p>
+                        <input
+                          type="text"
+                          value={settings.mobile_customer_splash_image || ''}
+                          onChange={(e) => handleChange('mobile_customer_splash_image', e.target.value)}
+                          placeholder="https://..."
+                        />
+                      </div>
+                      {settings.mobile_customer_splash_image && (
+                        <div style={{ marginTop: '12px', maxWidth: '200px' }}>
+                          <img
+                            src={settings.mobile_customer_splash_image}
+                            alt="Customer splash preview"
+                            style={{ width: '100%', borderRadius: '8px', border: '1px solid var(--border-color)' }}
+                          />
+                        </div>
+                      )}
+                    </div>
+
+                    <div className="col-md-6">
+                      <div className="setting-item">
+                        <label>Headline</label>
+                        <p className="setting-description">Main title text on the splash screen</p>
+                        <input
+                          type="text"
+                          value={settings.mobile_customer_splash_headline || 'Find Your Perfect Tailor'}
+                          onChange={(e) => handleChange('mobile_customer_splash_headline', e.target.value)}
+                        />
+                      </div>
+                    </div>
+
+                    <div className="col-md-6">
+                      <div className="setting-item">
+                        <label>Subheadline</label>
+                        <p className="setting-description">Subtitle text below the headline</p>
+                        <input
+                          type="text"
+                          value={settings.mobile_customer_splash_subheadline || 'Connect with skilled tailors in your area'}
+                          onChange={(e) => handleChange('mobile_customer_splash_subheadline', e.target.value)}
+                        />
+                      </div>
+                    </div>
+                  </div>
+                </div>
+
+                {/* Tailor App Section */}
+                <div style={{ borderTop: '3px solid var(--primary)', paddingTop: '32px', marginTop: '32px' }}>
+                  <h3 style={{ marginBottom: '8px' }}>Tailor App - Onboarding Screen</h3>
+                  <p className="section-description" style={{ color: 'var(--text-tertiary)', marginBottom: '24px' }}>
+                    Customize the splash/onboarding screen for the Tailor mobile app
+                  </p>
+
+                  <div className="row g-4">
+                    <div className="col-12">
+                      <div className="setting-item">
+                        <label>Background Image URL</label>
+                        <p className="setting-description">Full-screen background image for the tailor onboarding screen</p>
+                        <input
+                          type="text"
+                          value={settings.mobile_tailor_splash_image || ''}
+                          onChange={(e) => handleChange('mobile_tailor_splash_image', e.target.value)}
+                          placeholder="https://..."
+                        />
+                      </div>
+                      {settings.mobile_tailor_splash_image && (
+                        <div style={{ marginTop: '12px', maxWidth: '200px' }}>
+                          <img
+                            src={settings.mobile_tailor_splash_image}
+                            alt="Tailor splash preview"
+                            style={{ width: '100%', borderRadius: '8px', border: '1px solid var(--border-color)' }}
+                          />
+                        </div>
+                      )}
+                    </div>
+
+                    <div className="col-md-6">
+                      <div className="setting-item">
+                        <label>Headline</label>
+                        <p className="setting-description">Main title text on the splash screen</p>
+                        <input
+                          type="text"
+                          value={settings.mobile_tailor_splash_headline || 'Grow Your Tailoring Business'}
+                          onChange={(e) => handleChange('mobile_tailor_splash_headline', e.target.value)}
+                        />
+                      </div>
+                    </div>
+
+                    <div className="col-md-6">
+                      <div className="setting-item">
+                        <label>Subheadline</label>
+                        <p className="setting-description">Subtitle text below the headline</p>
+                        <input
+                          type="text"
+                          value={settings.mobile_tailor_splash_subheadline || 'Reach more customers and manage your orders'}
+                          onChange={(e) => handleChange('mobile_tailor_splash_subheadline', e.target.value)}
+                        />
                       </div>
                     </div>
                   </div>

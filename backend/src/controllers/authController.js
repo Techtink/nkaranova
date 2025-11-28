@@ -111,8 +111,8 @@ export const login = async (req, res, next) => {
       });
     }
 
-    // Check for user
-    const user = await User.findOne({ email }).select('+password');
+    // Check for user - also select twoFactorEnabled
+    const user = await User.findOne({ email }).select('+password +twoFactorEnabled');
     if (!user) {
       return res.status(401).json({
         success: false,
@@ -134,6 +134,16 @@ export const login = async (req, res, next) => {
       return res.status(401).json({
         success: false,
         message: 'Invalid credentials'
+      });
+    }
+
+    // Check if 2FA is enabled
+    if (user.twoFactorEnabled) {
+      return res.status(200).json({
+        success: true,
+        requires2FA: true,
+        userId: user._id,
+        message: 'Two-factor authentication required'
       });
     }
 

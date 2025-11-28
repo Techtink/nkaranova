@@ -8,6 +8,7 @@ import {
   initializeSettings,
   getPublicReferralSettings,
   getPublicLandingSettings,
+  getPublicMobileSettings,
   uploadHeroImage
 } from '../controllers/settingsController.js';
 import { protect, authorize } from '../middleware/auth.js';
@@ -18,6 +19,7 @@ const router = express.Router();
 // Public routes
 router.get('/public/referral', getPublicReferralSettings);
 router.get('/public/landing', getPublicLandingSettings);
+router.get('/public/mobile', getPublicMobileSettings);
 
 // Admin routes
 router.get('/', protect, authorize('admin'), getAllSettings);

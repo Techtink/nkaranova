@@ -1,17 +1,30 @@
-import * as Notifications from 'expo-notifications';
-import * as Device from 'expo-device';
 import Constants from 'expo-constants';
 import { Platform } from 'react-native';
 import api from './api';
 
-// Configure notification handling
-Notifications.setNotificationHandler({
-  handleNotification: async () => ({
-    shouldShowAlert: true,
-    shouldPlaySound: true,
-    shouldSetBadge: true
-  })
-});
+// Check if we're in Expo Go - notifications don't work there in SDK 53+
+const isExpoGo = Constants.appOwnership === 'expo';
+
+// Lazy load notifications module only when not in Expo Go
+let Notifications = null;
+let Device = null;
+
+if (!isExpoGo) {
+  try {
+    Notifications = require('expo-notifications');
+    Device = require('expo-device');
+
+    Notifications.setNotificationHandler({
+      handleNotification: async () => ({
+        shouldShowAlert: true,
+        shouldPlaySound: true,
+        shouldSetBadge: false
+      })
+    });
+  } catch (error) {
+    console.log('Notification setup skipped:', error.message);
+  }
+}
 
 class NotificationService {
   constructor() {
@@ -21,6 +34,12 @@ class NotificationService {
   }
 
   async registerForPushNotifications() {
+    // Skip if notifications not available (Expo Go)
+    if (!Notifications || !Device) {
+      console.log('Push notifications not available in Expo Go');
+      return null;
+    }
+
     let token = null;
 
     // Must be a physical device
@@ -113,6 +132,11 @@ class NotificationService {
   }
 
   setupNotificationListeners(navigation) {
+    // Skip if notifications not available (Expo Go)
+    if (!Notifications) {
+      return () => {}; // Return empty cleanup function
+    }
+
     // Listener for notifications received while app is foregrounded
     this.notificationListener = Notifications.addNotificationReceivedListener(
       (notification) => {
@@ -182,6 +206,7 @@ class NotificationService {
   }
 
   async setBadgeCount(count) {
+    if (!Notifications) return;
     try {
       await Notifications.setBadgeCountAsync(count);
     } catch (error) {
@@ -194,6 +219,7 @@ class NotificationService {
   }
 
   async scheduleLocalNotification(title, body, data = {}, trigger = null) {
+    if (!Notifications) return null;
     try {
       const notificationId = await Notifications.scheduleNotificationAsync({
         content: {
@@ -212,6 +238,7 @@ class NotificationService {
   }
 
   async cancelNotification(notificationId) {
+    if (!Notifications) return;
     try {
       await Notifications.cancelScheduledNotificationAsync(notificationId);
     } catch (error) {
@@ -220,6 +247,7 @@ class NotificationService {
   }
 
   async cancelAllNotifications() {
+    if (!Notifications) return;
     try {
       await Notifications.cancelAllScheduledNotificationsAsync();
     } catch (error) {
