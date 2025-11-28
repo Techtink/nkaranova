@@ -10,7 +10,7 @@
     position: absolute;
     bottom: 70px;
     right: 0;
-    background: white;
+    background: var(--card-bg);
     padding: 12px 16px;
     border-radius: 12px 12px 4px 12px;
     box-shadow: 0 4px 20px rgba(0, 0, 0, 0.15);
@@ -21,7 +21,7 @@
     p {
       margin: 0;
       font-size: 14px;
-      color: $text-primary;
+      color: var(--text-primary);
       line-height: 1.4;
     }
 
@@ -34,7 +34,7 @@
       height: 0;
       border-left: 8px solid transparent;
       border-right: 8px solid transparent;
-      border-top: 8px solid white;
+      border-top: 8px solid var(--card-bg);
     }
 
     &:hover {
@@ -109,7 +109,7 @@
     max-width: calc(100vw - 40px);
     height: 500px;
     max-height: calc(100vh - 120px);
-    background: white;
+    background: var(--card-bg);
     border-radius: 16px;
     box-shadow: 0 10px 40px rgba(0, 0, 0, 0.15);
     display: flex;
@@ -380,16 +380,18 @@
     display: flex;
     gap: 8px;
     padding: 12px 16px;
-    border-top: 1px solid $border-color;
-    background: white;
+    border-top: 1px solid var(--border-color);
+    background: var(--card-bg);
 
     input {
       flex: 1;
       padding: 12px 16px;
-      border: 1px solid $border-color;
+      border: 1px solid var(--border-color);
       border-radius: 24px;
       font-size: 14px;
       transition: border-color 0.2s;
+      background: var(--input-bg);
+      color: var(--text-primary);
 
       &:focus {
         outline: none;

@@ -619,7 +619,7 @@
   margin-bottom: 2rem;
 
   .stat-card {
-    background: white;
+    background: var(--card-bg);
     border-radius: $radius-lg;
     padding: 1.5rem;
     display: flex;
@@ -670,7 +670,7 @@
     gap: 1rem;
 
     .pending-card {
-      background: white;
+      background: var(--card-bg);
       border-radius: $radius-lg;
       padding: 1.5rem;
       text-align: center;
@@ -726,12 +726,12 @@
     gap: 1rem;
 
     .nav-card {
-      background: white;
+      background: var(--card-bg);
       border-radius: $radius-lg;
       padding: 1.5rem;
       text-align: center;
       text-decoration: none;
-      color: $text-primary;
+      color: var(--text-primary);
       box-shadow: $shadow-sm;
       transition: all 0.2s ease;
 
@@ -789,10 +789,11 @@
 
       select {
         padding: 0.5rem 1rem;
-        border: 1px solid $border-color;
+        border: 1px solid var(--border-color);
         border-radius: $radius-md;
         font-size: 0.875rem;
-        background: white;
+        background: var(--input-bg);
+        color: var(--text-primary);
 
         &:focus {
           outline: none;
@@ -810,9 +811,11 @@
       input {
         width: 100%;
         padding: 0.5rem 1rem 0.5rem 2.5rem;
-        border: 1px solid $border-color;
+        border: 1px solid var(--border-color);
         border-radius: $radius-md;
         font-size: 0.875rem;
+        background: var(--input-bg);
+        color: var(--text-primary);
 
         &:focus {
           outline: none;
@@ -835,7 +838,7 @@
 
 // Data Table
 .data-table {
-  background: white;
+  background: var(--card-bg);
   border-radius: $radius-lg;
   box-shadow: $shadow-sm;
   overflow: hidden;
@@ -851,27 +854,27 @@
     th, td {
       padding: 1rem;
       text-align: left;
-      border-bottom: 1px solid $border-color;
+      border-bottom: 1px solid var(--border-color);
     }
 
     th {
-      background: $gray-50;
+      background: var(--bg-tertiary);
       font-weight: 600;
       font-size: 0.875rem;
-      color: $text-secondary;
+      color: var(--text-secondary);
       white-space: nowrap;
     }
 
     td {
       font-size: 0.875rem;
-      color: $text-primary;
+      color: var(--text-primary);
     }
 
     tbody tr {
       transition: background 0.2s ease;
 
       &:hover {
-        background: $gray-50;
+        background: var(--bg-hover);
       }
 
       &:last-child td {
@@ -1037,11 +1040,11 @@
   justify-content: space-between;
   align-items: center;
   padding: 1rem;
-  border-top: 1px solid $border-color;
+  border-top: 1px solid var(--border-color);
 
   .page-info {
     font-size: 0.875rem;
-    color: $text-secondary;
+    color: var(--text-secondary);
   }
 
   .page-buttons {
@@ -1050,12 +1053,13 @@
 
     button {
       padding: 0.5rem 1rem;
-      border: 1px solid $border-color;
-      background: white;
+      border: 1px solid var(--border-color);
+      background: var(--card-bg);
       border-radius: $radius-sm;
       font-size: 0.875rem;
       cursor: pointer;
       transition: all 0.2s ease;
+      color: var(--text-primary);
 
       &:hover:not(:disabled) {
         border-color: $primary;
@@ -1080,25 +1084,25 @@
 .empty-state {
   text-align: center;
   padding: 4rem 2rem;
-  background: white;
+  background: var(--card-bg);
   border-radius: $radius-lg;
   box-shadow: $shadow-sm;
 
   svg {
     width: 64px;
     height: 64px;
-    color: $gray-400;
+    color: var(--text-muted);
     margin-bottom: 1rem;
   }
 
   h3 {
     font-size: 1.25rem;
-    color: $text-primary;
+    color: var(--text-primary);
     margin-bottom: 0.5rem;
   }
 
   p {
-    color: $text-secondary;
+    color: var(--text-secondary);
   }
 }
 
@@ -1311,12 +1315,12 @@
       align-items: center;
       gap: 0.5rem;
       padding: 0.5rem 1rem;
-      background: white;
-      border: 1px solid $border-color;
+      background: var(--card-bg);
+      border: 1px solid var(--border-color);
       border-radius: $radius-md;
       cursor: pointer;
       font-size: 0.875rem;
-      color: $text-secondary;
+      color: var(--text-secondary);
       transition: all 0.2s;
 
       &:hover {
@@ -1340,7 +1344,7 @@
   }
 
   .conversations-panel {
-    background: white;
+    background: var(--card-bg);
     border-radius: $radius-lg;
     box-shadow: $shadow-sm;
     display: flex;
@@ -1480,7 +1484,7 @@
   }
 
   .chat-panel {
-    background: white;
+    background: var(--card-bg);
     border-radius: $radius-lg;
     box-shadow: $shadow-sm;
     display: flex;
@@ -1856,7 +1860,7 @@
   }
 
   .role-card {
-    background: white;
+    background: var(--card-bg);
     border-radius: $radius-lg;
     box-shadow: $shadow-sm;
     overflow: hidden;
@@ -1866,7 +1870,7 @@
       align-items: flex-start;
       gap: 1rem;
       padding: 1.5rem;
-      border-bottom: 1px solid $border-color;
+      border-bottom: 1px solid var(--border-color);
 
       .role-icon {
         width: 48px;

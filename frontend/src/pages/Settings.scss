@@ -248,7 +248,7 @@
 
 .settings-page {
   padding: $spacing-xl;
-  max-width: 900px;
+  width: 100%;
 
   @include mobile {
     padding: $spacing-md;

@@ -21,7 +21,94 @@ import { Link } from 'react-router-dom';
 import { useAuth } from '../context/AuthContext';
 import { useTheme } from '../context/ThemeContext';
 import { authAPI, uploadsAPI, measurementsAPI } from '../services/api';
+import ImageCropper from '../components/common/ImageCropper';
 import './Settings.scss';
+
+// Countries list
+const COUNTRIES = [
+  { code: 'NG', name: 'Nigeria', currency: 'NGN', timezone: 'Africa/Lagos' },
+  { code: 'GH', name: 'Ghana', currency: 'GHS', timezone: 'Africa/Accra' },
+  { code: 'KE', name: 'Kenya', currency: 'KES', timezone: 'Africa/Nairobi' },
+  { code: 'ZA', name: 'South Africa', currency: 'ZAR', timezone: 'Africa/Johannesburg' },
+  { code: 'EG', name: 'Egypt', currency: 'EGP', timezone: 'Africa/Cairo' },
+  { code: 'MA', name: 'Morocco', currency: 'MAD', timezone: 'Africa/Casablanca' },
+  { code: 'TZ', name: 'Tanzania', currency: 'TZS', timezone: 'Africa/Dar_es_Salaam' },
+  { code: 'UG', name: 'Uganda', currency: 'UGX', timezone: 'Africa/Kampala' },
+  { code: 'RW', name: 'Rwanda', currency: 'RWF', timezone: 'Africa/Kigali' },
+  { code: 'ET', name: 'Ethiopia', currency: 'ETB', timezone: 'Africa/Addis_Ababa' },
+  { code: 'SN', name: 'Senegal', currency: 'XOF', timezone: 'Africa/Dakar' },
+  { code: 'CI', name: "Cote d'Ivoire", currency: 'XOF', timezone: 'Africa/Abidjan' },
+  { code: 'CM', name: 'Cameroon', currency: 'XAF', timezone: 'Africa/Douala' },
+  { code: 'GB', name: 'United Kingdom', currency: 'GBP', timezone: 'Europe/London' },
+  { code: 'US', name: 'United States', currency: 'USD', timezone: 'America/New_York' },
+  { code: 'CA', name: 'Canada', currency: 'CAD', timezone: 'America/Toronto' },
+  { code: 'AU', name: 'Australia', currency: 'AUD', timezone: 'Australia/Sydney' },
+  { code: 'DE', name: 'Germany', currency: 'EUR', timezone: 'Europe/Berlin' },
+  { code: 'FR', name: 'France', currency: 'EUR', timezone: 'Europe/Paris' },
+  { code: 'IT', name: 'Italy', currency: 'EUR', timezone: 'Europe/Rome' },
+  { code: 'ES', name: 'Spain', currency: 'EUR', timezone: 'Europe/Madrid' },
+  { code: 'NL', name: 'Netherlands', currency: 'EUR', timezone: 'Europe/Amsterdam' },
+  { code: 'BE', name: 'Belgium', currency: 'EUR', timezone: 'Europe/Brussels' },
+  { code: 'PT', name: 'Portugal', currency: 'EUR', timezone: 'Europe/Lisbon' },
+  { code: 'IE', name: 'Ireland', currency: 'EUR', timezone: 'Europe/Dublin' },
+  { code: 'AE', name: 'United Arab Emirates', currency: 'AED', timezone: 'Asia/Dubai' },
+  { code: 'SA', name: 'Saudi Arabia', currency: 'SAR', timezone: 'Asia/Riyadh' },
+  { code: 'IN', name: 'India', currency: 'INR', timezone: 'Asia/Kolkata' },
+  { code: 'PK', name: 'Pakistan', currency: 'PKR', timezone: 'Asia/Karachi' },
+  { code: 'BD', name: 'Bangladesh', currency: 'BDT', timezone: 'Asia/Dhaka' },
+  { code: 'MY', name: 'Malaysia', currency: 'MYR', timezone: 'Asia/Kuala_Lumpur' },
+  { code: 'SG', name: 'Singapore', currency: 'SGD', timezone: 'Asia/Singapore' },
+  { code: 'JP', name: 'Japan', currency: 'JPY', timezone: 'Asia/Tokyo' },
+  { code: 'CN', name: 'China', currency: 'CNY', timezone: 'Asia/Shanghai' },
+  { code: 'BR', name: 'Brazil', currency: 'BRL', timezone: 'America/Sao_Paulo' },
+  { code: 'MX', name: 'Mexico', currency: 'MXN', timezone: 'America/Mexico_City' },
+  { code: 'AR', name: 'Argentina', currency: 'ARS', timezone: 'America/Buenos_Aires' },
+  { code: 'CO', name: 'Colombia', currency: 'COP', timezone: 'America/Bogota' },
+  { code: 'CL', name: 'Chile', currency: 'CLP', timezone: 'America/Santiago' }
+].sort((a, b) => a.name.localeCompare(b.name));
+
+// Timezones list
+const TIMEZONES = [
+  { value: 'Africa/Lagos', label: 'West Africa Time (WAT) - Lagos' },
+  { value: 'Africa/Accra', label: 'Ghana Mean Time (GMT) - Accra' },
+  { value: 'Africa/Nairobi', label: 'East Africa Time (EAT) - Nairobi' },
+  { value: 'Africa/Johannesburg', label: 'South Africa Standard Time (SAST)' },
+  { value: 'Africa/Cairo', label: 'Eastern European Time (EET) - Cairo' },
+  { value: 'Europe/London', label: 'Greenwich Mean Time (GMT) - London' },
+  { value: 'Europe/Paris', label: 'Central European Time (CET) - Paris' },
+  { value: 'Europe/Berlin', label: 'Central European Time (CET) - Berlin' },
+  { value: 'America/New_York', label: 'Eastern Standard Time (EST) - New York' },
+  { value: 'America/Chicago', label: 'Central Standard Time (CST) - Chicago' },
+  { value: 'America/Denver', label: 'Mountain Standard Time (MST) - Denver' },
+  { value: 'America/Los_Angeles', label: 'Pacific Standard Time (PST) - Los Angeles' },
+  { value: 'America/Toronto', label: 'Eastern Standard Time (EST) - Toronto' },
+  { value: 'Asia/Dubai', label: 'Gulf Standard Time (GST) - Dubai' },
+  { value: 'Asia/Kolkata', label: 'India Standard Time (IST) - Mumbai' },
+  { value: 'Asia/Singapore', label: 'Singapore Time (SGT)' },
+  { value: 'Asia/Tokyo', label: 'Japan Standard Time (JST) - Tokyo' },
+  { value: 'Asia/Shanghai', label: 'China Standard Time (CST) - Shanghai' },
+  { value: 'Australia/Sydney', label: 'Australian Eastern Time (AEST) - Sydney' },
+  { value: 'Pacific/Auckland', label: 'New Zealand Standard Time (NZST)' }
+];
+
+// Languages list
+const LANGUAGES = [
+  { code: 'en', name: 'English (US)' },
+  { code: 'en-GB', name: 'English (UK)' },
+  { code: 'fr', name: 'French' },
+  { code: 'es', name: 'Spanish' },
+  { code: 'de', name: 'German' },
+  { code: 'pt', name: 'Portuguese' },
+  { code: 'ar', name: 'Arabic' },
+  { code: 'zh', name: 'Chinese (Simplified)' },
+  { code: 'ja', name: 'Japanese' },
+  { code: 'ko', name: 'Korean' },
+  { code: 'hi', name: 'Hindi' },
+  { code: 'sw', name: 'Swahili' },
+  { code: 'yo', name: 'Yoruba' },
+  { code: 'ig', name: 'Igbo' },
+  { code: 'ha', name: 'Hausa' }
+];
 
 const navItems = [
   { id: 'profile', icon: FiUser, label: 'My Profile' },
@@ -80,6 +167,17 @@ export default function Settings() {
     twoFactorAuth: false
   });
 
+  // Image cropper state
+  const [showCropper, setShowCropper] = useState(false);
+  const [cropperImage, setCropperImage] = useState(null);
+
+  // Region settings
+  const [regionSettings, setRegionSettings] = useState({
+    language: user?.preferences?.language || 'en',
+    timezone: user?.preferences?.timezone || 'Africa/Lagos',
+    currency: user?.preferences?.currency || 'NGN'
+  });
+
   // Load measurement profiles
   useEffect(() => {
     if (activeTab === 'measurements') {
@@ -107,14 +205,27 @@ export default function Settings() {
     const file = e.target.files?.[0];
     if (!file) return;
 
-    if (file.size > 2 * 1024 * 1024) {
-      toast.error('Image must be under 2MB');
+    if (file.size > 10 * 1024 * 1024) {
+      toast.error('Image must be under 10MB');
       return;
     }
 
+    // Create object URL for cropper preview
+    const imageUrl = URL.createObjectURL(file);
+    setCropperImage(imageUrl);
+    setShowCropper(true);
+
+    // Reset the input
+    e.target.value = '';
+  };
+
+  const handleCropComplete = async (croppedFile) => {
+    setShowCropper(false);
+    setCropperImage(null);
     setUploadingAvatar(true);
+
     try {
-      const response = await uploadsAPI.uploadProfilePhoto(file);
+      const response = await uploadsAPI.uploadProfilePhoto(croppedFile);
       const avatarUrl = response.data.url;
       await authAPI.updateDetails({ avatar: avatarUrl });
       updateUser({ avatar: avatarUrl });
@@ -124,6 +235,14 @@ export default function Settings() {
     } finally {
       setUploadingAvatar(false);
     }
+  };
+
+  const handleCropCancel = () => {
+    setShowCropper(false);
+    if (cropperImage) {
+      URL.revokeObjectURL(cropperImage);
+    }
+    setCropperImage(null);
   };
 
   const handleRemoveAvatar = async () => {
@@ -274,6 +393,17 @@ export default function Settings() {
 
   return (
     <div className="settings-layout">
+      {/* Image Cropper Modal */}
+      {showCropper && cropperImage && (
+        <ImageCropper
+          imageSrc={cropperImage}
+          onCropComplete={handleCropComplete}
+          onCancel={handleCropCancel}
+          aspectRatio={1}
+          circularCrop={true}
+        />
+      )}
+
       {/* Mobile Menu Button */}
       <button
         className="mobile-menu-btn"
@@ -670,12 +800,11 @@ export default function Settings() {
                           value={addressForm.country}
                           onChange={(e) => setAddressForm(prev => ({ ...prev, country: e.target.value }))}
                         >
-                          <option value="Nigeria">Nigeria</option>
-                          <option value="Ghana">Ghana</option>
-                          <option value="Kenya">Kenya</option>
-                          <option value="South Africa">South Africa</option>
-                          <option value="United Kingdom">United Kingdom</option>
-                          <option value="United States">United States</option>
+                          {COUNTRIES.map(country => (
+                            <option key={country.code} value={country.name}>
+                              {country.name}
+                            </option>
+                          ))}
                         </select>
                       </div>
                       <div className="form-group">
@@ -845,25 +974,69 @@ export default function Settings() {
                 <h3>Language</h3>
                 <div className="form-group">
                   <label>Display Language</label>
-                  <select defaultValue="en">
-                    <option value="en">English (US)</option>
-                    <option value="en-gb">English (UK)</option>
-                    <option value="fr">French</option>
-                    <option value="es">Spanish</option>
+                  <select
+                    value={regionSettings.language}
+                    onChange={(e) => setRegionSettings(prev => ({ ...prev, language: e.target.value }))}
+                  >
+                    {LANGUAGES.map(lang => (
+                      <option key={lang.code} value={lang.code}>
+                        {lang.name}
+                      </option>
+                    ))}
                   </select>
                 </div>
               </div>
 
               <div className="card-section">
-                <h3>Region</h3>
+                <h3>Region Settings</h3>
                 <div className="form-group">
                   <label>Time Zone</label>
-                  <select defaultValue="WAT">
-                    <option value="WAT">West Africa Time (WAT)</option>
-                    <option value="GMT">Greenwich Mean Time (GMT)</option>
-                    <option value="EST">Eastern Standard Time (EST)</option>
-                    <option value="PST">Pacific Standard Time (PST)</option>
+                  <select
+                    value={regionSettings.timezone}
+                    onChange={(e) => setRegionSettings(prev => ({ ...prev, timezone: e.target.value }))}
+                  >
+                    {TIMEZONES.map(tz => (
+                      <option key={tz.value} value={tz.value}>
+                        {tz.label}
+                      </option>
+                    ))}
                   </select>
+                </div>
+
+                <div className="form-group">
+                  <label>Preferred Currency</label>
+                  <select
+                    value={regionSettings.currency}
+                    onChange={(e) => setRegionSettings(prev => ({ ...prev, currency: e.target.value }))}
+                  >
+                    {[...new Set(COUNTRIES.map(c => c.currency))].sort().map(currency => (
+                      <option key={currency} value={currency}>
+                        {currency}
+                      </option>
+                    ))}
+                  </select>
+                </div>
+
+                <div className="form-actions">
+                  <button
+                    type="button"
+                    className="btn btn-primary"
+                    disabled={saving}
+                    onClick={async () => {
+                      setSaving(true);
+                      try {
+                        await authAPI.updateDetails({ preferences: { ...user?.preferences, ...regionSettings } });
+                        updateUser({ preferences: { ...user?.preferences, ...regionSettings } });
+                        toast.success('Region settings saved');
+                      } catch (error) {
+                        toast.error('Failed to save settings');
+                      } finally {
+                        setSaving(false);
+                      }
+                    }}
+                  >
+                    {saving ? 'Saving...' : 'Save Settings'}
+                  </button>
                 </div>
               </div>
             </div>
