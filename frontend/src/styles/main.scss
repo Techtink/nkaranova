@@ -1365,7 +1365,6 @@ $grid-gutter-width: 1.5rem;
 // ============================================
 // Ensure ALL avatar-related elements are rounded
 [class*="avatar"] {
-  border-radius: 50% !important;
   overflow: hidden;
 
   img {
