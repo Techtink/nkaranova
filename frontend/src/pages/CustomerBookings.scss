@@ -1,108 +1,523 @@
 @import '../styles/variables';
 @import '../styles/mixins';
 
+.customer-bookings-page {
+  background: var(--bg-secondary);
+  min-height: 100vh;
+  padding: $spacing-xl 0;
+
+  .container {
+    max-width: 1200px;
+  }
+}
+
+// Header with Filter Tabs
+.bookings-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: $spacing-xl;
+  background: var(--card-bg);
+  padding: $spacing-sm;
+  border-radius: $radius-lg;
+  box-shadow: var(--shadow-sm);
+}
+
 .filter-tabs {
   display: flex;
-  gap: $spacing-sm;
-  margin-bottom: $spacing-xl;
-  overflow-x: auto;
-  padding-bottom: $spacing-sm;
+  gap: $spacing-xs;
 }
 
 .filter-tab {
   padding: $spacing-sm $spacing-lg;
   font-size: $text-sm;
-  font-weight: $font-medium;
+  font-weight: $font-semibold;
   color: var(--text-secondary);
-  background: var(--bg-tertiary);
+  background: transparent;
   border: none;
-  border-radius: $radius-full;
-  white-space: nowrap;
+  border-radius: $radius-md;
   cursor: pointer;
   transition: all $transition-base;
 
   &:hover {
-    background: var(--bg-hover);
+    background: var(--bg-tertiary);
   }
 
   &.active {
-    background: $primary;
-    color: $white;
+    background: #3B82F6;
+    color: white;
   }
 }
 
+// Bookings List
 .bookings-list {
   display: flex;
   flex-direction: column;
   gap: $spacing-lg;
 }
 
+// Booking Card - Main Container
 .booking-card {
   background: var(--card-bg);
+  border-radius: $radius-xl;
+  box-shadow: var(--shadow-md);
+  overflow: hidden;
   border: 1px solid var(--border-color);
-  border-radius: $radius-lg;
-  padding: $spacing-lg;
-  box-shadow: var(--shadow-sm);
 }
 
-.booking-header {
-  @include flex-between;
-  margin-bottom: $spacing-md;
+// Card Header
+.card-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: $spacing-md $spacing-lg;
+  border-bottom: 1px solid var(--border-color);
 }
 
-.tailor-info {
+.service-type {
   display: flex;
   align-items: center;
   gap: $spacing-md;
 
-  .tailor-name {
-    display: block;
-    font-weight: $font-medium;
+  .service-name {
+    font-size: $text-base;
+    font-weight: $font-semibold;
     color: var(--text-primary);
-    text-decoration: none;
-    margin-bottom: $spacing-xs;
+  }
 
-    &:hover {
-      color: $primary;
+  .status-badge {
+    padding: $spacing-xs $spacing-sm;
+    font-size: $text-xs;
+    font-weight: $font-medium;
+    border-radius: $radius-full;
+
+    &.warning {
+      background: rgba(#F59E0B, 0.1);
+      color: #F59E0B;
+    }
+
+    &.info {
+      background: rgba(#3B82F6, 0.1);
+      color: #3B82F6;
+    }
+
+    &.success {
+      background: rgba(#10B981, 0.1);
+      color: #10B981;
+    }
+
+    &.error {
+      background: rgba(#EF4444, 0.1);
+      color: #EF4444;
     }
   }
 }
 
-.booking-details {
+.share-btn {
+  width: 36px;
+  height: 36px;
   display: flex;
-  flex-wrap: wrap;
-  gap: $spacing-lg;
-  margin-bottom: $spacing-md;
+  align-items: center;
+  justify-content: center;
+  background: #3B82F6;
+  color: white;
+  border: none;
+  border-radius: $radius-md;
+  cursor: pointer;
+  transition: all $transition-base;
 
-  .detail {
+  &:hover {
+    background: darken(#3B82F6, 10%);
+  }
+
+  svg {
+    width: 16px;
+    height: 16px;
+  }
+}
+
+// Card Body
+.card-body {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: $spacing-xl;
+  padding: $spacing-lg;
+
+  @include tablet {
+    grid-template-columns: 1fr;
+  }
+}
+
+// Left Section - Booking Info
+.booking-info {
+  display: flex;
+  flex-direction: column;
+  gap: $spacing-lg;
+}
+
+.route-info {
+  display: flex;
+  align-items: center;
+  gap: $spacing-lg;
+
+  .location {
+    display: flex;
+    flex-direction: column;
+    gap: $spacing-xs;
+
+    .location-name {
+      font-size: $text-base;
+      font-weight: $font-semibold;
+      color: var(--text-primary);
+    }
+
+    .location-date {
+      font-size: $text-sm;
+      color: var(--text-secondary);
+    }
+  }
+
+  .route-icon {
+    width: 40px;
+    height: 40px;
     display: flex;
     align-items: center;
-    gap: $spacing-xs;
-    font-size: $text-sm;
-    color: var(--text-secondary);
+    justify-content: center;
+    color: var(--text-tertiary);
 
     svg {
-      width: 16px;
-      height: 16px;
+      width: 24px;
+      height: 24px;
     }
   }
 }
 
-.booking-service,
-.booking-notes {
-  font-size: $text-sm;
-  margin-bottom: $spacing-sm;
-  color: var(--text-primary);
+.days-progress {
+  position: relative;
+  height: 8px;
+  background: var(--bg-tertiary);
+  border-radius: $radius-full;
+  overflow: visible;
 
-  strong {
+  .progress-bar {
+    height: 100%;
+    background: linear-gradient(90deg, #10B981, #34D399);
+    border-radius: $radius-full;
+    transition: width 0.3s ease;
+
+    &.soon {
+      background: linear-gradient(90deg, #F59E0B, #FBBF24);
+    }
+
+    &.overdue {
+      background: linear-gradient(90deg, #EF4444, #F87171);
+    }
+  }
+
+  .days-text {
+    position: absolute;
+    right: 0;
+    top: $spacing-md;
+    font-size: $text-xs;
     color: var(--text-secondary);
   }
 }
 
-.booking-actions {
-  display: flex;
-  gap: $spacing-sm;
+.reference-grid {
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  gap: $spacing-md $spacing-xl;
   margin-top: $spacing-md;
-  padding-top: $spacing-md;
+
+  .ref-item {
+    display: flex;
+    flex-direction: column;
+    gap: 2px;
+
+    .ref-label {
+      font-size: $text-xs;
+      color: var(--text-tertiary);
+    }
+
+    .ref-value {
+      font-size: $text-sm;
+      font-weight: $font-medium;
+      color: var(--text-primary);
+    }
+  }
+}
+
+// Right Section - Progress Timeline
+.progress-section {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: $spacing-md;
+  padding-left: $spacing-lg;
+  border-left: 1px solid var(--border-color);
+
+  @include tablet {
+    border-left: none;
+    border-top: 1px solid var(--border-color);
+    padding-left: 0;
+    padding-top: $spacing-lg;
+  }
+
+  .tailor-label {
+    font-size: $text-sm;
+    font-weight: $font-semibold;
+    color: var(--text-primary);
+    text-align: center;
+  }
+}
+
+.progress-timeline {
+  display: flex;
+  align-items: flex-start;
+  justify-content: center;
+  gap: 0;
+  width: 100%;
+  padding: $spacing-md 0;
+}
+
+.timeline-stage {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: $spacing-xs;
+  position: relative;
+  min-width: 70px;
+
+  .stage-icon {
+    width: 40px;
+    height: 40px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    background: var(--bg-tertiary);
+    border: 2px solid var(--border-color);
+    border-radius: 50%;
+    color: var(--text-tertiary);
+    z-index: 1;
+
+    svg {
+      width: 18px;
+      height: 18px;
+    }
+
+    &.completed {
+      background: #10B981;
+      border-color: #10B981;
+      color: white;
+    }
+
+    &.current {
+      background: #3B82F6;
+      border-color: #3B82F6;
+      color: white;
+      animation: pulse 2s infinite;
+    }
+  }
+
+  .stage-code {
+    font-size: $text-xs;
+    font-weight: $font-bold;
+    color: var(--text-primary);
+  }
+
+  .stage-status {
+    font-size: 10px;
+    color: var(--text-tertiary);
+
+    &.completed {
+      color: #10B981;
+    }
+
+    &.current {
+      color: #3B82F6;
+    }
+  }
+
+  .connector {
+    position: absolute;
+    top: 20px;
+    left: calc(50% + 20px);
+    width: calc(100% - 40px);
+    height: 2px;
+    background: var(--border-color);
+
+    &::before {
+      content: '';
+      position: absolute;
+      top: -3px;
+      right: 0;
+      width: 0;
+      height: 0;
+      border-left: 6px solid var(--border-color);
+      border-top: 4px solid transparent;
+      border-bottom: 4px solid transparent;
+    }
+
+    &.completed {
+      background: #10B981;
+
+      &::before {
+        border-left-color: #10B981;
+      }
+    }
+  }
+}
+
+// Card Actions
+.card-actions {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: $spacing-sm;
+  padding: $spacing-md $spacing-lg;
   border-top: 1px solid var(--border-color);
+  background: var(--bg-secondary);
+
+  @include mobile {
+    grid-template-columns: 1fr;
+  }
+}
+
+.action-btn {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: $spacing-sm;
+  padding: $spacing-sm $spacing-md;
+  font-size: $text-sm;
+  font-weight: $font-medium;
+  border: none;
+  border-radius: $radius-md;
+  cursor: pointer;
+  transition: all $transition-base;
+  text-decoration: none;
+
+  svg {
+    width: 16px;
+    height: 16px;
+  }
+
+  &.primary {
+    background: #3B82F6;
+    color: white;
+
+    &:hover {
+      background: darken(#3B82F6, 10%);
+    }
+  }
+
+  &.secondary {
+    background: #10B981;
+    color: white;
+
+    &:hover {
+      background: darken(#10B981, 10%);
+    }
+  }
+
+  &.warning {
+    background: rgba(#EF4444, 0.1);
+    color: #EF4444;
+    border: 1px solid rgba(#EF4444, 0.3);
+
+    &:hover {
+      background: rgba(#EF4444, 0.2);
+    }
+  }
+}
+
+// Empty State
+.empty-state {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  padding: $spacing-3xl;
+  text-align: center;
+  background: var(--card-bg);
+  border-radius: $radius-xl;
+
+  svg {
+    color: var(--text-tertiary);
+    margin-bottom: $spacing-lg;
+  }
+
+  h3 {
+    font-size: $text-xl;
+    color: var(--text-primary);
+    margin-bottom: $spacing-sm;
+  }
+
+  p {
+    color: var(--text-secondary);
+    margin-bottom: $spacing-lg;
+  }
+}
+
+// Pulse Animation
+@keyframes pulse {
+  0%, 100% {
+    box-shadow: 0 0 0 0 rgba(#3B82F6, 0.4);
+  }
+  50% {
+    box-shadow: 0 0 0 8px rgba(#3B82F6, 0);
+  }
+}
+
+// Mobile Adjustments
+@include mobile {
+  .customer-bookings-page {
+    padding: $spacing-md 0;
+  }
+
+  .bookings-header {
+    flex-direction: column;
+    gap: $spacing-md;
+  }
+
+  .filter-tabs {
+    width: 100%;
+    overflow-x: auto;
+    padding-bottom: $spacing-xs;
+
+    &::-webkit-scrollbar {
+      display: none;
+    }
+  }
+
+  .filter-tab {
+    white-space: nowrap;
+    flex-shrink: 0;
+  }
+
+  .route-info {
+    flex-wrap: wrap;
+    justify-content: center;
+    text-align: center;
+
+    .location {
+      align-items: center;
+    }
+  }
+
+  .reference-grid {
+    grid-template-columns: 1fr 1fr;
+  }
+
+  .progress-timeline {
+    flex-wrap: wrap;
+    gap: $spacing-md;
+  }
+
+  .timeline-stage {
+    min-width: 60px;
+
+    .connector {
+      display: none;
+    }
+  }
 }
