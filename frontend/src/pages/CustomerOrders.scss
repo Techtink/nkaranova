@@ -13,15 +13,15 @@
     padding: $spacing-sm $spacing-lg;
     font-size: $text-sm;
     font-weight: $font-medium;
-    color: $text-secondary;
-    background: $gray-100;
+    color: var(--text-secondary);
+    background: var(--bg-tertiary);
     border: none;
     border-radius: $radius-full;
     cursor: pointer;
     transition: all $transition-base;
 
     &:hover {
-      background: $gray-200;
+      background: var(--bg-hover);
     }
 
     &.active {
@@ -38,17 +38,19 @@
 }
 
 .order-card {
-  @include card;
+  background: var(--card-bg);
+  border: 1px solid var(--border-color);
+  border-radius: $radius-lg;
   overflow: hidden;
   transition: box-shadow $transition-base;
 
   &:hover {
-    box-shadow: $shadow-lg;
+    box-shadow: var(--shadow-lg);
   }
 
   &.expanded {
     .order-header {
-      border-bottom: 1px solid $gray-100;
+      border-bottom: 1px solid var(--border-color);
     }
   }
 }
@@ -61,7 +63,7 @@
   cursor: pointer;
 
   &:hover {
-    background: $gray-50;
+    background: var(--bg-hover);
   }
 }
 
@@ -86,7 +88,7 @@
   .tailor-name {
     display: block;
     font-weight: $font-medium;
-    color: $text-primary;
+    color: var(--text-primary);
     text-decoration: none;
 
     &:hover {
@@ -97,7 +99,7 @@
   .order-service {
     display: block;
     font-size: $text-sm;
-    color: $text-muted;
+    color: var(--text-muted);
   }
 }
 
@@ -114,7 +116,7 @@
     .progress-bar {
       width: 80px;
       height: 8px;
-      background: $gray-200;
+      background: var(--bg-tertiary);
       border-radius: $radius-full;
       overflow: hidden;
 
@@ -133,7 +135,7 @@
           background: $warning;
         }
         &.gray {
-          background: $gray-400;
+          background: var(--text-muted);
         }
       }
     }
@@ -141,7 +143,7 @@
     .progress-text {
       font-size: $text-sm;
       font-weight: $font-medium;
-      color: $text-secondary;
+      color: var(--text-secondary);
     }
   }
 
@@ -164,30 +166,30 @@
   display: flex;
   align-items: center;
   justify-content: center;
-  background: $gray-100;
+  background: var(--bg-tertiary);
   border: none;
   border-radius: $radius-full;
   cursor: pointer;
   transition: all $transition-base;
 
   &:hover {
-    background: $gray-200;
+    background: var(--bg-hover);
   }
 
   svg {
     width: 18px;
     height: 18px;
-    color: $text-secondary;
+    color: var(--text-secondary);
   }
 }
 
 .order-details {
   padding: $spacing-lg;
-  background: $gray-50;
+  background: var(--bg-secondary);
 
   .status-description {
     font-size: $text-sm;
-    color: $text-secondary;
+    color: var(--text-secondary);
     margin-bottom: $spacing-lg;
   }
 }
@@ -198,6 +200,7 @@
   h4 {
     font-size: $text-base;
     font-weight: $font-semibold;
+    color: var(--text-primary);
     margin-bottom: $spacing-md;
   }
 }
@@ -213,7 +216,7 @@
     top: 20px;
     bottom: 20px;
     width: 2px;
-    background: $gray-200;
+    background: var(--border-color);
   }
 }
 
@@ -233,11 +236,11 @@
     display: flex;
     align-items: center;
     justify-content: center;
-    background: $gray-200;
+    background: var(--bg-tertiary);
     border-radius: 50%;
     font-size: $text-xs;
     font-weight: $font-semibold;
-    color: $text-secondary;
+    color: var(--text-secondary);
     z-index: 1;
 
     svg {
@@ -278,12 +281,12 @@
     .stage-name {
       display: block;
       font-weight: $font-medium;
-      color: $text-primary;
+      color: var(--text-primary);
     }
 
     .stage-description {
       font-size: $text-sm;
-      color: $text-secondary;
+      color: var(--text-secondary);
       margin: $spacing-xs 0;
     }
 
@@ -292,7 +295,7 @@
       align-items: center;
       gap: $spacing-xs;
       font-size: $text-xs;
-      color: $text-muted;
+      color: var(--text-muted);
 
       svg {
         width: 12px;
@@ -315,6 +318,7 @@
   background: rgba($primary, 0.05);
   border-radius: $radius-md;
   font-size: $text-sm;
+  color: var(--text-primary);
 
   svg {
     color: $primary;
@@ -332,6 +336,7 @@
   h4 {
     font-size: $text-base;
     font-weight: $font-semibold;
+    color: var(--text-primary);
     margin-bottom: $spacing-md;
   }
 }
@@ -345,6 +350,7 @@
   p {
     margin: 0 0 $spacing-sm;
     font-size: $text-sm;
+    color: var(--text-primary);
   }
 
   .delay-actions {
@@ -360,7 +366,7 @@
   gap: $spacing-sm;
   margin-top: $spacing-lg;
   padding-top: $spacing-md;
-  border-top: 1px solid $gray-200;
+  border-top: 1px solid var(--border-color);
 }
 
 // Modals
@@ -368,6 +374,8 @@
 .review-modal {
   width: 100%;
   max-width: 480px;
+  background: var(--card-bg);
+  border-radius: $radius-lg;
 }
 
 .modal-header {
@@ -375,11 +383,12 @@
   align-items: center;
   justify-content: space-between;
   padding: $spacing-lg;
-  border-bottom: 1px solid $gray-100;
+  border-bottom: 1px solid var(--border-color);
 
   h2 {
     margin: 0;
     font-size: $text-xl;
+    color: var(--text-primary);
   }
 
   .close-btn {
@@ -392,9 +401,10 @@
     border: none;
     border-radius: $radius-full;
     cursor: pointer;
+    color: var(--text-secondary);
 
     &:hover {
-      background: $gray-100;
+      background: var(--bg-tertiary);
     }
 
     svg {
@@ -409,21 +419,27 @@
 
   > p {
     font-size: $text-sm;
-    color: $text-secondary;
+    color: var(--text-secondary);
     margin-bottom: $spacing-lg;
   }
 
   textarea {
     width: 100%;
     padding: $spacing-md;
-    border: 1px solid $gray-200;
+    border: 1px solid var(--border-color);
     border-radius: $radius-md;
     font-size: $text-sm;
     resize: vertical;
+    background: var(--bg-secondary);
+    color: var(--text-primary);
 
     &:focus {
       outline: none;
       border-color: $primary;
+    }
+
+    &::placeholder {
+      color: var(--text-muted);
     }
   }
 }
@@ -435,6 +451,7 @@
     display: block;
     font-size: $text-sm;
     font-weight: $font-medium;
+    color: var(--text-primary);
     margin-bottom: $spacing-sm;
   }
 }
@@ -450,7 +467,7 @@
     align-items: center;
     justify-content: center;
     background: transparent;
-    border: 1px solid $gray-200;
+    border: 1px solid var(--border-color);
     border-radius: $radius-md;
     cursor: pointer;
     transition: all $transition-base;
@@ -458,7 +475,7 @@
     svg {
       width: 24px;
       height: 24px;
-      color: $gray-300;
+      color: var(--text-muted);
       transition: color $transition-base;
     }
 
@@ -489,6 +506,7 @@
     display: block;
     font-size: $text-sm;
     font-weight: $font-medium;
+    color: var(--text-primary);
     margin-bottom: $spacing-sm;
   }
 }
@@ -498,7 +516,7 @@
   justify-content: flex-end;
   gap: $spacing-md;
   padding-top: $spacing-lg;
-  border-top: 1px solid $gray-100;
+  border-top: 1px solid var(--border-color);
 }
 
 @keyframes pulse {

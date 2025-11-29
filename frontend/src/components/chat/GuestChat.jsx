@@ -1,9 +1,40 @@
 import { useState, useEffect, useRef, useCallback } from 'react';
-import { FiMessageCircle, FiX, FiSend, FiUser } from 'react-icons/fi';
+import { FiX, FiSend, FiUser } from 'react-icons/fi';
 import { io } from 'socket.io-client';
 import { guestChatAPI } from '../../services/api';
 import { useAuth } from '../../context/AuthContext';
 import './GuestChat.scss';
+
+// Custom Robot Chat Icon
+function RobotIcon({ className }) {
+  return (
+    <svg className={className} viewBox="0 0 64 64" fill="none" xmlns="http://www.w3.org/2000/svg">
+      {/* Antenna */}
+      <circle cx="32" cy="8" r="4" fill="currentColor" />
+      <rect x="30" y="10" width="4" height="8" fill="currentColor" />
+
+      {/* Robot Head */}
+      <rect x="12" y="18" width="40" height="32" rx="8" fill="currentColor" />
+
+      {/* Eyes */}
+      <circle cx="24" cy="32" r="5" fill="white" />
+      <circle cx="40" cy="32" r="5" fill="white" />
+      <circle cx="25" cy="31" r="2" fill="#333" />
+      <circle cx="41" cy="31" r="2" fill="#333" />
+
+      {/* Mouth */}
+      <rect x="22" y="42" width="20" height="3" rx="1.5" fill="white" />
+
+      {/* Ears/Side panels */}
+      <rect x="6" y="28" width="6" height="12" rx="2" fill="currentColor" />
+      <rect x="52" y="28" width="6" height="12" rx="2" fill="currentColor" />
+
+      {/* Speech bubble indicator */}
+      <circle cx="54" cy="14" r="8" fill="#4CAF50" />
+      <ellipse cx="52" cy="20" rx="2" ry="3" fill="#4CAF50" />
+    </svg>
+  );
+}
 
 const GUEST_ID_KEY = 'tc_guest_id';
 const CONVERSATION_ID_KEY = 'tc_conversation_id';
@@ -202,7 +233,7 @@ export default function GuestChat() {
         onClick={() => { setIsOpen(!isOpen); setShowGreeting(false); }}
         aria-label={isOpen ? 'Close chat' : 'Open chat'}
       >
-        {isOpen ? <FiX /> : <FiMessageCircle />}
+        {isOpen ? <FiX /> : <RobotIcon className="robot-icon" />}
       </button>
 
       {/* Chat Window */}
@@ -210,7 +241,7 @@ export default function GuestChat() {
         <div className="chat-window">
           <div className="chat-header">
             <div className="header-info">
-              <FiMessageCircle />
+              <RobotIcon className="header-robot-icon" />
               <div>
                 <h4>Chat with Us</h4>
                 <span className={`status-indicator ${status}`}>
