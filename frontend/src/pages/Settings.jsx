@@ -338,7 +338,7 @@ export default function Settings() {
 
     try {
       const response = await uploadsAPI.uploadProfilePhoto(croppedFile);
-      const avatarUrl = response.data.url;
+      const avatarUrl = response.data.data.url;
       await authAPI.updateDetails({ avatar: avatarUrl });
       updateUser({ avatar: avatarUrl });
       toast.success('Profile photo updated');
