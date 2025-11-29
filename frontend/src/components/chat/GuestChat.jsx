@@ -29,9 +29,8 @@ function RobotIcon({ className }) {
       <rect x="6" y="28" width="6" height="12" rx="2" fill="currentColor" />
       <rect x="52" y="28" width="6" height="12" rx="2" fill="currentColor" />
 
-      {/* Speech bubble indicator */}
-      <circle cx="54" cy="14" r="8" fill="#4CAF50" />
-      <ellipse cx="52" cy="20" rx="2" ry="3" fill="#4CAF50" />
+      {/* Speech bubble indicator - green dot */}
+      <circle cx="54" cy="14" r="6" fill="#4CAF50" />
     </svg>
   );
 }
