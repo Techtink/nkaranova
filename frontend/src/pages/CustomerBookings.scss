@@ -19,7 +19,6 @@ $font-montserrat: 'Montserrat', sans-serif;
 .bookings-header-wrapper {
   display: flex;
   justify-content: center;
-  margin-bottom: $spacing-xl;
 }
 
 // Header with Filter Tabs - Pill container
@@ -161,9 +160,6 @@ $font-montserrat: 'Montserrat', sans-serif;
   align-items: flex-start;
   justify-content: space-between;
   gap: $spacing-lg;
-  margin-bottom: $spacing-lg;
-  padding-bottom: $spacing-lg;
-  border-bottom: 1px solid var(--border-color);
 }
 
 .endpoint {
@@ -480,7 +476,6 @@ $font-montserrat: 'Montserrat', sans-serif;
   }
 
   .bookings-header-wrapper {
-    margin-bottom: $spacing-lg;
     padding: 0 $spacing-sm;
   }
 
