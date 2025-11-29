@@ -155,74 +155,55 @@ $font-montserrat: 'Montserrat', sans-serif;
   padding: $spacing-lg;
 }
 
-// Two Column Layout
-.card-content {
+// Route Row - Customer on left, Tailor on right
+.route-row {
   display: flex;
-  gap: $spacing-xl;
+  justify-content: space-between;
+  align-items: flex-start;
+  margin-bottom: $spacing-lg;
 }
 
-.left-section {
-  flex: 1;
-  min-width: 0;
+.endpoint {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+
+  &.customer {
+    text-align: left;
+  }
+
+  &.tailor {
+    text-align: right;
+  }
+
+  .endpoint-name {
+    font-family: $font-montserrat;
+    font-size: $text-base;
+    font-weight: 500;
+    color: var(--text-primary);
+  }
+
+  .endpoint-date {
+    font-family: $font-montserrat;
+    font-size: $text-sm;
+    font-weight: 300;
+    color: var(--text-secondary);
+  }
 }
 
-.right-section {
-  flex-shrink: 0;
+// Timeline Progress Row - Icons with connectors + Days
+.timeline-progress-row {
   display: flex;
   align-items: flex-start;
-  padding-top: $spacing-sm;
-}
-
-// Route Info - Customer to Tailor
-.route-info {
-  display: flex;
-  align-items: center;
   gap: $spacing-lg;
   margin-bottom: $spacing-lg;
-
-  .location {
-    display: flex;
-    flex-direction: column;
-    gap: 4px;
-
-    .location-name {
-      font-family: $font-montserrat;
-      font-size: $text-base;
-      font-weight: 500;
-      color: var(--text-primary);
-    }
-
-    .location-date {
-      font-family: $font-montserrat;
-      font-size: $text-sm;
-      font-weight: 300;
-      color: var(--text-secondary);
-    }
-  }
-
-  .route-icon {
-    width: 40px;
-    height: 40px;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    background: #3B82F6;
-    border-radius: 50%;
-    color: white;
-    flex-shrink: 0;
-
-    svg {
-      width: 18px;
-      height: 18px;
-    }
-  }
 }
 
-// Timeline Container - Horizontal stages
-.timeline-container {
+.timeline-track {
   display: flex;
   align-items: flex-start;
-  gap: 0;
+  flex: 1;
+  justify-content: space-between;
 }
 
 .timeline-stage {
@@ -230,6 +211,11 @@ $font-montserrat: 'Montserrat', sans-serif;
   flex-direction: column;
   align-items: center;
   position: relative;
+  flex: 1;
+
+  &:last-child {
+    flex: 0;
+  }
 
   .stage-icon {
     width: 44px;
@@ -265,9 +251,9 @@ $font-montserrat: 'Montserrat', sans-serif;
 
   .connector {
     position: absolute;
-    top: 22px;
-    left: 44px;
-    width: 30px;
+    top: 21px;
+    left: 50%;
+    width: 100%;
     height: 2px;
     background: var(--border-color);
     z-index: 0;
@@ -302,47 +288,27 @@ $font-montserrat: 'Montserrat', sans-serif;
   }
 }
 
-// Progress Track - Below route row
-.progress-track {
+// Days Indicator
+.days-indicator {
   display: flex;
+  flex-direction: column;
   align-items: center;
-  gap: $spacing-md;
-  margin-bottom: $spacing-lg;
+  flex-shrink: 0;
+  padding-top: 8px;
 
-  .track-line {
-    flex: 1;
-    height: 6px;
-    background: var(--bg-tertiary);
-    border-radius: 50px;
-    overflow: hidden;
-
-    .track-fill {
-      height: 100%;
-      background: linear-gradient(90deg, #10B981, #34D399);
-      border-radius: 50px;
-      transition: width 0.5s ease;
-    }
+  .days-count {
+    font-family: $font-montserrat;
+    font-size: $text-2xl;
+    font-weight: 500;
+    color: var(--text-primary);
+    line-height: 1;
   }
 
-  .days-indicator {
-    display: flex;
-    align-items: baseline;
-    gap: 4px;
-    flex-shrink: 0;
-
-    .days-count {
-      font-family: $font-montserrat;
-      font-size: $text-lg;
-      font-weight: 500;
-      color: var(--text-primary);
-    }
-
-    .days-label {
-      font-family: $font-montserrat;
-      font-size: $text-xs;
-      font-weight: 300;
-      color: var(--text-secondary);
-    }
+  .days-label {
+    font-family: $font-montserrat;
+    font-size: $text-xs;
+    font-weight: 300;
+    color: var(--text-secondary);
   }
 }
 
@@ -511,29 +477,29 @@ $font-montserrat: 'Montserrat', sans-serif;
     padding: $spacing-sm $spacing-md;
   }
 
-  .card-content {
+  .route-row {
     flex-direction: column;
-    gap: $spacing-lg;
-  }
+    gap: $spacing-md;
+    align-items: center;
 
-  .right-section {
-    justify-content: center;
-    padding-top: 0;
-    border-top: 1px solid var(--border-color);
-    padding-top: $spacing-lg;
-  }
-
-  .route-info {
-    flex-wrap: wrap;
-    justify-content: center;
-
-    .location {
+    .endpoint {
       text-align: center;
+
+      &.customer,
+      &.tailor {
+        text-align: center;
+      }
     }
   }
 
-  .timeline-container {
-    justify-content: center;
+  .timeline-progress-row {
+    flex-direction: column;
+    align-items: center;
+    gap: $spacing-md;
+  }
+
+  .timeline-track {
+    width: 100%;
   }
 
   .timeline-stage {
@@ -548,23 +514,14 @@ $font-montserrat: 'Montserrat', sans-serif;
     }
 
     .connector {
-      top: 18px;
-      left: 36px;
-      width: 20px;
+      top: 17px;
     }
   }
 
-  .progress-track {
-    flex-direction: column;
-    align-items: stretch;
-
-    .track-line {
-      width: 100%;
-    }
-
-    .days-indicator {
-      justify-content: center;
-    }
+  .days-indicator {
+    flex-direction: row;
+    gap: 4px;
+    padding-top: 0;
   }
 
   .reference-grid {
@@ -573,20 +530,14 @@ $font-montserrat: 'Montserrat', sans-serif;
 }
 
 @include md {
-  .card-content {
-    flex-direction: column;
-    gap: $spacing-lg;
-  }
-
-  .right-section {
-    justify-content: flex-start;
-    border-top: 1px solid var(--border-color);
-    padding-top: $spacing-lg;
-  }
-
   .timeline-stage {
+    .stage-icon {
+      width: 40px;
+      height: 40px;
+    }
+
     .connector {
-      width: 25px;
+      top: 19px;
     }
   }
 }
