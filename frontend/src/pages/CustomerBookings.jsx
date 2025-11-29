@@ -199,80 +199,91 @@ export default function CustomerBookings() {
                     </button>
                   </div>
 
-                  {/* Card Body */}
+                  {/* Card Body - Two Column Layout */}
                   <div className="card-body">
-                    {/* Main Route Row - Customer | Timeline | Tailor */}
-                    <div className="route-row">
-                      {/* Customer (Left) */}
-                      <div className="endpoint customer-endpoint">
-                        <span className="endpoint-name">
-                          {user?.firstName && user?.lastName
-                            ? `${user.firstName} ${user.lastName}`
-                            : user?.username || 'Customer'}
-                        </span>
-                        <span className="endpoint-date">{formatDate(booking.createdAt)}</span>
-                      </div>
-
-                      {/* Timeline Icons (Center) */}
-                      <div className="timeline-row">
-                        {stages.map((stage, index) => (
-                          <div key={stage.id} className="timeline-stage">
-                            <StageIcon
-                              stage={stage.id}
-                              isCompleted={stage.isCompleted}
-                              isCurrent={stage.isCurrent}
-                            />
-                            {index < stages.length - 1 && (
-                              <div className={`connector ${stage.isCompleted ? 'completed' : ''}`} />
-                            )}
+                    <div className="card-content">
+                      {/* Left Section - Route Info */}
+                      <div className="left-section">
+                        {/* Route: Customer to Tailor */}
+                        <div className="route-info">
+                          <div className="location">
+                            <span className="location-name">
+                              {user?.firstName && user?.lastName
+                                ? `${user.firstName} ${user.lastName}`
+                                : user?.username || 'Customer'}
+                            </span>
+                            <span className="location-date">{formatDate(booking.createdAt)}</span>
                           </div>
-                        ))}
+                          <div className="route-icon">
+                            <FiScissors />
+                          </div>
+                          <div className="location">
+                            <span className="location-name">
+                              {booking.tailor?.businessName || booking.tailor?.username || 'Tailor'}
+                            </span>
+                            <span className="location-date">
+                              {booking.status === 'pending'
+                                ? 'Awaiting'
+                                : formatDate(booking.acceptedAt || booking.updatedAt)}
+                            </span>
+                          </div>
+                        </div>
+
+                        {/* Progress Bar with Days */}
+                        <div className="progress-track">
+                          <div className="track-line">
+                            <div
+                              className="track-fill"
+                              style={{ width: `${progressPercent}%` }}
+                            />
+                          </div>
+                          <div className="days-indicator">
+                            <span className="days-count">{daysSinceBooking}</span>
+                            <span className="days-label">Days</span>
+                          </div>
+                        </div>
+
+                        {/* Reference Grid */}
+                        <div className="reference-grid">
+                          <div className="ref-item">
+                            <span className="ref-label">Booking Ref</span>
+                            <span className="ref-value">{booking._id.slice(-8).toUpperCase()}</span>
+                          </div>
+                          <div className="ref-item">
+                            <span className="ref-label">Customer Ref</span>
+                            <span className="ref-value">{user?._id?.slice(-8).toUpperCase() || 'N/A'}</span>
+                          </div>
+                          <div className="ref-item">
+                            <span className="ref-label">Appointment</span>
+                            <span className="ref-value">{formatDate(booking.date)}</span>
+                          </div>
+                          <div className="ref-item">
+                            <span className="ref-label">Time</span>
+                            <span className="ref-value">{booking.startTime} - {booking.endTime}</span>
+                          </div>
+                        </div>
                       </div>
 
-                      {/* Tailor (Right) */}
-                      <div className="endpoint tailor-endpoint">
-                        <span className="endpoint-name">
-                          {booking.tailor?.businessName || booking.tailor?.username || 'Tailor'}
-                        </span>
-                        <span className="endpoint-date">
-                          {booking.status === 'pending'
-                            ? 'Awaiting'
-                            : formatDate(booking.acceptedAt || booking.updatedAt)}
-                        </span>
-                      </div>
-                    </div>
-
-                    {/* Progress Bar with Days */}
-                    <div className="progress-track">
-                      <div className="track-line">
-                        <div
-                          className="track-fill"
-                          style={{ width: `${progressPercent}%` }}
-                        />
-                      </div>
-                      <div className="days-indicator">
-                        <span className="days-count">{daysSinceBooking}</span>
-                        <span className="days-label">Days</span>
-                      </div>
-                    </div>
-
-                    {/* Reference Grid */}
-                    <div className="reference-grid">
-                      <div className="ref-item">
-                        <span className="ref-label">Booking Ref</span>
-                        <span className="ref-value">{booking._id.slice(-8).toUpperCase()}</span>
-                      </div>
-                      <div className="ref-item">
-                        <span className="ref-label">Customer Ref</span>
-                        <span className="ref-value">{user?._id?.slice(-8).toUpperCase() || 'N/A'}</span>
-                      </div>
-                      <div className="ref-item">
-                        <span className="ref-label">Appointment</span>
-                        <span className="ref-value">{formatDate(booking.date)}</span>
-                      </div>
-                      <div className="ref-item">
-                        <span className="ref-label">Time</span>
-                        <span className="ref-value">{booking.startTime} - {booking.endTime}</span>
+                      {/* Right Section - Timeline */}
+                      <div className="right-section">
+                        <div className="timeline-container">
+                          {stages.map((stage, index) => (
+                            <div key={stage.id} className="timeline-stage">
+                              <StageIcon
+                                stage={stage.id}
+                                isCompleted={stage.isCompleted}
+                                isCurrent={stage.isCurrent}
+                              />
+                              {index < stages.length - 1 && (
+                                <div className={`connector ${stage.isCompleted ? 'completed' : ''}`} />
+                              )}
+                              <span className="stage-code">{stage.code}</span>
+                              <span className={`stage-status ${stage.isCompleted ? 'completed' : stage.isCurrent ? 'current' : ''}`}>
+                                {stage.isCompleted ? 'Done' : stage.isCurrent ? 'Current' : 'Pending'}
+                              </span>
+                            </div>
+                          ))}
+                        </div>
                       </div>
                     </div>
                   </div>

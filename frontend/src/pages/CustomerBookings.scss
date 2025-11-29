@@ -19,6 +19,7 @@ $font-montserrat: 'Montserrat', sans-serif;
 .bookings-header-wrapper {
   display: flex;
   justify-content: center;
+  margin-bottom: $spacing-xl;
 }
 
 // Header with Filter Tabs - Pill container
@@ -154,61 +155,85 @@ $font-montserrat: 'Montserrat', sans-serif;
   padding: $spacing-lg;
 }
 
-// Main Route Row - Customer | Timeline | Tailor on same line
-.route-row {
+// Two Column Layout
+.card-content {
   display: flex;
-  align-items: center;
-  justify-content: space-between;
-  gap: $spacing-md;
-  margin-bottom: $spacing-lg;
+  gap: $spacing-xl;
 }
 
-.endpoint {
-  display: flex;
-  flex-direction: column;
-  gap: 4px;
-  min-width: 100px;
-
-  .endpoint-name {
-    font-family: $font-montserrat;
-    font-size: $text-base;
-    font-weight: 500;
-    color: var(--text-primary);
-  }
-
-  .endpoint-date {
-    font-family: $font-montserrat;
-    font-size: $text-sm;
-    font-weight: 300;
-    color: var(--text-secondary);
-  }
-
-  &.customer-endpoint {
-    text-align: left;
-  }
-
-  &.tailor-endpoint {
-    text-align: right;
-  }
-}
-
-// Timeline Row - Horizontal icons between names
-.timeline-row {
-  display: flex;
-  align-items: center;
-  justify-content: center;
+.left-section {
   flex: 1;
+  min-width: 0;
+}
+
+.right-section {
+  flex-shrink: 0;
+  display: flex;
+  align-items: flex-start;
+  padding-top: $spacing-sm;
+}
+
+// Route Info - Customer to Tailor
+.route-info {
+  display: flex;
+  align-items: center;
+  gap: $spacing-lg;
+  margin-bottom: $spacing-lg;
+
+  .location {
+    display: flex;
+    flex-direction: column;
+    gap: 4px;
+
+    .location-name {
+      font-family: $font-montserrat;
+      font-size: $text-base;
+      font-weight: 500;
+      color: var(--text-primary);
+    }
+
+    .location-date {
+      font-family: $font-montserrat;
+      font-size: $text-sm;
+      font-weight: 300;
+      color: var(--text-secondary);
+    }
+  }
+
+  .route-icon {
+    width: 40px;
+    height: 40px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    background: #3B82F6;
+    border-radius: 50%;
+    color: white;
+    flex-shrink: 0;
+
+    svg {
+      width: 18px;
+      height: 18px;
+    }
+  }
+}
+
+// Timeline Container - Horizontal stages
+.timeline-container {
+  display: flex;
+  align-items: flex-start;
   gap: 0;
 }
 
 .timeline-stage {
   display: flex;
+  flex-direction: column;
   align-items: center;
   position: relative;
 
   .stage-icon {
-    width: 40px;
-    height: 40px;
+    width: 44px;
+    height: 44px;
     display: flex;
     align-items: center;
     justify-content: center;
@@ -239,13 +264,40 @@ $font-montserrat: 'Montserrat', sans-serif;
   }
 
   .connector {
+    position: absolute;
+    top: 22px;
+    left: 44px;
     width: 30px;
     height: 2px;
     background: var(--border-color);
-    flex-shrink: 0;
+    z-index: 0;
 
     &.completed {
       background: #10B981;
+    }
+  }
+
+  .stage-code {
+    margin-top: $spacing-sm;
+    font-family: $font-montserrat;
+    font-size: $text-xs;
+    font-weight: 500;
+    color: var(--text-primary);
+  }
+
+  .stage-status {
+    font-family: $font-montserrat;
+    font-size: 10px;
+    font-weight: 300;
+    color: var(--text-tertiary);
+    margin-top: 2px;
+
+    &.completed {
+      color: #10B981;
+    }
+
+    &.current {
+      color: #3B82F6;
     }
   }
 }
@@ -299,9 +351,6 @@ $font-montserrat: 'Montserrat', sans-serif;
   display: grid;
   grid-template-columns: repeat(4, 1fr);
   gap: $spacing-md;
-  margin-bottom: $spacing-lg;
-  padding-bottom: $spacing-lg;
-  border-bottom: 1px solid var(--border-color);
 
   .ref-item {
     display: flex;
@@ -462,30 +511,35 @@ $font-montserrat: 'Montserrat', sans-serif;
     padding: $spacing-sm $spacing-md;
   }
 
-  .route-row {
+  .card-content {
     flex-direction: column;
-    align-items: center;
-    gap: $spacing-md;
+    gap: $spacing-lg;
+  }
 
-    .endpoint {
+  .right-section {
+    justify-content: center;
+    padding-top: 0;
+    border-top: 1px solid var(--border-color);
+    padding-top: $spacing-lg;
+  }
+
+  .route-info {
+    flex-wrap: wrap;
+    justify-content: center;
+
+    .location {
       text-align: center;
-
-      &.customer-endpoint,
-      &.tailor-endpoint {
-        text-align: center;
-      }
     }
   }
 
-  .timeline-row {
-    width: 100%;
+  .timeline-container {
     justify-content: center;
   }
 
   .timeline-stage {
     .stage-icon {
-      width: 32px;
-      height: 32px;
+      width: 36px;
+      height: 36px;
 
       svg {
         width: 14px;
@@ -494,6 +548,8 @@ $font-montserrat: 'Montserrat', sans-serif;
     }
 
     .connector {
+      top: 18px;
+      left: 36px;
       width: 20px;
     }
   }
@@ -517,8 +573,15 @@ $font-montserrat: 'Montserrat', sans-serif;
 }
 
 @include md {
-  .route-row {
-    flex-wrap: wrap;
+  .card-content {
+    flex-direction: column;
+    gap: $spacing-lg;
+  }
+
+  .right-section {
+    justify-content: flex-start;
+    border-top: 1px solid var(--border-color);
+    padding-top: $spacing-lg;
   }
 
   .timeline-stage {
