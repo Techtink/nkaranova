@@ -191,19 +191,36 @@ $font-montserrat: 'Montserrat', sans-serif;
   }
 }
 
-// Timeline Progress Row - Icons with connectors + Days
-.timeline-progress-row {
+// Progress Timeline Row - Progress bar left, Timeline icons right
+.progress-timeline-row {
   display: flex;
-  align-items: flex-start;
+  align-items: center;
   gap: $spacing-lg;
   margin-bottom: $spacing-lg;
 }
 
-.timeline-track {
+// Progress Bar
+.progress-bar {
+  flex: 1;
+  height: 6px;
+  background: var(--bg-tertiary);
+  border-radius: 50px;
+  overflow: hidden;
+
+  .progress-fill {
+    height: 100%;
+    background: linear-gradient(90deg, #10B981, #34D399);
+    border-radius: 50px;
+    transition: width 0.5s ease;
+  }
+}
+
+// Timeline Icons - Compact on the right
+.timeline-icons {
   display: flex;
   align-items: flex-start;
-  flex: 1;
-  justify-content: space-between;
+  gap: 0;
+  flex-shrink: 0;
 }
 
 .timeline-stage {
@@ -211,15 +228,10 @@ $font-montserrat: 'Montserrat', sans-serif;
   flex-direction: column;
   align-items: center;
   position: relative;
-  flex: 1;
-
-  &:last-child {
-    flex: 0;
-  }
 
   .stage-icon {
-    width: 44px;
-    height: 44px;
+    width: 32px;
+    height: 32px;
     display: flex;
     align-items: center;
     justify-content: center;
@@ -231,8 +243,8 @@ $font-montserrat: 'Montserrat', sans-serif;
     flex-shrink: 0;
 
     svg {
-      width: 18px;
-      height: 18px;
+      width: 14px;
+      height: 14px;
     }
 
     &.completed {
@@ -251,9 +263,9 @@ $font-montserrat: 'Montserrat', sans-serif;
 
   .connector {
     position: absolute;
-    top: 21px;
-    left: 50%;
-    width: 100%;
+    top: 15px;
+    left: 32px;
+    width: 20px;
     height: 2px;
     background: var(--border-color);
     z-index: 0;
@@ -264,27 +276,11 @@ $font-montserrat: 'Montserrat', sans-serif;
   }
 
   .stage-code {
-    margin-top: $spacing-sm;
-    font-family: $font-montserrat;
-    font-size: $text-xs;
-    font-weight: 500;
-    color: var(--text-primary);
-  }
-
-  .stage-status {
+    margin-top: 4px;
     font-family: $font-montserrat;
     font-size: 10px;
-    font-weight: 300;
-    color: var(--text-tertiary);
-    margin-top: 2px;
-
-    &.completed {
-      color: #10B981;
-    }
-
-    &.current {
-      color: #3B82F6;
-    }
+    font-weight: 500;
+    color: var(--text-primary);
   }
 }
 
@@ -294,11 +290,10 @@ $font-montserrat: 'Montserrat', sans-serif;
   flex-direction: column;
   align-items: center;
   flex-shrink: 0;
-  padding-top: 8px;
 
   .days-count {
     font-family: $font-montserrat;
-    font-size: $text-2xl;
+    font-size: $text-xl;
     font-weight: 500;
     color: var(--text-primary);
     line-height: 1;
@@ -492,36 +487,46 @@ $font-montserrat: 'Montserrat', sans-serif;
     }
   }
 
-  .timeline-progress-row {
-    flex-direction: column;
-    align-items: center;
+  .progress-timeline-row {
+    flex-wrap: wrap;
     gap: $spacing-md;
   }
 
-  .timeline-track {
+  .progress-bar {
     width: 100%;
+    flex: none;
+  }
+
+  .timeline-icons {
+    flex: 1;
+    justify-content: center;
   }
 
   .timeline-stage {
     .stage-icon {
-      width: 36px;
-      height: 36px;
+      width: 28px;
+      height: 28px;
 
       svg {
-        width: 14px;
-        height: 14px;
+        width: 12px;
+        height: 12px;
       }
     }
 
     .connector {
-      top: 17px;
+      top: 13px;
+      left: 28px;
+      width: 16px;
+    }
+
+    .stage-code {
+      font-size: 9px;
     }
   }
 
   .days-indicator {
     flex-direction: row;
     gap: 4px;
-    padding-top: 0;
   }
 
   .reference-grid {
@@ -532,12 +537,14 @@ $font-montserrat: 'Montserrat', sans-serif;
 @include md {
   .timeline-stage {
     .stage-icon {
-      width: 40px;
-      height: 40px;
+      width: 30px;
+      height: 30px;
     }
 
     .connector {
-      top: 19px;
+      top: 14px;
+      left: 30px;
+      width: 18px;
     }
   }
 }

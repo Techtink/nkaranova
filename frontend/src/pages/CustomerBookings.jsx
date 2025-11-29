@@ -223,9 +223,15 @@ export default function CustomerBookings() {
                       </div>
                     </div>
 
-                    {/* Timeline Progress Row - Icons connected by progress line */}
-                    <div className="timeline-progress-row">
-                      <div className="timeline-track">
+                    {/* Progress Row - Progress bar left, Timeline icons right */}
+                    <div className="progress-timeline-row">
+                      {/* Progress Bar */}
+                      <div className="progress-bar">
+                        <div className="progress-fill" style={{ width: `${progressPercent}%` }} />
+                      </div>
+
+                      {/* Timeline Icons */}
+                      <div className="timeline-icons">
                         {stages.map((stage, index) => (
                           <div key={stage.id} className="timeline-stage">
                             <StageIcon
@@ -237,12 +243,11 @@ export default function CustomerBookings() {
                               <div className={`connector ${stage.isCompleted ? 'completed' : ''}`} />
                             )}
                             <span className="stage-code">{stage.code}</span>
-                            <span className={`stage-status ${stage.isCompleted ? 'completed' : stage.isCurrent ? 'current' : ''}`}>
-                              {stage.isCompleted ? 'Done' : stage.isCurrent ? 'Current' : 'Pending'}
-                            </span>
                           </div>
                         ))}
                       </div>
+
+                      {/* Days Indicator */}
                       <div className="days-indicator">
                         <span className="days-count">{daysSinceBooking}</span>
                         <span className="days-label">Days</span>
