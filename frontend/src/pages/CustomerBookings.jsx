@@ -136,27 +136,29 @@ export default function CustomerBookings() {
   return (
     <div className="customer-bookings-page page">
       <div className="container">
-        {/* Filter Tabs Header */}
-        <div className="bookings-header">
-          <div className="filter-tabs">
-            <button
-              className={`filter-tab ${filter === 'in-progress' ? 'active' : ''}`}
-              onClick={() => setFilter('in-progress')}
-            >
-              In-Progress
-            </button>
-            <button
-              className={`filter-tab ${filter === 'completed' ? 'active' : ''}`}
-              onClick={() => setFilter('completed')}
-            >
-              Completed
-            </button>
-            <button
-              className={`filter-tab ${filter === 'cancelled' ? 'active' : ''}`}
-              onClick={() => setFilter('cancelled')}
-            >
-              Cancelled
-            </button>
+        {/* Filter Tabs Header - Centered Pill */}
+        <div className="bookings-header-wrapper">
+          <div className="bookings-header">
+            <div className="filter-tabs">
+              <button
+                className={`filter-tab ${filter === 'in-progress' ? 'active' : ''}`}
+                onClick={() => setFilter('in-progress')}
+              >
+                In-Progress
+              </button>
+              <button
+                className={`filter-tab ${filter === 'completed' ? 'active' : ''}`}
+                onClick={() => setFilter('completed')}
+              >
+                Completed
+              </button>
+              <button
+                className={`filter-tab ${filter === 'cancelled' ? 'active' : ''}`}
+                onClick={() => setFilter('cancelled')}
+              >
+                Cancelled
+              </button>
+            </div>
           </div>
         </div>
 

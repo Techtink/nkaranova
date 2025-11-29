@@ -15,14 +15,19 @@ $font-montserrat: 'Montserrat', sans-serif;
   }
 }
 
-// Header with Filter Tabs
-.bookings-header {
+// Header wrapper to center the pill
+.bookings-header-wrapper {
   display: flex;
-  align-items: center;
   justify-content: center;
   margin-bottom: $spacing-xl;
+}
+
+// Header with Filter Tabs - Pill container
+.bookings-header {
+  display: inline-flex;
+  align-items: center;
   background: var(--card-bg);
-  padding: $spacing-sm;
+  padding: $spacing-xs;
   border-radius: 50px;
   box-shadow: var(--shadow-sm);
   border: 1px solid var(--border-color);
@@ -474,15 +479,14 @@ $font-montserrat: 'Montserrat', sans-serif;
     padding: $spacing-md 0;
   }
 
-  .bookings-header {
-    margin: 0 $spacing-sm $spacing-lg;
+  .bookings-header-wrapper {
+    margin-bottom: $spacing-lg;
+    padding: 0 $spacing-sm;
   }
 
   .filter-tabs {
-    width: 100%;
     overflow-x: auto;
     padding-bottom: $spacing-xs;
-    justify-content: center;
 
     &::-webkit-scrollbar {
       display: none;
