@@ -201,9 +201,9 @@ export default function CustomerBookings() {
 
                   {/* Card Body */}
                   <div className="card-body">
-                    {/* Route Section - Customer to Tailor */}
-                    <div className="route-section">
-                      {/* Customer (Sender) */}
+                    {/* Main Route Row - Customer | Timeline | Tailor */}
+                    <div className="route-row">
+                      {/* Customer (Left) */}
                       <div className="endpoint customer-endpoint">
                         <span className="endpoint-name">
                           {user?.firstName && user?.lastName
@@ -213,21 +213,23 @@ export default function CustomerBookings() {
                         <span className="endpoint-date">{formatDate(booking.createdAt)}</span>
                       </div>
 
-                      {/* Progress Track */}
-                      <div className="progress-track">
-                        <div className="track-line">
-                          <div
-                            className="track-fill"
-                            style={{ width: `${progressPercent}%` }}
-                          />
-                        </div>
-                        <div className="days-indicator">
-                          <span className="days-count">{daysSinceBooking}</span>
-                          <span className="days-label">Days</span>
-                        </div>
+                      {/* Timeline Icons (Center) */}
+                      <div className="timeline-row">
+                        {stages.map((stage, index) => (
+                          <div key={stage.id} className="timeline-stage">
+                            <StageIcon
+                              stage={stage.id}
+                              isCompleted={stage.isCompleted}
+                              isCurrent={stage.isCurrent}
+                            />
+                            {index < stages.length - 1 && (
+                              <div className={`connector ${stage.isCompleted ? 'completed' : ''}`} />
+                            )}
+                          </div>
+                        ))}
                       </div>
 
-                      {/* Tailor (Receiver) */}
+                      {/* Tailor (Right) */}
                       <div className="endpoint tailor-endpoint">
                         <span className="endpoint-name">
                           {booking.tailor?.businessName || booking.tailor?.username || 'Tailor'}
@@ -237,6 +239,20 @@ export default function CustomerBookings() {
                             ? 'Awaiting'
                             : formatDate(booking.acceptedAt || booking.updatedAt)}
                         </span>
+                      </div>
+                    </div>
+
+                    {/* Progress Bar with Days */}
+                    <div className="progress-track">
+                      <div className="track-line">
+                        <div
+                          className="track-fill"
+                          style={{ width: `${progressPercent}%` }}
+                        />
+                      </div>
+                      <div className="days-indicator">
+                        <span className="days-count">{daysSinceBooking}</span>
+                        <span className="days-label">Days</span>
                       </div>
                     </div>
 
@@ -258,26 +274,6 @@ export default function CustomerBookings() {
                         <span className="ref-label">Time</span>
                         <span className="ref-value">{booking.startTime} - {booking.endTime}</span>
                       </div>
-                    </div>
-
-                    {/* Progress Timeline */}
-                    <div className="progress-timeline">
-                      {stages.map((stage, index) => (
-                        <div key={stage.id} className="timeline-stage">
-                          <StageIcon
-                            stage={stage.id}
-                            isCompleted={stage.isCompleted}
-                            isCurrent={stage.isCurrent}
-                          />
-                          <span className="stage-code">{stage.code}</span>
-                          <span className={`stage-status ${stage.isCompleted ? 'completed' : stage.isCurrent ? 'current' : ''}`}>
-                            {stage.isCompleted ? 'Done' : stage.isCurrent ? 'Current' : 'Pending'}
-                          </span>
-                          {index < stages.length - 1 && (
-                            <div className={`connector ${stage.isCompleted ? 'completed' : ''}`} />
-                          )}
-                        </div>
-                      ))}
                     </div>
                   </div>
 

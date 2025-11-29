@@ -154,19 +154,20 @@ $font-montserrat: 'Montserrat', sans-serif;
   padding: $spacing-lg;
 }
 
-// Route Section - Shipping Tracker Style
-.route-section {
+// Main Route Row - Customer | Timeline | Tailor on same line
+.route-row {
   display: flex;
-  align-items: flex-start;
+  align-items: center;
   justify-content: space-between;
-  gap: $spacing-lg;
+  gap: $spacing-md;
+  margin-bottom: $spacing-lg;
 }
 
 .endpoint {
   display: flex;
   flex-direction: column;
   gap: 4px;
-  min-width: 120px;
+  min-width: 100px;
 
   .endpoint-name {
     font-family: $font-montserrat;
@@ -191,22 +192,77 @@ $font-montserrat: 'Montserrat', sans-serif;
   }
 }
 
-// Progress Track
-.progress-track {
-  flex: 1;
+// Timeline Row - Horizontal icons between names
+.timeline-row {
   display: flex;
-  flex-direction: column;
   align-items: center;
-  gap: $spacing-sm;
-  padding: 0 $spacing-md;
+  justify-content: center;
+  flex: 1;
+  gap: 0;
+}
+
+.timeline-stage {
+  display: flex;
+  align-items: center;
+  position: relative;
+
+  .stage-icon {
+    width: 40px;
+    height: 40px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    background: var(--bg-tertiary);
+    border: 2px solid var(--border-color);
+    border-radius: 50%;
+    color: var(--text-tertiary);
+    z-index: 1;
+    flex-shrink: 0;
+
+    svg {
+      width: 18px;
+      height: 18px;
+    }
+
+    &.completed {
+      background: #10B981;
+      border-color: #10B981;
+      color: white;
+    }
+
+    &.current {
+      background: #3B82F6;
+      border-color: #3B82F6;
+      color: white;
+      animation: pulse 2s infinite;
+    }
+  }
+
+  .connector {
+    width: 30px;
+    height: 2px;
+    background: var(--border-color);
+    flex-shrink: 0;
+
+    &.completed {
+      background: #10B981;
+    }
+  }
+}
+
+// Progress Track - Below route row
+.progress-track {
+  display: flex;
+  align-items: center;
+  gap: $spacing-md;
+  margin-bottom: $spacing-lg;
 
   .track-line {
-    width: 100%;
+    flex: 1;
     height: 6px;
     background: var(--bg-tertiary);
     border-radius: 50px;
     overflow: hidden;
-    position: relative;
 
     .track-fill {
       height: 100%;
@@ -218,9 +274,9 @@ $font-montserrat: 'Montserrat', sans-serif;
 
   .days-indicator {
     display: flex;
-    flex-direction: column;
-    align-items: center;
-    gap: 2px;
+    align-items: baseline;
+    gap: 4px;
+    flex-shrink: 0;
 
     .days-count {
       font-family: $font-montserrat;
@@ -274,94 +330,6 @@ $font-montserrat: 'Montserrat', sans-serif;
   }
 }
 
-// Progress Timeline - Horizontal with rounded icons
-.progress-timeline {
-  display: flex;
-  align-items: flex-start;
-  justify-content: space-between;
-  width: 100%;
-  padding: $spacing-md $spacing-xl;
-}
-
-.timeline-stage {
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  gap: 6px;
-  position: relative;
-  flex: 1;
-
-  .stage-icon {
-    width: 48px;
-    height: 48px;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    background: var(--bg-tertiary);
-    border: 2px solid var(--border-color);
-    border-radius: 50%;
-    color: var(--text-tertiary);
-    z-index: 1;
-
-    svg {
-      width: 20px;
-      height: 20px;
-    }
-
-    &.completed {
-      background: #10B981;
-      border-color: #10B981;
-      color: white;
-    }
-
-    &.current {
-      background: #3B82F6;
-      border-color: #3B82F6;
-      color: white;
-      animation: pulse 2s infinite;
-    }
-  }
-
-  .stage-code {
-    font-family: $font-montserrat;
-    font-size: $text-xs;
-    font-weight: 500;
-    color: var(--text-primary);
-  }
-
-  .stage-status {
-    font-family: $font-montserrat;
-    font-size: 10px;
-    font-weight: 300;
-    color: var(--text-tertiary);
-
-    &.completed {
-      color: #10B981;
-    }
-
-    &.current {
-      color: #3B82F6;
-    }
-  }
-
-  // Connector line between stages
-  .connector {
-    position: absolute;
-    top: 24px;
-    left: calc(50% + 24px);
-    width: calc(100% - 48px);
-    height: 2px;
-    background: var(--border-color);
-
-    &.completed {
-      background: #10B981;
-    }
-  }
-
-  &:last-child .connector {
-    display: none;
-  }
-}
 
 // Card Actions - Pill shaped buttons
 .card-actions {
@@ -494,10 +462,9 @@ $font-montserrat: 'Montserrat', sans-serif;
     padding: $spacing-sm $spacing-md;
   }
 
-  .route-section {
+  .route-row {
     flex-direction: column;
     align-items: center;
-    text-align: center;
     gap: $spacing-md;
 
     .endpoint {
@@ -508,56 +475,55 @@ $font-montserrat: 'Montserrat', sans-serif;
         text-align: center;
       }
     }
+  }
 
-    .progress-track {
+  .timeline-row {
+    width: 100%;
+    justify-content: center;
+  }
+
+  .timeline-stage {
+    .stage-icon {
+      width: 32px;
+      height: 32px;
+
+      svg {
+        width: 14px;
+        height: 14px;
+      }
+    }
+
+    .connector {
+      width: 20px;
+    }
+  }
+
+  .progress-track {
+    flex-direction: column;
+    align-items: stretch;
+
+    .track-line {
       width: 100%;
+    }
+
+    .days-indicator {
+      justify-content: center;
     }
   }
 
   .reference-grid {
     grid-template-columns: repeat(2, 1fr);
   }
-
-  .progress-timeline {
-    padding: $spacing-md 0;
-    flex-wrap: wrap;
-    gap: $spacing-sm;
-    justify-content: center;
-  }
-
-  .timeline-stage {
-    flex: 0 0 auto;
-    min-width: 70px;
-
-    .stage-icon {
-      width: 40px;
-      height: 40px;
-
-      svg {
-        width: 16px;
-        height: 16px;
-      }
-    }
-
-    .connector {
-      display: none;
-    }
-  }
 }
 
 @include md {
-  .route-section {
+  .route-row {
     flex-wrap: wrap;
-  }
-
-  .progress-timeline {
-    padding: $spacing-md $spacing-sm;
   }
 
   .timeline-stage {
     .connector {
-      width: calc(100% - 56px);
-      left: calc(50% + 28px);
+      width: 25px;
     }
   }
 }
