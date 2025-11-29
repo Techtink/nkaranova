@@ -2,18 +2,17 @@ import { useState, useEffect } from 'react';
 import { Link } from 'react-router-dom';
 import {
   FiCalendar,
-  FiClock,
-  FiUser,
-  FiScissors,
   FiCheck,
   FiMessageSquare,
   FiShare2,
-  FiFileText,
+  FiUser,
+  FiScissors,
+  FiPackage,
   FiAlertCircle
 } from 'react-icons/fi';
 import Button from '../components/common/Button';
 import { bookingsAPI } from '../services/api';
-import { BOOKING_STATUS } from '../utils/constants';
+import { useAuth } from '../context/AuthContext';
 import './CustomerBookings.scss';
 
 // Progress stage icons
@@ -22,7 +21,7 @@ const StageIcon = ({ stage, isCompleted, isCurrent }) => {
     booked: FiCalendar,
     confirmed: FiCheck,
     in_progress: FiScissors,
-    completed: FiCheck
+    completed: FiPackage
   };
   const Icon = icons[stage] || FiCalendar;
 
@@ -34,6 +33,7 @@ const StageIcon = ({ stage, isCompleted, isCurrent }) => {
 };
 
 export default function CustomerBookings() {
+  const { user } = useAuth();
   const [bookings, setBookings] = useState([]);
   const [loading, setLoading] = useState(true);
   const [filter, setFilter] = useState('in-progress');
@@ -45,7 +45,6 @@ export default function CustomerBookings() {
   const fetchBookings = async () => {
     setLoading(true);
     try {
-      // Map filter to API status values
       let params = {};
       if (filter === 'in-progress') {
         params.status = 'pending,accepted';
@@ -64,35 +63,38 @@ export default function CustomerBookings() {
   };
 
   const formatDate = (date) => {
+    if (!date) return 'N/A';
     return new Date(date).toLocaleDateString('en-US', {
-      weekday: 'short',
       day: 'numeric',
       month: 'short',
-      year: '2-digit'
+      year: 'numeric'
     });
   };
 
-  const formatShortDate = (date) => {
-    return new Date(date).toLocaleDateString('en-US', {
-      day: 'numeric',
-      month: 'short'
-    });
-  };
-
-  const getDaysUntil = (date) => {
+  const getDaysSinceBooking = (createdAt) => {
+    const created = new Date(createdAt);
     const today = new Date();
-    const targetDate = new Date(date);
-    const diffTime = targetDate - today;
-    const diffDays = Math.ceil(diffTime / (1000 * 60 * 60 * 24));
+    const diffTime = today - created;
+    const diffDays = Math.floor(diffTime / (1000 * 60 * 60 * 24));
     return diffDays;
+  };
+
+  const getProgressPercent = (status) => {
+    const statusProgress = {
+      pending: 25,
+      accepted: 50,
+      in_progress: 75,
+      completed: 100
+    };
+    return statusProgress[status] || 25;
   };
 
   const getProgressStages = (status) => {
     const stages = [
-      { id: 'booked', label: 'Booked' },
-      { id: 'confirmed', label: 'Confirmed' },
-      { id: 'in_progress', label: 'In Progress' },
-      { id: 'completed', label: 'Completed' }
+      { id: 'booked', label: 'Booked', code: 'BOK' },
+      { id: 'confirmed', label: 'Confirmed', code: 'CNF' },
+      { id: 'in_progress', label: 'In Progress', code: 'WIP' },
+      { id: 'completed', label: 'Completed', code: 'DON' }
     ];
 
     let currentIndex = 0;
@@ -107,26 +109,28 @@ export default function CustomerBookings() {
     }));
   };
 
-  const getStatusColor = (status) => {
-    const colors = {
-      pending: 'warning',
-      accepted: 'info',
-      completed: 'success',
-      cancelled: 'error',
-      rejected: 'error'
-    };
-    return colors[status] || 'gray';
-  };
-
-  const getStatusLabel = (status) => {
+  const getCurrentStageLabel = (status) => {
     const labels = {
-      pending: 'Pending',
+      pending: 'Pending Confirmation',
       accepted: 'Confirmed',
+      in_progress: 'In Progress',
       completed: 'Completed',
       cancelled: 'Cancelled',
       rejected: 'Rejected'
     };
     return labels[status] || status;
+  };
+
+  const getStatusColor = (status) => {
+    const colors = {
+      pending: 'warning',
+      accepted: 'info',
+      in_progress: 'info',
+      completed: 'success',
+      cancelled: 'error',
+      rejected: 'error'
+    };
+    return colors[status] || 'gray';
   };
 
   return (
@@ -174,17 +178,18 @@ export default function CustomerBookings() {
           <div className="bookings-list">
             {bookings.map(booking => {
               const stages = getProgressStages(booking.status);
-              const daysUntil = getDaysUntil(booking.date);
+              const daysSinceBooking = getDaysSinceBooking(booking.createdAt);
+              const progressPercent = getProgressPercent(booking.status);
               const statusColor = getStatusColor(booking.status);
 
               return (
                 <div key={booking._id} className="booking-card">
                   {/* Card Header */}
                   <div className="card-header">
-                    <div className="service-type">
+                    <div className="header-left">
                       <span className="service-name">{booking.service || 'Tailoring Service'}</span>
-                      <span className={`status-badge ${statusColor}`}>
-                        {getStatusLabel(booking.status)}
+                      <span className={`stage-pill ${statusColor}`}>
+                        {getCurrentStageLabel(booking.status)}
                       </span>
                     </div>
                     <button className="share-btn">
@@ -194,84 +199,83 @@ export default function CustomerBookings() {
 
                   {/* Card Body */}
                   <div className="card-body">
-                    {/* Left Section - Booking Info */}
-                    <div className="booking-info">
-                      {/* Route Info */}
-                      <div className="route-info">
-                        <div className="location">
-                          <span className="location-name">
-                            {booking.tailor?.businessName || booking.tailor?.username}
-                          </span>
-                          <span className="location-date">{formatDate(booking.date)}</span>
-                        </div>
-                        <div className="route-icon">
-                          <FiScissors />
-                        </div>
-                        <div className="location">
-                          <span className="location-name">{booking.startTime} - {booking.endTime}</span>
-                          <span className="location-date">Appointment Time</span>
-                        </div>
-                      </div>
-
-                      {/* Progress Bar */}
-                      <div className="days-progress">
-                        <div
-                          className={`progress-bar ${daysUntil <= 0 ? 'overdue' : daysUntil <= 3 ? 'soon' : ''}`}
-                          style={{ width: `${Math.min(100, Math.max(10, 100 - (daysUntil * 10)))}%` }}
-                        />
-                        <span className="days-text">
-                          {daysUntil > 0
-                            ? `${daysUntil} Days (Until Appointment)`
-                            : daysUntil === 0
-                              ? 'Today!'
-                              : `${Math.abs(daysUntil)} Days Ago`}
+                    {/* Route Section - Customer to Tailor */}
+                    <div className="route-section">
+                      {/* Customer (Sender) */}
+                      <div className="endpoint customer-endpoint">
+                        <span className="endpoint-name">
+                          {user?.firstName && user?.lastName
+                            ? `${user.firstName} ${user.lastName}`
+                            : user?.username || 'Customer'}
                         </span>
+                        <span className="endpoint-date">{formatDate(booking.createdAt)}</span>
                       </div>
 
-                      {/* Reference Details */}
-                      <div className="reference-grid">
-                        <div className="ref-item">
-                          <span className="ref-label">Booking Ref.</span>
-                          <span className="ref-value">{booking._id.slice(-8).toUpperCase()}</span>
+                      {/* Progress Track */}
+                      <div className="progress-track">
+                        <div className="track-line">
+                          <div
+                            className="track-fill"
+                            style={{ width: `${progressPercent}%` }}
+                          />
                         </div>
-                        <div className="ref-item">
-                          <span className="ref-label">Tailor</span>
-                          <span className="ref-value">{booking.tailor?.username || 'N/A'}</span>
+                        <div className="days-indicator">
+                          <span className="days-count">{daysSinceBooking}</span>
+                          <span className="days-label">Days</span>
                         </div>
-                        <div className="ref-item">
-                          <span className="ref-label">Service</span>
-                          <span className="ref-value">{booking.service || 'Custom'}</span>
-                        </div>
-                        <div className="ref-item">
-                          <span className="ref-label">Duration</span>
-                          <span className="ref-value">1 Hour</span>
-                        </div>
+                      </div>
+
+                      {/* Tailor (Receiver) */}
+                      <div className="endpoint tailor-endpoint">
+                        <span className="endpoint-name">
+                          {booking.tailor?.businessName || booking.tailor?.username || 'Tailor'}
+                        </span>
+                        <span className="endpoint-date">
+                          {booking.status === 'pending'
+                            ? 'Awaiting'
+                            : formatDate(booking.acceptedAt || booking.updatedAt)}
+                        </span>
                       </div>
                     </div>
 
-                    {/* Right Section - Progress Timeline */}
-                    <div className="progress-section">
-                      <div className="tailor-label">
-                        {booking.tailor?.businessName || 'Tailor'}
+                    {/* Reference Grid */}
+                    <div className="reference-grid">
+                      <div className="ref-item">
+                        <span className="ref-label">Booking Ref</span>
+                        <span className="ref-value">{booking._id.slice(-8).toUpperCase()}</span>
                       </div>
-                      <div className="progress-timeline">
-                        {stages.map((stage, index) => (
-                          <div key={stage.id} className="timeline-stage">
-                            <StageIcon
-                              stage={stage.id}
-                              isCompleted={stage.isCompleted}
-                              isCurrent={stage.isCurrent}
-                            />
-                            <span className="stage-code">{stage.label.substring(0, 3).toUpperCase()}</span>
-                            <span className={`stage-status ${stage.isCompleted ? 'completed' : stage.isCurrent ? 'current' : ''}`}>
-                              {stage.isCompleted ? 'Done' : stage.isCurrent ? 'Current' : 'Pending'}
-                            </span>
-                            {index < stages.length - 1 && (
-                              <div className={`connector ${stage.isCompleted ? 'completed' : ''}`} />
-                            )}
-                          </div>
-                        ))}
+                      <div className="ref-item">
+                        <span className="ref-label">Customer Ref</span>
+                        <span className="ref-value">{user?._id?.slice(-8).toUpperCase() || 'N/A'}</span>
                       </div>
+                      <div className="ref-item">
+                        <span className="ref-label">Appointment</span>
+                        <span className="ref-value">{formatDate(booking.date)}</span>
+                      </div>
+                      <div className="ref-item">
+                        <span className="ref-label">Time</span>
+                        <span className="ref-value">{booking.startTime} - {booking.endTime}</span>
+                      </div>
+                    </div>
+
+                    {/* Progress Timeline */}
+                    <div className="progress-timeline">
+                      {stages.map((stage, index) => (
+                        <div key={stage.id} className="timeline-stage">
+                          <StageIcon
+                            stage={stage.id}
+                            isCompleted={stage.isCompleted}
+                            isCurrent={stage.isCurrent}
+                          />
+                          <span className="stage-code">{stage.code}</span>
+                          <span className={`stage-status ${stage.isCompleted ? 'completed' : stage.isCurrent ? 'current' : ''}`}>
+                            {stage.isCompleted ? 'Done' : stage.isCurrent ? 'Current' : 'Pending'}
+                          </span>
+                          {index < stages.length - 1 && (
+                            <div className={`connector ${stage.isCompleted ? 'completed' : ''}`} />
+                          )}
+                        </div>
+                      ))}
                     </div>
                   </div>
 
@@ -279,16 +283,16 @@ export default function CustomerBookings() {
                   <div className="card-actions">
                     <Link to={`/tailor/${booking.tailor?.username}`} className="action-btn primary">
                       <FiUser />
-                      View Tailor Profile
+                      View Tailor
                     </Link>
                     <Link to={`/messages?tailor=${booking.tailor?.username}`} className="action-btn secondary">
                       <FiMessageSquare />
-                      Message Tailor
+                      Message
                     </Link>
                     {['pending', 'accepted'].includes(booking.status) && (
                       <button className="action-btn warning">
                         <FiAlertCircle />
-                        Cancel Booking
+                        Cancel
                       </button>
                     )}
                   </div>

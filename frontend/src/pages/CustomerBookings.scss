@@ -1,13 +1,17 @@
 @import '../styles/variables';
 @import '../styles/mixins';
 
+// Font family
+$font-montserrat: 'Montserrat', sans-serif;
+
 .customer-bookings-page {
   background: var(--bg-secondary);
   min-height: 100vh;
   padding: $spacing-xl 0;
+  font-family: $font-montserrat;
 
   .container {
-    max-width: 1200px;
+    max-width: 900px;
   }
 }
 
@@ -15,12 +19,13 @@
 .bookings-header {
   display: flex;
   align-items: center;
-  justify-content: space-between;
+  justify-content: center;
   margin-bottom: $spacing-xl;
   background: var(--card-bg);
   padding: $spacing-sm;
-  border-radius: $radius-lg;
+  border-radius: 50px;
   box-shadow: var(--shadow-sm);
+  border: 1px solid var(--border-color);
 }
 
 .filter-tabs {
@@ -29,13 +34,14 @@
 }
 
 .filter-tab {
-  padding: $spacing-sm $spacing-lg;
+  padding: $spacing-sm $spacing-xl;
+  font-family: $font-montserrat;
   font-size: $text-sm;
-  font-weight: $font-semibold;
+  font-weight: 400;
   color: var(--text-secondary);
   background: transparent;
   border: none;
-  border-radius: $radius-md;
+  border-radius: 50px;
   cursor: pointer;
   transition: all $transition-base;
 
@@ -46,6 +52,7 @@
   &.active {
     background: #3B82F6;
     color: white;
+    font-weight: 500;
   }
 }
 
@@ -53,13 +60,13 @@
 .bookings-list {
   display: flex;
   flex-direction: column;
-  gap: $spacing-lg;
+  gap: $spacing-xl;
 }
 
 // Booking Card - Main Container
 .booking-card {
   background: var(--card-bg);
-  border-radius: $radius-xl;
+  border-radius: 16px;
   box-shadow: var(--shadow-md);
   overflow: hidden;
   border: 1px solid var(--border-color);
@@ -72,43 +79,45 @@
   justify-content: space-between;
   padding: $spacing-md $spacing-lg;
   border-bottom: 1px solid var(--border-color);
-}
 
-.service-type {
-  display: flex;
-  align-items: center;
-  gap: $spacing-md;
+  .header-left {
+    display: flex;
+    align-items: center;
+    gap: $spacing-md;
+  }
 
   .service-name {
+    font-family: $font-montserrat;
     font-size: $text-base;
-    font-weight: $font-semibold;
+    font-weight: 500;
     color: var(--text-primary);
   }
 
-  .status-badge {
-    padding: $spacing-xs $spacing-sm;
+  .stage-pill {
+    padding: 6px 16px;
+    font-family: $font-montserrat;
     font-size: $text-xs;
-    font-weight: $font-medium;
-    border-radius: $radius-full;
+    font-weight: 500;
+    border-radius: 50px;
 
     &.warning {
-      background: rgba(#F59E0B, 0.1);
-      color: #F59E0B;
+      background: rgba(#F59E0B, 0.15);
+      color: #D97706;
     }
 
     &.info {
-      background: rgba(#3B82F6, 0.1);
-      color: #3B82F6;
+      background: rgba(#3B82F6, 0.15);
+      color: #2563EB;
     }
 
     &.success {
-      background: rgba(#10B981, 0.1);
-      color: #10B981;
+      background: rgba(#10B981, 0.15);
+      color: #059669;
     }
 
     &.error {
-      background: rgba(#EF4444, 0.1);
-      color: #EF4444;
+      background: rgba(#EF4444, 0.15);
+      color: #DC2626;
     }
   }
 }
@@ -122,7 +131,7 @@
   background: #3B82F6;
   color: white;
   border: none;
-  border-radius: $radius-md;
+  border-radius: 50px;
   cursor: pointer;
   transition: all $transition-base;
 
@@ -138,159 +147,152 @@
 
 // Card Body
 .card-body {
-  display: grid;
-  grid-template-columns: 1fr 1fr;
-  gap: $spacing-xl;
   padding: $spacing-lg;
+}
 
-  @include md {
-    grid-template-columns: 1fr;
+// Route Section - Shipping Tracker Style
+.route-section {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: $spacing-lg;
+  margin-bottom: $spacing-lg;
+  padding-bottom: $spacing-lg;
+  border-bottom: 1px solid var(--border-color);
+}
+
+.endpoint {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  min-width: 120px;
+
+  .endpoint-name {
+    font-family: $font-montserrat;
+    font-size: $text-base;
+    font-weight: 500;
+    color: var(--text-primary);
+  }
+
+  .endpoint-date {
+    font-family: $font-montserrat;
+    font-size: $text-sm;
+    font-weight: 300;
+    color: var(--text-secondary);
+  }
+
+  &.customer-endpoint {
+    text-align: left;
+  }
+
+  &.tailor-endpoint {
+    text-align: right;
   }
 }
 
-// Left Section - Booking Info
-.booking-info {
+// Progress Track
+.progress-track {
+  flex: 1;
   display: flex;
   flex-direction: column;
-  gap: $spacing-lg;
-}
-
-.route-info {
-  display: flex;
   align-items: center;
-  gap: $spacing-lg;
+  gap: $spacing-sm;
+  padding: 0 $spacing-md;
 
-  .location {
+  .track-line {
+    width: 100%;
+    height: 6px;
+    background: var(--bg-tertiary);
+    border-radius: 50px;
+    overflow: hidden;
+    position: relative;
+
+    .track-fill {
+      height: 100%;
+      background: linear-gradient(90deg, #10B981, #34D399);
+      border-radius: 50px;
+      transition: width 0.5s ease;
+    }
+  }
+
+  .days-indicator {
     display: flex;
     flex-direction: column;
-    gap: $spacing-xs;
+    align-items: center;
+    gap: 2px;
 
-    .location-name {
-      font-size: $text-base;
-      font-weight: $font-semibold;
+    .days-count {
+      font-family: $font-montserrat;
+      font-size: $text-lg;
+      font-weight: 500;
       color: var(--text-primary);
     }
 
-    .location-date {
-      font-size: $text-sm;
+    .days-label {
+      font-family: $font-montserrat;
+      font-size: $text-xs;
+      font-weight: 300;
       color: var(--text-secondary);
     }
   }
-
-  .route-icon {
-    width: 40px;
-    height: 40px;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    color: var(--text-tertiary);
-
-    svg {
-      width: 24px;
-      height: 24px;
-    }
-  }
 }
 
-.days-progress {
-  position: relative;
-  height: 8px;
-  background: var(--bg-tertiary);
-  border-radius: $radius-full;
-  overflow: visible;
-
-  .progress-bar {
-    height: 100%;
-    background: linear-gradient(90deg, #10B981, #34D399);
-    border-radius: $radius-full;
-    transition: width 0.3s ease;
-
-    &.soon {
-      background: linear-gradient(90deg, #F59E0B, #FBBF24);
-    }
-
-    &.overdue {
-      background: linear-gradient(90deg, #EF4444, #F87171);
-    }
-  }
-
-  .days-text {
-    position: absolute;
-    right: 0;
-    top: $spacing-md;
-    font-size: $text-xs;
-    color: var(--text-secondary);
-  }
-}
-
+// Reference Grid
 .reference-grid {
   display: grid;
-  grid-template-columns: repeat(2, 1fr);
-  gap: $spacing-md $spacing-xl;
-  margin-top: $spacing-md;
+  grid-template-columns: repeat(4, 1fr);
+  gap: $spacing-md;
+  margin-bottom: $spacing-lg;
+  padding-bottom: $spacing-lg;
+  border-bottom: 1px solid var(--border-color);
 
   .ref-item {
     display: flex;
     flex-direction: column;
-    gap: 2px;
+    gap: 4px;
 
     .ref-label {
+      font-family: $font-montserrat;
       font-size: $text-xs;
+      font-weight: 300;
       color: var(--text-tertiary);
+      text-transform: uppercase;
+      letter-spacing: 0.5px;
     }
 
     .ref-value {
+      font-family: $font-montserrat;
       font-size: $text-sm;
-      font-weight: $font-medium;
+      font-weight: 500;
       color: var(--text-primary);
     }
   }
-}
-
-// Right Section - Progress Timeline
-.progress-section {
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  gap: $spacing-md;
-  padding-left: $spacing-lg;
-  border-left: 1px solid var(--border-color);
 
   @include md {
-    border-left: none;
-    border-top: 1px solid var(--border-color);
-    padding-left: 0;
-    padding-top: $spacing-lg;
-  }
-
-  .tailor-label {
-    font-size: $text-sm;
-    font-weight: $font-semibold;
-    color: var(--text-primary);
-    text-align: center;
+    grid-template-columns: repeat(2, 1fr);
   }
 }
 
+// Progress Timeline - Horizontal with rounded icons
 .progress-timeline {
   display: flex;
   align-items: flex-start;
-  justify-content: center;
-  gap: 0;
+  justify-content: space-between;
   width: 100%;
-  padding: $spacing-md 0;
+  padding: $spacing-md $spacing-xl;
 }
 
 .timeline-stage {
   display: flex;
   flex-direction: column;
   align-items: center;
-  gap: $spacing-xs;
+  gap: 6px;
   position: relative;
-  min-width: 70px;
+  flex: 1;
 
   .stage-icon {
-    width: 40px;
-    height: 40px;
+    width: 48px;
+    height: 48px;
     display: flex;
     align-items: center;
     justify-content: center;
@@ -301,8 +303,8 @@
     z-index: 1;
 
     svg {
-      width: 18px;
-      height: 18px;
+      width: 20px;
+      height: 20px;
     }
 
     &.completed {
@@ -320,13 +322,16 @@
   }
 
   .stage-code {
+    font-family: $font-montserrat;
     font-size: $text-xs;
-    font-weight: $font-bold;
+    font-weight: 500;
     color: var(--text-primary);
   }
 
   .stage-status {
+    font-family: $font-montserrat;
     font-size: 10px;
+    font-weight: 300;
     color: var(--text-tertiary);
 
     &.completed {
@@ -338,60 +343,50 @@
     }
   }
 
+  // Connector line between stages
   .connector {
     position: absolute;
-    top: 20px;
-    left: calc(50% + 20px);
-    width: calc(100% - 40px);
+    top: 24px;
+    left: calc(50% + 24px);
+    width: calc(100% - 48px);
     height: 2px;
     background: var(--border-color);
 
-    &::before {
-      content: '';
-      position: absolute;
-      top: -3px;
-      right: 0;
-      width: 0;
-      height: 0;
-      border-left: 6px solid var(--border-color);
-      border-top: 4px solid transparent;
-      border-bottom: 4px solid transparent;
-    }
-
     &.completed {
       background: #10B981;
-
-      &::before {
-        border-left-color: #10B981;
-      }
     }
+  }
+
+  &:last-child .connector {
+    display: none;
   }
 }
 
-// Card Actions
+// Card Actions - Pill shaped buttons
 .card-actions {
-  display: grid;
-  grid-template-columns: repeat(3, 1fr);
+  display: flex;
   gap: $spacing-sm;
   padding: $spacing-md $spacing-lg;
   border-top: 1px solid var(--border-color);
   background: var(--bg-secondary);
 
   @include mobile {
-    grid-template-columns: 1fr;
+    flex-direction: column;
   }
 }
 
 .action-btn {
+  flex: 1;
   display: flex;
   align-items: center;
   justify-content: center;
   gap: $spacing-sm;
-  padding: $spacing-sm $spacing-md;
+  padding: 12px $spacing-lg;
+  font-family: $font-montserrat;
   font-size: $text-sm;
-  font-weight: $font-medium;
+  font-weight: 500;
   border: none;
-  border-radius: $radius-md;
+  border-radius: 50px;
   cursor: pointer;
   transition: all $transition-base;
   text-decoration: none;
@@ -406,7 +401,7 @@
     color: white;
 
     &:hover {
-      background: darken(#3B82F6, 10%);
+      background: darken(#3B82F6, 8%);
     }
   }
 
@@ -415,7 +410,7 @@
     color: white;
 
     &:hover {
-      background: darken(#10B981, 10%);
+      background: darken(#10B981, 8%);
     }
   }
 
@@ -439,7 +434,8 @@
   padding: $spacing-3xl;
   text-align: center;
   background: var(--card-bg);
-  border-radius: $radius-xl;
+  border-radius: 16px;
+  border: 1px solid var(--border-color);
 
   svg {
     color: var(--text-tertiary);
@@ -447,12 +443,16 @@
   }
 
   h3 {
+    font-family: $font-montserrat;
     font-size: $text-xl;
+    font-weight: 500;
     color: var(--text-primary);
     margin-bottom: $spacing-sm;
   }
 
   p {
+    font-family: $font-montserrat;
+    font-weight: 300;
     color: var(--text-secondary);
     margin-bottom: $spacing-lg;
   }
@@ -464,7 +464,7 @@
     box-shadow: 0 0 0 0 rgba(#3B82F6, 0.4);
   }
   50% {
-    box-shadow: 0 0 0 8px rgba(#3B82F6, 0);
+    box-shadow: 0 0 0 10px rgba(#3B82F6, 0);
   }
 }
 
@@ -475,14 +475,14 @@
   }
 
   .bookings-header {
-    flex-direction: column;
-    gap: $spacing-md;
+    margin: 0 $spacing-sm $spacing-lg;
   }
 
   .filter-tabs {
     width: 100%;
     overflow-x: auto;
     padding-bottom: $spacing-xs;
+    justify-content: center;
 
     &::-webkit-scrollbar {
       display: none;
@@ -492,32 +492,73 @@
   .filter-tab {
     white-space: nowrap;
     flex-shrink: 0;
+    padding: $spacing-sm $spacing-md;
   }
 
-  .route-info {
-    flex-wrap: wrap;
-    justify-content: center;
+  .route-section {
+    flex-direction: column;
+    align-items: center;
     text-align: center;
+    gap: $spacing-md;
 
-    .location {
-      align-items: center;
+    .endpoint {
+      text-align: center;
+
+      &.customer-endpoint,
+      &.tailor-endpoint {
+        text-align: center;
+      }
+    }
+
+    .progress-track {
+      width: 100%;
     }
   }
 
   .reference-grid {
-    grid-template-columns: 1fr 1fr;
+    grid-template-columns: repeat(2, 1fr);
   }
 
   .progress-timeline {
+    padding: $spacing-md 0;
     flex-wrap: wrap;
-    gap: $spacing-md;
+    gap: $spacing-sm;
+    justify-content: center;
   }
 
   .timeline-stage {
-    min-width: 60px;
+    flex: 0 0 auto;
+    min-width: 70px;
+
+    .stage-icon {
+      width: 40px;
+      height: 40px;
+
+      svg {
+        width: 16px;
+        height: 16px;
+      }
+    }
 
     .connector {
       display: none;
+    }
+  }
+}
+
+@include md {
+  .route-section {
+    flex-wrap: wrap;
+  }
+
+  .progress-timeline {
+    padding: $spacing-md $spacing-sm;
+  }
+
+  .timeline-stage {
+    .connector {
+      width: calc(100% - 56px);
+      left: calc(50% + 28px);
     }
   }
 }
