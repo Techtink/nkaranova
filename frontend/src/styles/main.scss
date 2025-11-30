@@ -75,29 +75,15 @@ ul, ol {
 }
 
 // ============================================
-// CUSTOM SCROLLBAR
+// HIDE SCROLLBAR (still allows scrolling)
 // ============================================
 ::-webkit-scrollbar {
-  width: 8px;
-  height: 8px;
-}
-
-::-webkit-scrollbar-track {
-  background: var(--bg-tertiary);
-}
-
-::-webkit-scrollbar-thumb {
-  background: $primary;
-  transition: background $transition-fast;
-}
-
-::-webkit-scrollbar-thumb:hover {
-  background: $primary-dark;
+  display: none;
 }
 
 * {
-  scrollbar-width: thin;
-  scrollbar-color: $primary var(--bg-tertiary);
+  scrollbar-width: none;
+  -ms-overflow-style: none;
 }
 
 // ============================================
