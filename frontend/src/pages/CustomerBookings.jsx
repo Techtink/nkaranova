@@ -628,7 +628,7 @@ export default function CustomerBookings() {
                       <FiMessageSquare />
                       Message
                     </Link>
-                    {booking.status === 'completed' && !booking.order && (
+                    {booking.order?.status === 'completed' && !booking.order?.completionFeedback && (
                       <button
                         className="action-btn rating"
                         onClick={() => handleOpenReview(booking)}
