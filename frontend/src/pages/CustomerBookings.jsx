@@ -44,6 +44,9 @@ export default function CustomerBookings() {
   const [filter, setFilter] = useState('in-progress');
   const [reviewModalOpen, setReviewModalOpen] = useState(false);
   const [selectedBooking, setSelectedBooking] = useState(null);
+  const [page, setPage] = useState(1);
+  const [totalPages, setTotalPages] = useState(1);
+  const [totalCount, setTotalCount] = useState(0);
 
   const handleOpenReview = (booking) => {
     setSelectedBooking(booking);
@@ -57,12 +60,12 @@ export default function CustomerBookings() {
 
   useEffect(() => {
     fetchBookings();
-  }, [filter]);
+  }, [filter, page]);
 
   const fetchBookings = async () => {
     setLoading(true);
     try {
-      let params = {};
+      let params = { page, limit: 10 };
       if (filter === 'in-progress') {
         params.status = 'pending,accepted';
       } else if (filter === 'completed') {
@@ -72,11 +75,18 @@ export default function CustomerBookings() {
       }
       const response = await bookingsAPI.getCustomerBookings(params);
       setBookings(response.data.data || []);
+      setTotalPages(response.data.pagination?.pages || 1);
+      setTotalCount(response.data.pagination?.total || response.data.data?.length || 0);
     } catch (error) {
       console.error('Error fetching bookings:', error);
     } finally {
       setLoading(false);
     }
+  };
+
+  const handleFilterChange = (newFilter) => {
+    setFilter(newFilter);
+    setPage(1);
   };
 
   const formatDate = (date) => {
@@ -185,19 +195,19 @@ export default function CustomerBookings() {
             <div className="filter-tabs">
               <button
                 className={`filter-tab ${filter === 'in-progress' ? 'active' : ''}`}
-                onClick={() => setFilter('in-progress')}
+                onClick={() => handleFilterChange('in-progress')}
               >
                 In-Progress
               </button>
               <button
                 className={`filter-tab ${filter === 'completed' ? 'active' : ''}`}
-                onClick={() => setFilter('completed')}
+                onClick={() => handleFilterChange('completed')}
               >
                 Completed
               </button>
               <button
                 className={`filter-tab ${filter === 'cancelled' ? 'active' : ''}`}
-                onClick={() => setFilter('cancelled')}
+                onClick={() => handleFilterChange('cancelled')}
               >
                 Cancelled
               </button>
@@ -377,6 +387,30 @@ export default function CustomerBookings() {
                 </div>
               );
             })}
+
+            {/* Pagination */}
+            {totalPages > 1 && (
+              <div className="pagination">
+                <span className="pagination-info">
+                  Page {page} of {totalPages} ({totalCount} bookings)
+                </span>
+                <div className="pagination-buttons">
+                  <button
+                    disabled={page === 1}
+                    onClick={() => setPage(page - 1)}
+                  >
+                    <FiChevronLeft />
+                  </button>
+                  <button className="active">{page}</button>
+                  <button
+                    disabled={page === totalPages}
+                    onClick={() => setPage(page + 1)}
+                  >
+                    <FiChevronRight />
+                  </button>
+                </div>
+              </div>
+            )}
           </div>
         )}
       </div>

@@ -635,6 +635,75 @@ $font-montserrat: 'Montserrat', sans-serif;
   }
 }
 
+// Pagination
+.pagination {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: $spacing-lg;
+  background: var(--card-bg);
+  border-radius: 12px;
+  margin-top: $spacing-xl;
+  border: 1px solid var(--border-color);
+
+  .pagination-info {
+    font-family: $font-montserrat;
+    font-size: $text-sm;
+    color: var(--text-secondary);
+  }
+
+  .pagination-buttons {
+    display: flex;
+    align-items: center;
+    gap: $spacing-xs;
+
+    button {
+      width: 36px;
+      height: 36px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      background: var(--bg-secondary);
+      border: 1px solid var(--border-color);
+      border-radius: 8px;
+      color: var(--text-secondary);
+      cursor: pointer;
+      transition: all 0.2s ease;
+      font-family: $font-montserrat;
+      font-size: $text-sm;
+      font-weight: 500;
+
+      &:hover:not(:disabled) {
+        background: var(--bg-tertiary);
+        border-color: var(--text-secondary);
+        color: var(--text-primary);
+      }
+
+      &:disabled {
+        opacity: 0.5;
+        cursor: not-allowed;
+      }
+
+      &.active {
+        background: #312e81;
+        border-color: #312e81;
+        color: white;
+      }
+
+      svg {
+        width: 16px;
+        height: 16px;
+      }
+    }
+  }
+
+  @include mobile {
+    flex-direction: column;
+    gap: $spacing-md;
+    text-align: center;
+  }
+}
+
 // Pulse Animation
 @keyframes pulse {
   0%, 100% {
