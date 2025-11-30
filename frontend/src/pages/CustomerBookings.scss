@@ -230,7 +230,7 @@ $font-montserrat: 'Montserrat', sans-serif;
   flex-direction: column;
   align-items: center;
   position: relative;
-  min-width: 70px;
+  min-width: 90px;
 
   &:last-child {
     min-width: auto;
@@ -322,8 +322,9 @@ $font-montserrat: 'Montserrat', sans-serif;
 
   .ref-item {
     display: flex;
-    flex-direction: column;
-    gap: 4px;
+    flex-direction: row;
+    align-items: baseline;
+    gap: $spacing-sm;
 
     .ref-label {
       font-family: $font-montserrat;
@@ -372,7 +373,7 @@ $font-montserrat: 'Montserrat', sans-serif;
   font-size: $text-sm;
   font-weight: 500;
   border: none;
-  border-radius: 50px;
+  border-radius: 8px;
   cursor: pointer;
   transition: all $transition-base;
   text-decoration: none;
