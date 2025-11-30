@@ -92,12 +92,12 @@ $font-montserrat: 'Montserrat', sans-serif;
   border: 1px solid var(--border-color);
 }
 
-.filter-tabs {
+.customer-bookings-page .filter-tabs {
   display: flex;
   gap: $spacing-xs;
 }
 
-.filter-tab {
+.customer-bookings-page .filter-tab {
   padding: $spacing-sm $spacing-xl;
   font-family: $font-montserrat;
   font-size: $text-sm;
@@ -724,7 +724,7 @@ $font-montserrat: 'Montserrat', sans-serif;
     padding: 0 $spacing-sm;
   }
 
-  .filter-tabs {
+  .customer-bookings-page .filter-tabs {
     overflow-x: auto;
     padding-bottom: $spacing-xs;
 
@@ -733,7 +733,7 @@ $font-montserrat: 'Montserrat', sans-serif;
     }
   }
 
-  .filter-tab {
+  .customer-bookings-page .filter-tab {
     white-space: nowrap;
     flex-shrink: 0;
     padding: $spacing-sm $spacing-md;
