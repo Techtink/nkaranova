@@ -296,7 +296,7 @@ const seedMichaelBookings = async () => {
 
     console.log('Created: Cancelled bookings');
 
-    // 5. Completed booking (for review)
+    // 5. Completed booking (for review) - Booking status is 'converted' when it has an order
     const completedBooking = await Booking.create({
       tailor: tailor._id,
       customer: michael._id,
@@ -305,13 +305,11 @@ const seedMichaelBookings = async () => {
       endTime: '11:00',
       service: 'Ankara Shirt',
       notes: 'Ankara shirt for birthday',
-      status: 'completed',
-      completedAt: oneWeekAgo,
+      status: 'converted',
       statusHistory: [
         { status: 'pending', changedAt: threeWeeksAgo },
         { status: 'confirmed', changedAt: threeWeeksAgo },
-        { status: 'converted', changedAt: threeWeeksAgo },
-        { status: 'completed', changedAt: oneWeekAgo }
+        { status: 'converted', changedAt: threeWeeksAgo }
       ],
       quote: {
         submittedAt: threeWeeksAgo,
