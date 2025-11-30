@@ -221,7 +221,7 @@ $font-montserrat: 'Montserrat', sans-serif;
   display: flex;
   align-items: center;
   flex: 1;
-  gap: $spacing-md;
+  gap: $spacing-xs;
 }
 
 .timeline-nav {
@@ -299,8 +299,8 @@ $font-montserrat: 'Montserrat', sans-serif;
   .connector {
     position: absolute;
     top: 23px;
-    left: calc(50% + 24px);
-    width: calc(100% + $spacing-md - 48px);
+    left: calc(50% + 22px);
+    width: calc(100% + $spacing-md - 44px);
     height: 2px;
     z-index: 0;
 
