@@ -7,11 +7,49 @@ $font-montserrat: 'Montserrat', sans-serif;
 .customer-bookings-page {
   background: var(--bg-secondary);
   min-height: 100vh;
-  padding: $spacing-xl 0;
   font-family: $font-montserrat;
 
   .container {
     max-width: 1400px;
+  }
+}
+
+// Page Header
+.page-header {
+  background: var(--card-bg);
+  padding: $spacing-3xl 0;
+  margin-bottom: $spacing-xl;
+  border-bottom: 1px solid var(--border-color);
+
+  .container {
+    max-width: 1400px;
+  }
+
+  .page-label {
+    display: inline-block;
+    font-family: $font-montserrat;
+    font-size: $text-sm;
+    font-weight: 500;
+    color: #10B981;
+    margin-bottom: $spacing-sm;
+  }
+
+  .page-title {
+    font-family: $font-montserrat;
+    font-size: 2.5rem;
+    font-weight: 700;
+    color: var(--text-primary);
+    margin: 0 0 $spacing-sm 0;
+    line-height: 1.2;
+  }
+
+  .page-description {
+    font-family: $font-montserrat;
+    font-size: $text-base;
+    font-weight: 400;
+    color: var(--text-secondary);
+    margin: 0;
+    max-width: 500px;
   }
 }
 

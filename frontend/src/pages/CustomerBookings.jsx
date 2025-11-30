@@ -146,6 +146,17 @@ export default function CustomerBookings() {
 
   return (
     <div className="customer-bookings-page page">
+      {/* Page Header */}
+      <div className="page-header">
+        <div className="container">
+          <span className="page-label">Booking Management</span>
+          <h1 className="page-title">My Bookings</h1>
+          <p className="page-description">
+            Track and manage all your tailoring appointments in one place.
+          </p>
+        </div>
+      </div>
+
       <div className="container">
         {/* Filter Tabs Header - Centered Pill */}
         <div className="bookings-header-wrapper">
