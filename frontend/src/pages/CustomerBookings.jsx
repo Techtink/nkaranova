@@ -255,7 +255,7 @@ export default function CustomerBookings() {
                                 isCurrent={stage.isCurrent}
                               />
                               {index < stages.length - 1 && (
-                                <div className={`connector ${stage.isCompleted ? 'completed' : ''}`} />
+                                <div className={`connector ${stage.isCompleted && index < stages.length - 2 ? 'completed' : ''}`} />
                               )}
                               <div className="stage-info">
                                 <span className="stage-code">{stage.code}</span>
