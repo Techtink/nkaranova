@@ -503,29 +503,32 @@ $font-montserrat: 'Montserrat', sans-serif;
   }
 
   &.primary {
+    background: #312e81;
     border-color: #312e81;
-    color: #312e81;
+    color: white;
 
     &:hover {
-      background: rgba(#312e81, 0.1);
+      background: darken(#312e81, 8%);
     }
   }
 
   &.secondary {
+    background: #312e81;
     border-color: #312e81;
-    color: #312e81;
+    color: white;
 
     &:hover {
-      background: rgba(#312e81, 0.1);
+      background: darken(#312e81, 8%);
     }
   }
 
   &.warning {
+    background: #312e81;
     border-color: #312e81;
-    color: #312e81;
+    color: white;
 
     &:hover {
-      background: rgba(#312e81, 0.1);
+      background: darken(#312e81, 8%);
     }
   }
 }
