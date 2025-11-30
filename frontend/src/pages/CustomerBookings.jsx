@@ -17,7 +17,8 @@ import {
   FiDollarSign,
   FiClock,
   FiThumbsUp,
-  FiThumbsDown
+  FiThumbsDown,
+  FiX
 } from 'react-icons/fi';
 import Header from '../components/layout/Header';
 import Button from '../components/common/Button';
@@ -52,6 +53,7 @@ export default function CustomerBookings() {
   const [loading, setLoading] = useState(true);
   const [filter, setFilter] = useState('in-progress');
   const [reviewModalOpen, setReviewModalOpen] = useState(false);
+  const [rejectModalOpen, setRejectModalOpen] = useState(false);
   const [selectedBooking, setSelectedBooking] = useState(null);
   const [page, setPage] = useState(1);
   const [totalPages, setTotalPages] = useState(1);
@@ -75,7 +77,15 @@ export default function CustomerBookings() {
     setLoading(true);
     try {
       let params = { page, limit: 10 };
-      if (filter === 'in-progress') {
+      if (filter === 'pending-approval') {
+        // Bookings with orders awaiting work plan approval
+        params.status = 'converted';
+        params.orderStatus = 'plan_review';
+      } else if (filter === 'delay-requests') {
+        // Bookings with pending delay requests
+        params.status = 'converted';
+        params.hasDelayRequest = 'true';
+      } else if (filter === 'in-progress') {
         // Include all active statuses
         params.status = 'pending,confirmed,consultation_done,quote_submitted,quote_accepted,paid,converted';
       } else if (filter === 'completed') {
@@ -84,9 +94,20 @@ export default function CustomerBookings() {
         params.status = 'cancelled,declined';
       }
       const response = await bookingsAPI.getCustomerBookings(params);
-      setBookings(response.data.data || []);
+      let fetchedBookings = response.data.data || [];
+
+      // Client-side filtering for special filters (until backend supports)
+      if (filter === 'pending-approval') {
+        fetchedBookings = fetchedBookings.filter(b => b.order?.status === 'plan_review');
+      } else if (filter === 'delay-requests') {
+        fetchedBookings = fetchedBookings.filter(b =>
+          b.order?.delayRequests?.some(dr => dr.status === 'pending')
+        );
+      }
+
+      setBookings(fetchedBookings);
       setTotalPages(response.data.pagination?.pages || 1);
-      setTotalCount(response.data.pagination?.total || response.data.data?.length || 0);
+      setTotalCount(fetchedBookings.length);
     } catch (error) {
       console.error('Error fetching bookings:', error);
     } finally {
@@ -102,6 +123,43 @@ export default function CustomerBookings() {
       fetchBookings();
     } catch (error) {
       toast.error(error.response?.data?.message || 'Failed to respond to delay request');
+    }
+  };
+
+  // Handle work plan approval
+  const handleApproveWorkPlan = async (orderId) => {
+    try {
+      await ordersAPI.approveWorkPlan(orderId);
+      toast.success('Work plan approved! Work will begin shortly.');
+      fetchBookings();
+    } catch (error) {
+      toast.error(error.response?.data?.message || 'Failed to approve work plan');
+    }
+  };
+
+  // Handle work plan rejection
+  const handleRejectWorkPlan = async (orderId, reason) => {
+    try {
+      await ordersAPI.rejectWorkPlan(orderId, reason);
+      toast.success('Feedback sent to tailor');
+      setRejectModalOpen(false);
+      setSelectedBooking(null);
+      fetchBookings();
+    } catch (error) {
+      toast.error(error.response?.data?.message || 'Failed to send feedback');
+    }
+  };
+
+  // Handle confirm receipt (mark order complete)
+  const handleConfirmReceipt = async (orderId, rating, comment) => {
+    try {
+      await ordersAPI.markCompleted(orderId, { rating, comment });
+      toast.success('Order confirmed as received!');
+      setReviewModalOpen(false);
+      setSelectedBooking(null);
+      fetchBookings();
+    } catch (error) {
+      toast.error(error.response?.data?.message || 'Failed to confirm receipt');
     }
   };
 
@@ -282,6 +340,18 @@ export default function CustomerBookings() {
         <div className="bookings-header-wrapper">
           <div className="bookings-header">
             <div className="filter-tabs">
+              <button
+                className={`filter-tab ${filter === 'pending-approval' ? 'active' : ''}`}
+                onClick={() => handleFilterChange('pending-approval')}
+              >
+                Pending Approval
+              </button>
+              <button
+                className={`filter-tab ${filter === 'delay-requests' ? 'active' : ''}`}
+                onClick={() => handleFilterChange('delay-requests')}
+              >
+                Delay Requests
+              </button>
               <button
                 className={`filter-tab ${filter === 'in-progress' ? 'active' : ''}`}
                 onClick={() => handleFilterChange('in-progress')}
@@ -506,6 +576,43 @@ export default function CustomerBookings() {
 
                   {/* Card Actions */}
                   <div className="card-actions">
+                    {/* Work Plan Approval Actions */}
+                    {booking.order?.status === 'plan_review' && (
+                      <>
+                        <button
+                          className="action-btn success"
+                          onClick={() => handleApproveWorkPlan(booking.order._id)}
+                        >
+                          <FiThumbsUp />
+                          Approve Plan
+                        </button>
+                        <button
+                          className="action-btn"
+                          onClick={() => {
+                            setSelectedBooking(booking);
+                            setRejectModalOpen(true);
+                          }}
+                        >
+                          <FiThumbsDown />
+                          Request Changes
+                        </button>
+                      </>
+                    )}
+
+                    {/* Confirm Receipt Action */}
+                    {booking.order?.status === 'ready' && (
+                      <button
+                        className="action-btn success"
+                        onClick={() => {
+                          setSelectedBooking(booking);
+                          setReviewModalOpen(true);
+                        }}
+                      >
+                        <FiCheck />
+                        Confirm Receipt
+                      </button>
+                    )}
+
                     <Link to={`/tailor/${booking.tailor?.username}`} className="action-btn primary">
                       <FiUser />
                       View Tailor
@@ -514,7 +621,7 @@ export default function CustomerBookings() {
                       <FiMessageSquare />
                       Message
                     </Link>
-                    {booking.status === 'completed' && (
+                    {booking.status === 'completed' && !booking.order && (
                       <button
                         className="action-btn rating"
                         onClick={() => handleOpenReview(booking)}
@@ -561,13 +668,153 @@ export default function CustomerBookings() {
         )}
       </div>
 
-      {/* Review Modal */}
+      {/* Review Modal - for regular reviews */}
       <ReviewModal
-        isOpen={reviewModalOpen}
+        isOpen={reviewModalOpen && !selectedBooking?.order?.status}
         onClose={() => setReviewModalOpen(false)}
         booking={selectedBooking}
         onSuccess={handleReviewSuccess}
       />
+
+      {/* Confirm Receipt Modal - when order is ready */}
+      {reviewModalOpen && selectedBooking?.order?.status === 'ready' && (
+        <ConfirmReceiptModal
+          booking={selectedBooking}
+          onClose={() => {
+            setReviewModalOpen(false);
+            setSelectedBooking(null);
+          }}
+          onSubmit={(rating, comment) => handleConfirmReceipt(selectedBooking.order._id, rating, comment)}
+        />
+      )}
+
+      {/* Reject Work Plan Modal */}
+      {rejectModalOpen && selectedBooking && (
+        <RejectPlanModal
+          booking={selectedBooking}
+          onClose={() => {
+            setRejectModalOpen(false);
+            setSelectedBooking(null);
+          }}
+          onSubmit={(reason) => handleRejectWorkPlan(selectedBooking.order._id, reason)}
+        />
+      )}
+    </div>
+  );
+}
+
+// Reject Work Plan Modal Component
+function RejectPlanModal({ booking, onClose, onSubmit }) {
+  const [reason, setReason] = useState('');
+  const [submitting, setSubmitting] = useState(false);
+
+  const handleSubmit = async (e) => {
+    e.preventDefault();
+    if (!reason.trim()) {
+      toast.error('Please provide feedback');
+      return;
+    }
+    setSubmitting(true);
+    await onSubmit(reason);
+    setSubmitting(false);
+  };
+
+  return (
+    <div className="modal-overlay" onClick={onClose}>
+      <div className="modal reject-modal" onClick={e => e.stopPropagation()}>
+        <div className="modal-header">
+          <h2>Request Changes</h2>
+          <button className="close-btn" onClick={onClose}>
+            <FiX />
+          </button>
+        </div>
+        <div className="modal-body">
+          <p>Let the tailor know what changes you'd like to see in the work plan:</p>
+          <form onSubmit={handleSubmit}>
+            <textarea
+              value={reason}
+              onChange={(e) => setReason(e.target.value)}
+              placeholder="E.g., I'd like the fitting stage to be longer..."
+              rows={4}
+              required
+            />
+            <div className="modal-actions">
+              <Button variant="ghost" type="button" onClick={onClose}>
+                Cancel
+              </Button>
+              <Button type="submit" loading={submitting}>
+                Send Feedback
+              </Button>
+            </div>
+          </form>
+        </div>
+      </div>
+    </div>
+  );
+}
+
+// Confirm Receipt Modal Component
+function ConfirmReceiptModal({ booking, onClose, onSubmit }) {
+  const [rating, setRating] = useState(5);
+  const [comment, setComment] = useState('');
+  const [submitting, setSubmitting] = useState(false);
+
+  const handleSubmit = async (e) => {
+    e.preventDefault();
+    setSubmitting(true);
+    await onSubmit(rating, comment);
+    setSubmitting(false);
+  };
+
+  return (
+    <div className="modal-overlay" onClick={onClose}>
+      <div className="modal review-modal" onClick={e => e.stopPropagation()}>
+        <div className="modal-header">
+          <h2>Confirm Order Receipt</h2>
+          <button className="close-btn" onClick={onClose}>
+            <FiX />
+          </button>
+        </div>
+        <div className="modal-body">
+          <p>How was your experience with this order?</p>
+          <form onSubmit={handleSubmit}>
+            <div className="rating-section">
+              <label>Rating</label>
+              <div className="star-rating">
+                {[1, 2, 3, 4, 5].map(star => (
+                  <button
+                    key={star}
+                    type="button"
+                    className={`star-btn ${star <= rating ? 'active' : ''}`}
+                    onClick={() => setRating(star)}
+                  >
+                    <FiStar />
+                  </button>
+                ))}
+              </div>
+            </div>
+
+            <div className="comment-section">
+              <label>Feedback (optional)</label>
+              <textarea
+                value={comment}
+                onChange={(e) => setComment(e.target.value)}
+                placeholder="Share your experience..."
+                rows={3}
+              />
+            </div>
+
+            <div className="modal-actions">
+              <Button variant="ghost" type="button" onClick={onClose}>
+                Cancel
+              </Button>
+              <Button type="submit" loading={submitting}>
+                <FiCheck /> Confirm Receipt
+              </Button>
+            </div>
+          </form>
+        </div>
+      </div>
     </div>
   );
 }
