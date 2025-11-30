@@ -197,24 +197,17 @@ export default function CustomerBookings() {
 
               return (
                 <div key={booking._id} className="booking-card">
-                  {/* Card Header */}
-                  <div className="card-header">
-                    <div className="header-left">
-                      <span className="service-name">{booking.service || 'Tailoring Service'}</span>
-                      <span className={`stage-pill ${statusColor}`}>
-                        {getCurrentStageLabel(booking.status)}
-                      </span>
-                    </div>
-                    <button className="share-btn">
-                      <FiShare2 />
-                    </button>
-                  </div>
-
                   {/* Card Body */}
                   <div className="card-body">
                     {/* Route Row: Customer Name on left, Tailor Name on right */}
                     <div className="route-row">
                       <div className="endpoint customer">
+                        <div className="endpoint-meta">
+                          <span className="meta-service">{booking.service || 'Tailoring Service'}</span>
+                          <span className={`meta-status ${statusColor}`}>
+                            {getCurrentStageLabel(booking.status)}
+                          </span>
+                        </div>
                         <span className="endpoint-name">
                           {user?.firstName && user?.lastName
                             ? `${user.firstName} ${user.lastName}`
