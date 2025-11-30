@@ -399,8 +399,8 @@ $font-montserrat: 'Montserrat', sans-serif;
   .connector {
     position: absolute;
     top: 23px;
-    left: calc(50% + 24px);
-    width: calc(100% + $spacing-md);
+    left: 50%;
+    width: calc(100% + $spacing-md + 24px);
     height: 2px;
     z-index: 0;
 
@@ -714,8 +714,8 @@ $font-montserrat: 'Montserrat', sans-serif;
 
     .connector {
       top: 15px;
-      left: calc(50% + 16px);
-      width: calc(100% - 32px);
+      left: 50%;
+      width: calc(100% + 16px);
     }
 
     .stage-info {
@@ -750,8 +750,8 @@ $font-montserrat: 'Montserrat', sans-serif;
 
     .connector {
       top: 18px;
-      left: calc(50% + 19px);
-      width: calc(100% - 38px);
+      left: 50%;
+      width: calc(100% + 19px);
     }
 
     .stage-info {
