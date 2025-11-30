@@ -124,17 +124,20 @@ const orderSchema = new mongoose.Schema({
     ref: 'TailorProfile',
     required: true
   },
-  // Order status - simplified since consultation happens in booking phase
+  // Order status - includes work plan review phase
   status: {
     type: String,
     enum: [
-      'in_progress',        // Work in progress (Design -> Sew -> Deliver)
+      'awaiting_plan',      // Waiting for tailor to submit work plan
+      'plan_review',        // Work plan submitted, awaiting customer approval
+      'plan_rejected',      // Work plan rejected by customer, needs revision
+      'in_progress',        // Work plan approved, work in progress
       'ready',              // Work completed, ready for pickup/delivery
       'completed',          // Order delivered and confirmed
       'cancelled',          // Order cancelled
       'disputed'            // Under dispute
     ],
-    default: 'in_progress'
+    default: 'awaiting_plan'
   },
   statusHistory: [{
     status: String,
