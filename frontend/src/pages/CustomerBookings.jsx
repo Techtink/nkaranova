@@ -1,5 +1,6 @@
 import { useState, useEffect } from 'react';
 import { Link } from 'react-router-dom';
+import { toast } from 'react-hot-toast';
 import {
   FiCalendar,
   FiCheck,
@@ -11,12 +12,17 @@ import {
   FiAlertCircle,
   FiChevronLeft,
   FiChevronRight,
-  FiStar
+  FiStar,
+  FiFileText,
+  FiDollarSign,
+  FiClock,
+  FiThumbsUp,
+  FiThumbsDown
 } from 'react-icons/fi';
 import Header from '../components/layout/Header';
 import Button from '../components/common/Button';
 import ReviewModal from '../components/reviews/ReviewModal';
-import { bookingsAPI } from '../services/api';
+import { bookingsAPI, ordersAPI } from '../services/api';
 import { useAuth } from '../context/AuthContext';
 import './CustomerBookings.scss';
 
@@ -25,8 +31,11 @@ const StageIcon = ({ stage, isCompleted, isCurrent }) => {
   const icons = {
     booked: FiCalendar,
     confirmed: FiCheck,
+    quote: FiFileText,
+    paid: FiDollarSign,
     in_progress: FiScissors,
-    completed: FiPackage
+    ready: FiPackage,
+    completed: FiCheck
   };
   const Icon = icons[stage] || FiCalendar;
 
@@ -67,11 +76,12 @@ export default function CustomerBookings() {
     try {
       let params = { page, limit: 10 };
       if (filter === 'in-progress') {
-        params.status = 'pending,accepted';
+        // Include all active statuses
+        params.status = 'pending,confirmed,consultation_done,quote_submitted,quote_accepted,paid,converted';
       } else if (filter === 'completed') {
         params.status = 'completed';
       } else if (filter === 'cancelled') {
-        params.status = 'cancelled,rejected';
+        params.status = 'cancelled,declined';
       }
       const response = await bookingsAPI.getCustomerBookings(params);
       setBookings(response.data.data || []);
@@ -81,6 +91,17 @@ export default function CustomerBookings() {
       console.error('Error fetching bookings:', error);
     } finally {
       setLoading(false);
+    }
+  };
+
+  // Handle delay request response
+  const handleRespondToDelay = async (orderId, requestId, approved) => {
+    try {
+      await ordersAPI.respondToDelayRequest(orderId, requestId, approved, '');
+      toast.success(approved ? 'Delay approved' : 'Delay declined');
+      fetchBookings();
+    } catch (error) {
+      toast.error(error.response?.data?.message || 'Failed to respond to delay request');
     }
   };
 
@@ -106,35 +127,57 @@ export default function CustomerBookings() {
     return diffDays;
   };
 
-  const getProgressPercent = (status) => {
+  const getProgressPercent = (status, booking) => {
+    // If booking has an order, use order progress
+    if (booking?.order?.progressPercentage !== undefined) {
+      // Map order progress to booking progress (order is 60-100% of total journey)
+      return 60 + (booking.order.progressPercentage * 0.4);
+    }
     const statusProgress = {
-      pending: 25,
-      accepted: 50,
-      in_progress: 75,
-      completed: 100
+      pending: 15,
+      confirmed: 30,
+      consultation_done: 40,
+      quote_submitted: 50,
+      quote_accepted: 55,
+      paid: 60,
+      converted: 70,
+      completed: 100,
+      cancelled: 0,
+      declined: 0
     };
-    return statusProgress[status] || 25;
+    return statusProgress[status] || 15;
   };
 
   const getProgressStages = (status, booking) => {
+    // 5-stage timeline: BOK → CNF → QOT → WIP → DON
     const stages = [
       { id: 'booked', label: 'Booked', code: 'BOK' },
       { id: 'confirmed', label: 'Confirmed', code: 'CNF' },
+      { id: 'quote', label: 'Quote', code: 'QOT' },
       { id: 'in_progress', label: 'In Progress', code: 'WIP' },
       { id: 'completed', label: 'Completed', code: 'DON' }
     ];
 
+    // Map backend status to stage index
     let currentIndex = 0;
-    if (status === 'accepted') currentIndex = 1;
-    if (status === 'in_progress') currentIndex = 2;
-    if (status === 'completed') currentIndex = 3;
+    if (['confirmed', 'consultation_done'].includes(status)) currentIndex = 1;
+    if (['quote_submitted', 'quote_accepted'].includes(status)) currentIndex = 2;
+    if (['paid', 'converted'].includes(status)) currentIndex = 3;
+    if (status === 'completed') currentIndex = 4;
+
+    // If has order, check order status
+    if (booking?.order) {
+      if (booking.order.status === 'ready') currentIndex = 4;
+      if (booking.order.status === 'completed') currentIndex = 4;
+    }
 
     // Assign dates based on booking data
     const stageDates = {
       booked: booking?.createdAt,
-      confirmed: booking?.acceptedAt || booking?.updatedAt,
-      in_progress: booking?.startedAt || booking?.updatedAt,
-      completed: booking?.completedAt
+      confirmed: booking?.statusHistory?.find(h => h.status === 'confirmed')?.changedAt,
+      quote: booking?.quote?.submittedAt,
+      in_progress: booking?.order?.workStartedAt || booking?.statusHistory?.find(h => h.status === 'converted')?.changedAt,
+      completed: booking?.completedAt || booking?.order?.completedAt
     };
 
     return stages.map((stage, index) => {
@@ -146,10 +189,9 @@ export default function CustomerBookings() {
       if (stageDates[stage.id]) {
         date = formatDate(stageDates[stage.id]);
       } else if (isCompleted) {
-        // For completed stages without specific dates, use updatedAt as fallback
         date = formatDate(booking?.updatedAt);
       } else if (isCurrent) {
-        date = 'In Progress';
+        date = 'Current';
       } else if (isPending) {
         date = 'Pending';
       }
@@ -163,26 +205,55 @@ export default function CustomerBookings() {
     });
   };
 
-  const getCurrentStageLabel = (status) => {
+  const getCurrentStageLabel = (status, booking) => {
+    // If has order, show order status
+    if (booking?.order) {
+      const orderLabels = {
+        in_progress: 'Work In Progress',
+        ready: 'Ready for Pickup',
+        completed: 'Completed'
+      };
+      return orderLabels[booking.order.status] || 'In Progress';
+    }
     const labels = {
       pending: 'Pending Confirmation',
-      accepted: 'Confirmed',
-      in_progress: 'In Progress',
+      confirmed: 'Confirmed',
+      consultation_done: 'Consultation Complete',
+      quote_submitted: 'Quote Pending',
+      quote_accepted: 'Quote Accepted',
+      paid: 'Payment Received',
+      converted: 'Work Started',
       completed: 'Completed',
       cancelled: 'Cancelled',
-      rejected: 'Rejected'
+      declined: 'Declined'
     };
     return labels[status] || status;
   };
 
-  const getStatusColor = (status) => {
+  const getStatusColor = (status, booking) => {
+    // If has order with delay request, show warning
+    if (booking?.order?.delayRequests?.some(dr => dr.status === 'pending')) {
+      return 'warning';
+    }
+    if (booking?.order) {
+      const orderColors = {
+        in_progress: 'info',
+        ready: 'success',
+        completed: 'success'
+      };
+      return orderColors[booking.order.status] || 'info';
+    }
     const colors = {
       pending: 'warning',
-      accepted: 'info',
-      in_progress: 'info',
+      confirmed: 'info',
+      consultation_done: 'info',
+      quote_submitted: 'warning',
+      quote_accepted: 'info',
+      paid: 'success',
+      converted: 'info',
       completed: 'success',
       cancelled: 'error',
-      rejected: 'error'
+      declined: 'error'
     };
     return colors[status] || 'gray';
   };
@@ -252,8 +323,10 @@ export default function CustomerBookings() {
             {bookings.map(booking => {
               const stages = getProgressStages(booking.status, booking);
               const daysSinceBooking = getDaysSinceBooking(booking.createdAt);
-              const progressPercent = getProgressPercent(booking.status);
-              const statusColor = getStatusColor(booking.status);
+              const progressPercent = getProgressPercent(booking.status, booking);
+              const statusColor = getStatusColor(booking.status, booking);
+              const hasPendingDelay = booking?.order?.delayRequests?.some(dr => dr.status === 'pending');
+              const workStages = booking?.order?.workPlan?.stages || [];
 
               return (
                 <div key={booking._id} className="booking-card">
@@ -373,7 +446,62 @@ export default function CustomerBookings() {
                           <span className="ref-value">{booking.startTime} - {booking.endTime}</span>
                         </div>
                       </div>
+                      {/* Column 4 - Work Stages (only when order exists) */}
+                      {workStages.length > 0 && (
+                        <div className="ref-column work-stages-column">
+                          <div className="ref-item work-stages-header">
+                            <span className="ref-label">Work Progress:</span>
+                          </div>
+                          <div className="work-stages-list">
+                            {workStages.map((stage, idx) => (
+                              <div key={stage._id || idx} className={`work-stage ${stage.status}`}>
+                                <span className="stage-marker">
+                                  {stage.status === 'completed' ? <FiCheck /> :
+                                   stage.status === 'in_progress' ? <FiScissors /> :
+                                   <span className="stage-num">{idx + 1}</span>}
+                                </span>
+                                <span className="stage-name">{stage.name}</span>
+                                <span className="stage-days">{stage.estimatedDays}d</span>
+                              </div>
+                            ))}
+                          </div>
+                        </div>
+                      )}
                     </div>
+
+                    {/* Delay Request Alert */}
+                    {hasPendingDelay && (
+                      <div className="delay-alert-row">
+                        <div className="delay-alert">
+                          <FiAlertCircle className="delay-icon" />
+                          <div className="delay-content">
+                            <span className="delay-title">Delay Request Pending</span>
+                            {booking.order.delayRequests
+                              .filter(dr => dr.status === 'pending')
+                              .map(request => (
+                                <div key={request._id} className="delay-request">
+                                  <span className="delay-reason">{request.reason}</span>
+                                  <span className="delay-days">+{request.additionalDays} days</span>
+                                  <div className="delay-actions">
+                                    <button
+                                      className="delay-btn approve"
+                                      onClick={() => handleRespondToDelay(booking.order._id, request._id, true)}
+                                    >
+                                      <FiThumbsUp /> Approve
+                                    </button>
+                                    <button
+                                      className="delay-btn decline"
+                                      onClick={() => handleRespondToDelay(booking.order._id, request._id, false)}
+                                    >
+                                      <FiThumbsDown /> Decline
+                                    </button>
+                                  </div>
+                                </div>
+                              ))}
+                          </div>
+                        </div>
+                      </div>
+                    )}
                   </div>
 
                   {/* Card Actions */}

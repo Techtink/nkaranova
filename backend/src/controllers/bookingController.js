@@ -145,7 +145,9 @@ export const getCustomerBookings = async (req, res, next) => {
 
     const query = { customer: req.user._id };
     if (status) {
-      query.status = status;
+      // Handle comma-separated status values
+      const statuses = status.split(',').map(s => s.trim());
+      query.status = statuses.length > 1 ? { $in: statuses } : statuses[0];
     }
 
     const total = await Booking.countDocuments(query);
@@ -160,6 +162,10 @@ export const getCustomerBookings = async (req, res, next) => {
           path: 'user',
           select: 'firstName lastName'
         }
+      })
+      .populate({
+        path: 'order',
+        select: 'status workPlan delayRequests currentStage progressPercentage isOverdue daysRemaining'
       });
 
     res.status(200).json({
