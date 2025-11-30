@@ -216,12 +216,13 @@ $font-montserrat: 'Montserrat', sans-serif;
   }
 }
 
-// Timeline Icons - Compact on the right
+// Timeline Icons - Expanded on the right
 .timeline-icons {
   display: flex;
   align-items: flex-start;
+  flex: 1;
+  justify-content: flex-end;
   gap: 0;
-  flex-shrink: 0;
 }
 
 .timeline-stage {
@@ -231,8 +232,8 @@ $font-montserrat: 'Montserrat', sans-serif;
   position: relative;
 
   .stage-icon {
-    width: 32px;
-    height: 32px;
+    width: 40px;
+    height: 40px;
     display: flex;
     align-items: center;
     justify-content: center;
@@ -244,8 +245,8 @@ $font-montserrat: 'Montserrat', sans-serif;
     flex-shrink: 0;
 
     svg {
-      width: 14px;
-      height: 14px;
+      width: 16px;
+      height: 16px;
     }
 
     &.completed {
@@ -264,9 +265,9 @@ $font-montserrat: 'Montserrat', sans-serif;
 
   .connector {
     position: absolute;
-    top: 15px;
-    left: 32px;
-    width: 20px;
+    top: 19px;
+    left: 40px;
+    width: 30px;
     height: 2px;
     background: var(--border-color);
     z-index: 0;
@@ -277,9 +278,9 @@ $font-montserrat: 'Montserrat', sans-serif;
   }
 
   .stage-code {
-    margin-top: 4px;
+    margin-top: 6px;
     font-family: $font-montserrat;
-    font-size: 10px;
+    font-size: $text-xs;
     font-weight: 500;
     color: var(--text-primary);
   }
@@ -504,23 +505,23 @@ $font-montserrat: 'Montserrat', sans-serif;
 
   .timeline-stage {
     .stage-icon {
-      width: 28px;
-      height: 28px;
+      width: 32px;
+      height: 32px;
 
       svg {
-        width: 12px;
-        height: 12px;
+        width: 14px;
+        height: 14px;
       }
     }
 
     .connector {
-      top: 13px;
-      left: 28px;
-      width: 16px;
+      top: 15px;
+      left: 32px;
+      width: 20px;
     }
 
     .stage-code {
-      font-size: 9px;
+      font-size: 10px;
     }
   }
 
@@ -537,14 +538,14 @@ $font-montserrat: 'Montserrat', sans-serif;
 @include md {
   .timeline-stage {
     .stage-icon {
-      width: 30px;
-      height: 30px;
+      width: 36px;
+      height: 36px;
     }
 
     .connector {
-      top: 14px;
-      left: 30px;
-      width: 18px;
+      top: 17px;
+      left: 36px;
+      width: 24px;
     }
   }
 }
