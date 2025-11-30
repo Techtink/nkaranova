@@ -289,8 +289,12 @@ export default function CustomerBookings() {
                         <span className="ref-value">{booking._id.slice(-8).toUpperCase()}</span>
                       </div>
                       <div className="ref-item">
-                        <span className="ref-label">Tailor:</span>
-                        <span className="ref-value">{booking.tailor?.businessName || booking.tailor?.username || 'N/A'}</span>
+                        <span className="ref-label">Shipper:</span>
+                        <span className="ref-value">
+                          {user?.firstName && user?.lastName
+                            ? `${user.firstName} ${user.lastName}`
+                            : user?.username || 'Customer'}
+                        </span>
                       </div>
                       <div className="ref-item">
                         <span className="ref-label">Appointment:</span>
@@ -302,8 +306,8 @@ export default function CustomerBookings() {
                         <span className="ref-value">{user?._id?.slice(-8).toUpperCase() || 'N/A'}</span>
                       </div>
                       <div className="ref-item">
-                        <span className="ref-label">Service:</span>
-                        <span className="ref-value">{booking.service || 'Tailoring'}</span>
+                        <span className="ref-label">Consignee:</span>
+                        <span className="ref-value">{booking.tailor?.businessName || booking.tailor?.username || 'N/A'}</span>
                       </div>
                       <div className="ref-item">
                         <span className="ref-label">Time:</span>
