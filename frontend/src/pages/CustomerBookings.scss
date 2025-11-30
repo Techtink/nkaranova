@@ -195,7 +195,7 @@ $font-montserrat: 'Montserrat', sans-serif;
 .progress-timeline-row {
   display: flex;
   align-items: center;
-  gap: $spacing-lg;
+  gap: $spacing-2xl;
   margin-bottom: $spacing-lg;
 }
 
@@ -383,7 +383,7 @@ $font-montserrat: 'Montserrat', sans-serif;
 // Reference Grid - 3 columns layout
 .reference-grid {
   display: flex;
-  gap: $spacing-md;
+  gap: $spacing-xl;
 
   .ref-column {
     display: flex;
