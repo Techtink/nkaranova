@@ -421,7 +421,7 @@ $font-montserrat: 'Montserrat', sans-serif;
 // Reference Grid - 3 columns layout
 .reference-grid {
   display: flex;
-  gap: $spacing-xl;
+  gap: 1.9rem;
 
   .ref-column {
     display: flex;
@@ -503,29 +503,29 @@ $font-montserrat: 'Montserrat', sans-serif;
   }
 
   &.primary {
-    border-color: #3B82F6;
-    color: #3B82F6;
+    border-color: #312e81;
+    color: #312e81;
 
     &:hover {
-      background: rgba(#3B82F6, 0.1);
+      background: rgba(#312e81, 0.1);
     }
   }
 
   &.secondary {
-    border-color: #10B981;
-    color: #10B981;
+    border-color: #312e81;
+    color: #312e81;
 
     &:hover {
-      background: rgba(#10B981, 0.1);
+      background: rgba(#312e81, 0.1);
     }
   }
 
   &.warning {
-    border-color: #EF4444;
-    color: #EF4444;
+    border-color: #312e81;
+    color: #312e81;
 
     &:hover {
-      background: rgba(#EF4444, 0.1);
+      background: rgba(#312e81, 0.1);
     }
   }
 }
