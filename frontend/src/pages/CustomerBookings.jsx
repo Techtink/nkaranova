@@ -12,6 +12,7 @@ import {
   FiChevronLeft,
   FiChevronRight
 } from 'react-icons/fi';
+import Header from '../components/layout/Header';
 import Button from '../components/common/Button';
 import { bookingsAPI } from '../services/api';
 import { useAuth } from '../context/AuthContext';
@@ -146,6 +147,8 @@ export default function CustomerBookings() {
 
   return (
     <div className="customer-bookings-page page">
+      <Header />
+
       {/* Page Header */}
       <div className="page-header">
         <div className="container">
