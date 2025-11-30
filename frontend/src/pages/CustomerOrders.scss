@@ -103,11 +103,6 @@ $font-montserrat: 'Montserrat', sans-serif;
   border: 1px solid var(--border-color);
   border-radius: $radius-lg;
   overflow: hidden;
-  transition: box-shadow $transition-base;
-
-  &:hover {
-    box-shadow: var(--shadow-lg);
-  }
 
   &.expanded {
     .order-header {
@@ -122,23 +117,6 @@ $font-montserrat: 'Montserrat', sans-serif;
   justify-content: space-between;
   padding: $spacing-lg;
   cursor: pointer;
-
-  &:hover {
-    background: var(--bg-hover);
-
-    // Ensure text remains visible in dark mode on hover
-    .tailor-name {
-      color: var(--text-primary);
-    }
-
-    .order-service {
-      color: var(--text-secondary);
-    }
-
-    .progress-text {
-      color: var(--text-secondary);
-    }
-  }
 }
 
 .order-main-info {
