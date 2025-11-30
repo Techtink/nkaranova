@@ -61,11 +61,12 @@ const seedMichaelBookings = async () => {
         submittedAt: oneWeekAgo,
         totalAmount: 85000,
         currency: 'NGN',
-        estimatedDays: 14,
+        estimatedDays: { design: 3, sew: 8, deliver: 3 },
+        totalEstimatedDays: 14,
         items: [
-          { description: 'Suit Jacket', price: 45000 },
-          { description: 'Trousers', price: 25000 },
-          { description: 'Waistcoat', price: 15000 }
+          { description: 'Suit Jacket', quantity: 1, unitPrice: 45000 },
+          { description: 'Trousers', quantity: 1, unitPrice: 25000 },
+          { description: 'Waistcoat', quantity: 1, unitPrice: 15000 }
         ]
       }
     });
@@ -118,7 +119,13 @@ const seedMichaelBookings = async () => {
         submittedAt: twoWeeksAgo,
         totalAmount: 120000,
         currency: 'NGN',
-        estimatedDays: 10
+        estimatedDays: { design: 2, sew: 6, deliver: 2 },
+        totalEstimatedDays: 10,
+        items: [
+          { description: 'Agbada Top', quantity: 1, unitPrice: 60000 },
+          { description: 'Agbada Sokoto', quantity: 1, unitPrice: 30000 },
+          { description: 'Fila Cap', quantity: 1, unitPrice: 30000 }
+        ]
       }
     });
 
@@ -181,7 +188,12 @@ const seedMichaelBookings = async () => {
         submittedAt: oneWeekAgo,
         totalAmount: 45000,
         currency: 'NGN',
-        estimatedDays: 7
+        estimatedDays: { design: 1, sew: 5, deliver: 1 },
+        totalEstimatedDays: 7,
+        items: [
+          { description: 'Senator Top', quantity: 1, unitPrice: 25000 },
+          { description: 'Senator Trouser', quantity: 1, unitPrice: 20000 }
+        ]
       }
     });
 
@@ -305,7 +317,11 @@ const seedMichaelBookings = async () => {
         submittedAt: threeWeeksAgo,
         totalAmount: 25000,
         currency: 'NGN',
-        estimatedDays: 5
+        estimatedDays: { design: 1, sew: 3, deliver: 1 },
+        totalEstimatedDays: 5,
+        items: [
+          { description: 'Ankara Shirt', quantity: 1, unitPrice: 25000 }
+        ]
       }
     });
 
