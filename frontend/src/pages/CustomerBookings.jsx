@@ -132,17 +132,35 @@ export default function CustomerBookings() {
     // Assign dates based on booking data
     const stageDates = {
       booked: booking?.createdAt,
-      confirmed: booking?.acceptedAt,
-      in_progress: booking?.startedAt,
+      confirmed: booking?.acceptedAt || booking?.updatedAt,
+      in_progress: booking?.startedAt || booking?.updatedAt,
       completed: booking?.completedAt
     };
 
-    return stages.map((stage, index) => ({
-      ...stage,
-      isCompleted: index < currentIndex,
-      isCurrent: index === currentIndex,
-      date: stageDates[stage.id] ? formatDate(stageDates[stage.id]) : null
-    }));
+    return stages.map((stage, index) => {
+      const isCompleted = index < currentIndex;
+      const isCurrent = index === currentIndex;
+      const isPending = index > currentIndex;
+
+      let date;
+      if (stageDates[stage.id]) {
+        date = formatDate(stageDates[stage.id]);
+      } else if (isCompleted) {
+        // For completed stages without specific dates, use updatedAt as fallback
+        date = formatDate(booking?.updatedAt);
+      } else if (isCurrent) {
+        date = 'In Progress';
+      } else if (isPending) {
+        date = 'Pending';
+      }
+
+      return {
+        ...stage,
+        isCompleted,
+        isCurrent,
+        date
+      };
+    });
   };
 
   const getCurrentStageLabel = (status) => {
@@ -297,9 +315,9 @@ export default function CustomerBookings() {
                                 <span className={`stage-label ${!stage.isCompleted && !stage.isCurrent ? 'pending' : ''}`}>
                                   {stage.label}
                                 </span>
-                                {stage.date && (
-                                  <span className="stage-date">{stage.date}</span>
-                                )}
+                                <span className={`stage-date ${!stage.isCompleted && !stage.isCurrent ? 'pending' : ''}`}>
+                                  {stage.date}
+                                </span>
                               </div>
                             </div>
                           ))}
