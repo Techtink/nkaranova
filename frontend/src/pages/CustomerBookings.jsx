@@ -8,7 +8,9 @@ import {
   FiUser,
   FiScissors,
   FiPackage,
-  FiAlertCircle
+  FiAlertCircle,
+  FiChevronLeft,
+  FiChevronRight
 } from 'react-icons/fi';
 import Button from '../components/common/Button';
 import { bookingsAPI } from '../services/api';
@@ -89,7 +91,7 @@ export default function CustomerBookings() {
     return statusProgress[status] || 25;
   };
 
-  const getProgressStages = (status) => {
+  const getProgressStages = (status, booking) => {
     const stages = [
       { id: 'booked', label: 'Booked', code: 'BOK' },
       { id: 'confirmed', label: 'Confirmed', code: 'CNF' },
@@ -102,10 +104,19 @@ export default function CustomerBookings() {
     if (status === 'in_progress') currentIndex = 2;
     if (status === 'completed') currentIndex = 3;
 
+    // Assign dates based on booking data
+    const stageDates = {
+      booked: booking?.createdAt,
+      confirmed: booking?.acceptedAt,
+      in_progress: booking?.startedAt,
+      completed: booking?.completedAt
+    };
+
     return stages.map((stage, index) => ({
       ...stage,
       isCompleted: index < currentIndex,
-      isCurrent: index === currentIndex
+      isCurrent: index === currentIndex,
+      date: stageDates[stage.id] ? formatDate(stageDates[stage.id]) : null
     }));
   };
 
@@ -179,7 +190,7 @@ export default function CustomerBookings() {
         ) : (
           <div className="bookings-list">
             {bookings.map(booking => {
-              const stages = getProgressStages(booking.status);
+              const stages = getProgressStages(booking.status, booking);
               const daysSinceBooking = getDaysSinceBooking(booking.createdAt);
               const progressPercent = getProgressPercent(booking.status);
               const statusColor = getStatusColor(booking.status);
@@ -230,26 +241,37 @@ export default function CustomerBookings() {
                         <div className="progress-fill" style={{ width: `${progressPercent}%` }} />
                       </div>
 
-                      {/* Timeline Icons */}
-                      <div className="timeline-icons">
-                        {stages.map((stage, index) => (
-                          <div key={stage.id} className="timeline-stage">
-                            <StageIcon
-                              stage={stage.id}
-                              isCompleted={stage.isCompleted}
-                              isCurrent={stage.isCurrent}
-                            />
-                            {index < stages.length - 1 && (
-                              <div className={`connector ${stage.isCompleted ? 'completed' : ''}`} />
-                            )}
-                            <div className="stage-info">
-                              <span className="stage-code">{stage.code}</span>
-                              <span className={`stage-label ${!stage.isCompleted && !stage.isCurrent ? 'pending' : ''}`}>
-                                {stage.label}
-                              </span>
+                      {/* Timeline Container with Nav Arrows */}
+                      <div className="timeline-container">
+                        <button className="timeline-nav">
+                          <FiChevronLeft />
+                        </button>
+                        <div className="timeline-icons">
+                          {stages.map((stage, index) => (
+                            <div key={stage.id} className="timeline-stage">
+                              <StageIcon
+                                stage={stage.id}
+                                isCompleted={stage.isCompleted}
+                                isCurrent={stage.isCurrent}
+                              />
+                              {index < stages.length - 1 && (
+                                <div className={`connector ${stage.isCompleted ? 'completed' : ''}`} />
+                              )}
+                              <div className="stage-info">
+                                <span className="stage-code">{stage.code}</span>
+                                <span className={`stage-label ${!stage.isCompleted && !stage.isCurrent ? 'pending' : ''}`}>
+                                  {stage.label}
+                                </span>
+                                {stage.date && (
+                                  <span className="stage-date">{stage.date}</span>
+                                )}
+                              </div>
                             </div>
-                          </div>
-                        ))}
+                          ))}
+                        </div>
+                        <button className="timeline-nav">
+                          <FiChevronRight />
+                        </button>
                       </div>
 
                       {/* Days Indicator */}
