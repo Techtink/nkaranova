@@ -212,20 +212,22 @@ export default function CustomerBookings() {
 
                   {/* Card Body */}
                   <div className="card-body">
-                    {/* Route Row: Customer Name on left, Tailor Name on right */}
+                    {/* Route Row: Names on same line, dates below */}
                     <div className="route-row">
-                      <div className="endpoint customer">
+                      <div className="route-names">
                         <span className="endpoint-name">
                           {user?.firstName && user?.lastName
                             ? `${user.firstName} ${user.lastName}`
                             : user?.username || 'Customer'}
                         </span>
-                        <span className="endpoint-date">{formatDate(booking.createdAt)}</span>
-                      </div>
-                      <div className="endpoint tailor">
+                        <span className="route-arrow">→</span>
                         <span className="endpoint-name">
                           {booking.tailor?.businessName || booking.tailor?.username || 'Tailor'}
                         </span>
+                      </div>
+                      <div className="route-dates">
+                        <span className="endpoint-date">{formatDate(booking.createdAt)}</span>
+                        <span className="date-separator">-</span>
                         <span className="endpoint-date">
                           {booking.status === 'pending'
                             ? 'Awaiting'
@@ -234,14 +236,19 @@ export default function CustomerBookings() {
                       </div>
                     </div>
 
-                    {/* Progress Row - Progress bar left, Timeline icons right */}
-                    <div className="progress-timeline-row">
-                      {/* Progress Bar */}
+                    {/* Progress Section - Progress bar with days indicator */}
+                    <div className="progress-section">
                       <div className="progress-bar">
                         <div className="progress-fill" style={{ width: `${progressPercent}%` }} />
                       </div>
+                      <div className="days-indicator">
+                        <span className="days-count">{daysSinceBooking}</span>
+                        <span className="days-label">Days (Actual Schedule)</span>
+                      </div>
+                    </div>
 
-                      {/* Timeline Container with Nav Arrows */}
+                    {/* Timeline Row */}
+                    <div className="timeline-row">
                       <div className="timeline-container">
                         <button className="timeline-nav">
                           <FiChevronLeft />
@@ -272,12 +279,6 @@ export default function CustomerBookings() {
                         <button className="timeline-nav">
                           <FiChevronRight />
                         </button>
-                      </div>
-
-                      {/* Days Indicator */}
-                      <div className="days-indicator">
-                        <span className="days-count">{daysSinceBooking}</span>
-                        <span className="days-label">Days</span>
                       </div>
                     </div>
 
