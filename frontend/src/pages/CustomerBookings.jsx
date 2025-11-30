@@ -86,10 +86,12 @@ export default function CustomerBookings() {
         params.status = 'converted';
         params.hasDelayRequest = 'true';
       } else if (filter === 'in-progress') {
-        // Include all active statuses
+        // Include all active statuses (exclude converted with completed orders)
         params.status = 'pending,confirmed,consultation_done,quote_submitted,quote_accepted,paid,converted';
       } else if (filter === 'completed') {
-        params.status = 'completed';
+        // Bookings with completed orders
+        params.status = 'converted';
+        params.orderStatus = 'completed';
       } else if (filter === 'cancelled') {
         params.status = 'cancelled,declined';
       }
@@ -103,6 +105,11 @@ export default function CustomerBookings() {
         fetchedBookings = fetchedBookings.filter(b =>
           b.order?.delayRequests?.some(dr => dr.status === 'pending')
         );
+      } else if (filter === 'completed') {
+        fetchedBookings = fetchedBookings.filter(b => b.order?.status === 'completed');
+      } else if (filter === 'in-progress') {
+        // Exclude bookings with completed orders from in-progress view
+        fetchedBookings = fetchedBookings.filter(b => b.order?.status !== 'completed');
       }
 
       setBookings(fetchedBookings);
