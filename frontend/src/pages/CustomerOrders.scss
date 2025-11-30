@@ -4,9 +4,19 @@
 $font-montserrat: 'Montserrat', sans-serif;
 
 .customer-orders-page {
-  // ERP Page Header
-  .erp-page-header {
-    margin-bottom: $spacing-xl;
+  background: var(--bg-secondary);
+  min-height: 100vh;
+  font-family: $font-montserrat;
+
+  .container {
+    max-width: 1400px;
+  }
+}
+
+// ERP Page Header (matching admin style)
+.customer-orders-page .erp-page-header {
+  margin-bottom: 32px;
+  padding-top: $spacing-xl;
 
     .header-top {
       display: flex;
@@ -25,70 +35,69 @@ $font-montserrat: 'Montserrat', sans-serif;
     .header-icon {
       width: 56px;
       height: 56px;
+      background: linear-gradient(135deg, #312e81 0%, #1e1b4b 100%);
       display: flex;
       align-items: center;
       justify-content: center;
-      background: linear-gradient(135deg, #312e81 0%, #1e1b4b 100%);
-      border-radius: $radius-lg;
       flex-shrink: 0;
 
       svg {
-        width: 28px;
-        height: 28px;
+        width: 32px;
+        height: 32px;
         color: white;
+        stroke: white;
       }
     }
 
     .header-text {
       h1 {
         font-family: $font-montserrat;
-        font-size: 1.75rem;
+        font-size: 32px;
         font-weight: 700;
         color: var(--text-primary);
-        margin: 0 0 $spacing-xs 0;
+        margin: 0;
       }
 
       p {
         font-family: $font-montserrat;
-        font-size: $text-sm;
-        color: var(--text-secondary);
-        margin: 0;
+        font-size: 14px;
+        color: var(--text-tertiary);
+        margin: 4px 0 0;
       }
     }
 
-    .header-line {
-      height: 3px;
-      background: linear-gradient(90deg, #312e81 0%, #1e1b4b 50%, transparent 100%);
-      border-radius: 2px;
-    }
+  .header-line {
+    height: 4px;
+    background: linear-gradient(90deg, #312e81 0%, #1e1b4b 50%, transparent 100%);
+    margin-top: 24px;
+  }
+}
+
+.customer-orders-page .filter-tabs {
+  display: flex;
+  flex-wrap: wrap;
+  gap: $spacing-sm;
+  margin-bottom: $spacing-xl;
+}
+
+.customer-orders-page .filter-tab {
+  padding: $spacing-sm $spacing-lg;
+  font-size: $text-sm;
+  font-weight: $font-medium;
+  color: var(--text-secondary);
+  background: var(--bg-tertiary);
+  border: none;
+  border-radius: $radius-full;
+  cursor: pointer;
+  transition: all $transition-base;
+
+  &:hover {
+    background: var(--bg-hover);
   }
 
-  .filter-tabs {
-    display: flex;
-    flex-wrap: wrap;
-    gap: $spacing-sm;
-    margin-bottom: $spacing-xl;
-  }
-
-  .filter-tab {
-    padding: $spacing-sm $spacing-lg;
-    font-size: $text-sm;
-    font-weight: $font-medium;
-    color: var(--text-secondary);
-    background: var(--bg-tertiary);
-    border: none;
-    border-radius: $radius-full;
-    cursor: pointer;
-    transition: all $transition-base;
-
-    &:hover {
-      background: var(--bg-hover);
-    }
-
-    &.active {
-      background: $primary;
-      color: $white;
-    }
+  &.active {
+    background: $primary;
+    color: $white;
   }
 }
 
