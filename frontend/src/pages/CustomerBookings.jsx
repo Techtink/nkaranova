@@ -163,18 +163,22 @@ export default function CustomerBookings() {
     <div className="customer-bookings-page page">
       <Header />
 
-      {/* Page Header */}
-      <div className="page-header">
-        <div className="container">
-          <span className="page-label">Booking Management</span>
-          <h1 className="page-title">My Bookings</h1>
-          <p className="page-description">
-            Track and manage all your tailoring appointments in one place.
-          </p>
-        </div>
-      </div>
-
       <div className="container">
+        {/* ERP Page Header */}
+        <div className="erp-page-header">
+          <div className="header-top">
+            <div className="header-left">
+              <div className="header-icon">
+                <FiCalendar />
+              </div>
+              <div className="header-text">
+                <h1>My Bookings</h1>
+                <p>Track and manage all your tailoring appointments</p>
+              </div>
+            </div>
+          </div>
+          <div className="header-line" />
+        </div>
         {/* Filter Tabs Header - Centered Pill */}
         <div className="bookings-header-wrapper">
           <div className="bookings-header">
