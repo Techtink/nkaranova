@@ -383,11 +383,11 @@ $font-montserrat: 'Montserrat', sans-serif;
     height: 2px;
     z-index: 0;
 
-    // Dashed line for pending - lighter color
+    // Dashed line for pending - use CSS variable for dark mode support
     background: repeating-linear-gradient(
       90deg,
-      rgba(0, 0, 0, 0.15) 0,
-      rgba(0, 0, 0, 0.15) 6px,
+      var(--border-color) 0,
+      var(--border-color) 6px,
       transparent 6px,
       transparent 12px
     );
