@@ -222,11 +222,6 @@ $font-montserrat: 'Montserrat', sans-serif;
   border: none;
   border-radius: $radius-full;
   cursor: pointer;
-  transition: all $transition-base;
-
-  &:hover {
-    background: var(--bg-hover);
-  }
 
   svg {
     width: 18px;
@@ -237,7 +232,7 @@ $font-montserrat: 'Montserrat', sans-serif;
 
 .order-details {
   padding: $spacing-lg;
-  background: var(--bg-secondary);
+  background: var(--card-bg);
 
   .status-description {
     font-size: $text-sm;
