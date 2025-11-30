@@ -242,7 +242,12 @@ export default function CustomerBookings() {
                             {index < stages.length - 1 && (
                               <div className={`connector ${stage.isCompleted ? 'completed' : ''}`} />
                             )}
-                            <span className="stage-label">{stage.label}</span>
+                            <div className="stage-info">
+                              <span className="stage-code">{stage.code}</span>
+                              <span className={`stage-label ${!stage.isCompleted && !stage.isCurrent ? 'pending' : ''}`}>
+                                {stage.label}
+                              </span>
+                            </div>
                           </div>
                         ))}
                       </div>
@@ -254,22 +259,32 @@ export default function CustomerBookings() {
                       </div>
                     </div>
 
-                    {/* Reference Grid */}
+                    {/* Reference Grid - 3 columns, 2 rows */}
                     <div className="reference-grid">
+                      {/* Row 1 */}
                       <div className="ref-item">
-                        <span className="ref-label">Booking Ref</span>
+                        <span className="ref-label">Booking Ref:</span>
                         <span className="ref-value">{booking._id.slice(-8).toUpperCase()}</span>
                       </div>
                       <div className="ref-item">
-                        <span className="ref-label">Customer Ref</span>
+                        <span className="ref-label">Tailor:</span>
+                        <span className="ref-value">{booking.tailor?.businessName || booking.tailor?.username || 'N/A'}</span>
+                      </div>
+                      <div className="ref-item">
+                        <span className="ref-label">Appointment:</span>
+                        <span className="ref-value">{formatDate(booking.date)}</span>
+                      </div>
+                      {/* Row 2 */}
+                      <div className="ref-item">
+                        <span className="ref-label">Customer Ref:</span>
                         <span className="ref-value">{user?._id?.slice(-8).toUpperCase() || 'N/A'}</span>
                       </div>
                       <div className="ref-item">
-                        <span className="ref-label">Appointment</span>
-                        <span className="ref-value">{formatDate(booking.date)}</span>
+                        <span className="ref-label">Service:</span>
+                        <span className="ref-value">{booking.service || 'Tailoring'}</span>
                       </div>
                       <div className="ref-item">
-                        <span className="ref-label">Time</span>
+                        <span className="ref-label">Time:</span>
                         <span className="ref-value">{booking.startTime} - {booking.endTime}</span>
                       </div>
                     </div>

@@ -230,15 +230,15 @@ $font-montserrat: 'Montserrat', sans-serif;
   flex-direction: column;
   align-items: center;
   position: relative;
-  min-width: 150px;
+  min-width: 160px;
 
   &:last-child {
     min-width: auto;
   }
 
   .stage-icon {
-    width: 40px;
-    height: 40px;
+    width: 44px;
+    height: 44px;
     display: flex;
     align-items: center;
     justify-content: center;
@@ -250,8 +250,8 @@ $font-montserrat: 'Montserrat', sans-serif;
     flex-shrink: 0;
 
     svg {
-      width: 16px;
-      height: 16px;
+      width: 18px;
+      height: 18px;
     }
 
     &.completed {
@@ -270,25 +270,52 @@ $font-montserrat: 'Montserrat', sans-serif;
 
   .connector {
     position: absolute;
-    top: 19px;
-    left: calc(50% + 20px);
-    width: calc(100% - 40px);
+    top: 21px;
+    left: calc(50% + 22px);
+    width: calc(100% - 44px);
     height: 2px;
     background: var(--border-color);
+    border-style: dashed;
     z-index: 0;
 
     &.completed {
       background: #10B981;
+      border-style: solid;
     }
   }
 
+  .stage-info {
+    margin-top: 8px;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 2px;
+    text-align: center;
+  }
+
+  .stage-code {
+    font-family: $font-montserrat;
+    font-size: $text-sm;
+    font-weight: 600;
+    color: var(--text-primary);
+  }
+
   .stage-label {
-    margin-top: 6px;
     font-family: $font-montserrat;
     font-size: $text-xs;
     font-weight: 400;
+    color: #10B981;
+
+    &.pending {
+      color: var(--text-tertiary);
+    }
+  }
+
+  .stage-date {
+    font-family: $font-montserrat;
+    font-size: 11px;
+    font-weight: 300;
     color: var(--text-secondary);
-    white-space: nowrap;
   }
 }
 
@@ -315,11 +342,11 @@ $font-montserrat: 'Montserrat', sans-serif;
   }
 }
 
-// Reference Grid
+// Reference Grid - 3 columns layout
 .reference-grid {
   display: grid;
-  grid-template-columns: repeat(4, 1fr);
-  gap: $spacing-md;
+  grid-template-columns: repeat(3, 1fr);
+  gap: $spacing-sm $spacing-lg;
 
   .ref-item {
     display: flex;
@@ -330,10 +357,8 @@ $font-montserrat: 'Montserrat', sans-serif;
     .ref-label {
       font-family: $font-montserrat;
       font-size: $text-xs;
-      font-weight: 300;
+      font-weight: 400;
       color: var(--text-tertiary);
-      text-transform: uppercase;
-      letter-spacing: 0.5px;
     }
 
     .ref-value {
@@ -346,6 +371,10 @@ $font-montserrat: 'Montserrat', sans-serif;
 
   @include md {
     grid-template-columns: repeat(2, 1fr);
+  }
+
+  @include mobile {
+    grid-template-columns: 1fr;
   }
 }
 
@@ -511,7 +540,7 @@ $font-montserrat: 'Montserrat', sans-serif;
   }
 
   .timeline-stage {
-    min-width: 75px;
+    min-width: 70px;
 
     .stage-icon {
       width: 32px;
@@ -529,8 +558,17 @@ $font-montserrat: 'Montserrat', sans-serif;
       width: calc(100% - 32px);
     }
 
+    .stage-info {
+      margin-top: 4px;
+      gap: 1px;
+    }
+
+    .stage-code {
+      font-size: $text-xs;
+    }
+
     .stage-label {
-      font-size: 10px;
+      font-size: 9px;
     }
   }
 
@@ -539,24 +577,33 @@ $font-montserrat: 'Montserrat', sans-serif;
     gap: 4px;
   }
 
-  .reference-grid {
-    grid-template-columns: repeat(2, 1fr);
-  }
 }
 
 @include md {
   .timeline-stage {
-    min-width: 120px;
+    min-width: 130px;
 
     .stage-icon {
-      width: 36px;
-      height: 36px;
+      width: 38px;
+      height: 38px;
     }
 
     .connector {
-      top: 17px;
-      left: calc(50% + 18px);
-      width: calc(100% - 36px);
+      top: 18px;
+      left: calc(50% + 19px);
+      width: calc(100% - 38px);
+    }
+
+    .stage-info {
+      margin-top: 6px;
+    }
+
+    .stage-code {
+      font-size: $text-sm;
+    }
+
+    .stage-label {
+      font-size: $text-xs;
     }
   }
 }
