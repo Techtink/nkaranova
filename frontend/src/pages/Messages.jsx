@@ -5,6 +5,7 @@ import { toast } from 'react-hot-toast';
 import { useAuth } from '../context/AuthContext';
 import { useSocket } from '../context/SocketContext';
 import { conversationsAPI, tailorsAPI } from '../services/api';
+import Header from '../components/layout/Header';
 import './Messages.scss';
 
 // Sewing Needle Typing Indicator Component
@@ -281,14 +282,19 @@ export default function Messages() {
 
   if (loading) {
     return (
-      <div className="loading-container">
-        <div className="spinner" />
-      </div>
+      <>
+        <Header />
+        <div className="loading-container">
+          <div className="spinner" />
+        </div>
+      </>
     );
   }
 
   return (
-    <div className="messages-page">
+    <>
+      <Header />
+      <div className="messages-page">
       {/* Conversations List */}
       <div className={`conversations-list ${activeConversation ? 'hidden-mobile' : ''}`}>
         <div className="conversations-header">
@@ -402,5 +408,6 @@ export default function Messages() {
         )}
       </div>
     </div>
+    </>
   );
 }
