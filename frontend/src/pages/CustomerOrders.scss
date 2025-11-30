@@ -1,7 +1,68 @@
 @import '../styles/variables';
 @import '../styles/mixins';
 
+$font-montserrat: 'Montserrat', sans-serif;
+
 .customer-orders-page {
+  // ERP Page Header
+  .erp-page-header {
+    margin-bottom: $spacing-xl;
+
+    .header-top {
+      display: flex;
+      align-items: flex-start;
+      justify-content: space-between;
+      gap: $spacing-lg;
+      margin-bottom: $spacing-lg;
+    }
+
+    .header-left {
+      display: flex;
+      align-items: center;
+      gap: $spacing-lg;
+    }
+
+    .header-icon {
+      width: 56px;
+      height: 56px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      background: linear-gradient(135deg, #312e81 0%, #1e1b4b 100%);
+      border-radius: $radius-lg;
+      flex-shrink: 0;
+
+      svg {
+        width: 28px;
+        height: 28px;
+        color: white;
+      }
+    }
+
+    .header-text {
+      h1 {
+        font-family: $font-montserrat;
+        font-size: 1.75rem;
+        font-weight: 700;
+        color: var(--text-primary);
+        margin: 0 0 $spacing-xs 0;
+      }
+
+      p {
+        font-family: $font-montserrat;
+        font-size: $text-sm;
+        color: var(--text-secondary);
+        margin: 0;
+      }
+    }
+
+    .header-line {
+      height: 3px;
+      background: linear-gradient(90deg, #312e81 0%, #1e1b4b 50%, transparent 100%);
+      border-radius: 2px;
+    }
+  }
+
   .filter-tabs {
     display: flex;
     flex-wrap: wrap;
@@ -64,6 +125,19 @@
 
   &:hover {
     background: var(--bg-hover);
+
+    // Ensure text remains visible in dark mode on hover
+    .tailor-name {
+      color: var(--text-primary);
+    }
+
+    .order-service {
+      color: var(--text-secondary);
+    }
+
+    .progress-text {
+      color: var(--text-secondary);
+    }
   }
 }
 

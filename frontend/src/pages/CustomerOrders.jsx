@@ -14,6 +14,7 @@ import {
   FiStar,
   FiX
 } from 'react-icons/fi';
+import Header from '../components/layout/Header';
 import Button from '../components/common/Button';
 import { ordersAPI } from '../services/api';
 import './CustomerOrders.scss';
@@ -130,10 +131,23 @@ export default function CustomerOrders() {
 
   return (
     <div className="customer-orders-page page">
+      <Header />
+
       <div className="container">
-        <div className="page-header">
-          <h1>My Orders</h1>
-          <p>Track progress of your tailoring orders</p>
+        {/* ERP Page Header */}
+        <div className="erp-page-header">
+          <div className="header-top">
+            <div className="header-left">
+              <div className="header-icon">
+                <FiPackage />
+              </div>
+              <div className="header-text">
+                <h1>My Orders</h1>
+                <p>Track progress and updates on your tailoring orders</p>
+              </div>
+            </div>
+          </div>
+          <div className="header-line" />
         </div>
 
         <div className="filter-tabs">
