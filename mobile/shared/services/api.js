@@ -114,6 +114,9 @@ export const ordersAPI = {
   respondToDelay: (id, data) => api.put(`/orders/${id}/delay/respond`, data),
   submitReview: (id, data) => api.post(`/orders/${id}/review`, data),
 
+  // Customer mark completed
+  markCompleted: (id, data) => api.put(`/orders/${id}/completed`, data),
+
   // Tailor endpoints
   getTailorOrders: (params) => api.get('/orders/tailor', { params }),
   submitWorkPlan: (id, data) => api.post(`/orders/${id}/work-plan`, data),

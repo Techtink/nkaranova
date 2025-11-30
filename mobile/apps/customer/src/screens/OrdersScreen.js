@@ -13,7 +13,7 @@ import {
   ScrollView
 } from 'react-native';
 import { Ionicons } from '@expo/vector-icons';
-import { ordersAPI } from '../../../../shared/services/api';
+import { ordersAPI, reviewsAPI } from '../../../../shared/services/api';
 import { colors, spacing, fontSize, borderRadius, shadows } from '../../../../shared/constants/theme';
 
 export default function OrdersScreen({ navigation }) {
@@ -25,6 +25,13 @@ export default function OrdersScreen({ navigation }) {
   const [rejectModal, setRejectModal] = useState({ visible: false, orderId: null });
   const [rejectReason, setRejectReason] = useState('');
   const [submitting, setSubmitting] = useState(false);
+
+  // Review modal state
+  const [reviewModal, setReviewModal] = useState({ visible: false, order: null, isConfirmReceipt: false });
+  const [reviewRating, setReviewRating] = useState(5);
+  const [reviewTitle, setReviewTitle] = useState('');
+  const [reviewComment, setReviewComment] = useState('');
+  const [recommend, setRecommend] = useState(true);
 
   useEffect(() => {
     loadOrders();
@@ -111,6 +118,76 @@ export default function OrdersScreen({ navigation }) {
         }
       ]
     );
+  };
+
+  // Handle confirm receipt (mark order as completed)
+  const handleConfirmReceipt = async () => {
+    if (!reviewModal.order) return;
+
+    setSubmitting(true);
+    try {
+      await ordersAPI.markCompleted(reviewModal.order._id, {
+        rating: reviewRating,
+        comment: reviewComment
+      });
+      Alert.alert('Success', 'Order confirmed as received!');
+      resetReviewModal();
+      loadOrders();
+    } catch (error) {
+      Alert.alert('Error', error.response?.data?.message || 'Failed to confirm receipt');
+    } finally {
+      setSubmitting(false);
+    }
+  };
+
+  // Handle review submission for completed orders
+  const handleSubmitReview = async () => {
+    if (!reviewModal.order) return;
+
+    if (!reviewTitle.trim()) {
+      Alert.alert('Error', 'Please enter a review title');
+      return;
+    }
+
+    if (!reviewComment.trim()) {
+      Alert.alert('Error', 'Please enter your review');
+      return;
+    }
+
+    setSubmitting(true);
+    try {
+      await reviewsAPI.create({
+        tailorUsername: reviewModal.order.tailor?.username,
+        rating: reviewRating,
+        title: reviewTitle.trim(),
+        comment: reviewComment.trim(),
+        bookingId: reviewModal.order.booking,
+        recommend
+      });
+      Alert.alert('Success', 'Thank you for your review!');
+      resetReviewModal();
+      loadOrders();
+    } catch (error) {
+      Alert.alert('Error', error.response?.data?.message || 'Failed to submit review');
+    } finally {
+      setSubmitting(false);
+    }
+  };
+
+  const resetReviewModal = () => {
+    setReviewModal({ visible: false, order: null, isConfirmReceipt: false });
+    setReviewRating(5);
+    setReviewTitle('');
+    setReviewComment('');
+    setRecommend(true);
+  };
+
+  const openReviewModal = (order, isConfirmReceipt = false) => {
+    setReviewModal({ visible: true, order, isConfirmReceipt });
+    setReviewRating(5);
+    setReviewTitle('');
+    setReviewComment('');
+    setRecommend(true);
   };
 
   const getStatusColor = (status) => {
@@ -324,6 +401,29 @@ export default function OrdersScreen({ navigation }) {
                   </TouchableOpacity>
                 </>
               )}
+
+              {/* Confirm Receipt for ready orders */}
+              {order.status === 'ready' && (
+                <TouchableOpacity
+                  style={[styles.actionButton, styles.successButton]}
+                  onPress={() => openReviewModal(order, true)}
+                >
+                  <Ionicons name="checkmark-done" size={16} color={colors.white} />
+                  <Text style={styles.actionButtonText}>Confirm Receipt</Text>
+                </TouchableOpacity>
+              )}
+
+              {/* Rate & Review for completed orders without feedback */}
+              {order.status === 'completed' && !order.completionFeedback && (
+                <TouchableOpacity
+                  style={[styles.actionButton, styles.ratingButton]}
+                  onPress={() => openReviewModal(order, false)}
+                >
+                  <Ionicons name="star" size={16} color="#1a1a2e" />
+                  <Text style={styles.ratingButtonText}>Rate & Review</Text>
+                </TouchableOpacity>
+              )}
+
               <TouchableOpacity
                 style={[styles.actionButton, styles.secondaryButton]}
                 onPress={() => navigation.navigate('Chat', { tailorId: order.tailor?._id })}
@@ -396,6 +496,137 @@ export default function OrdersScreen({ navigation }) {
     </Modal>
   );
 
+  // Review Modal (for both Confirm Receipt and Rate & Review)
+  const ReviewModal = () => (
+    <Modal
+      visible={reviewModal.visible}
+      animationType="slide"
+      presentationStyle="pageSheet"
+    >
+      <View style={styles.modalContainer}>
+        <View style={styles.modalHeader}>
+          <Text style={styles.modalTitle}>
+            {reviewModal.isConfirmReceipt ? 'Confirm Receipt' : 'Rate & Review'}
+          </Text>
+          <TouchableOpacity onPress={resetReviewModal}>
+            <Ionicons name="close" size={24} color={colors.textPrimary} />
+          </TouchableOpacity>
+        </View>
+
+        <ScrollView style={styles.modalBody}>
+          <Text style={styles.modalHelp}>
+            {reviewModal.isConfirmReceipt
+              ? 'How was your experience with this order?'
+              : 'Share your experience to help others'}
+          </Text>
+
+          {/* Star Rating */}
+          <View style={styles.ratingSection}>
+            <Text style={styles.ratingLabel}>Overall Rating</Text>
+            <View style={styles.starContainer}>
+              {[1, 2, 3, 4, 5].map((star) => (
+                <TouchableOpacity
+                  key={star}
+                  style={styles.starBtn}
+                  onPress={() => setReviewRating(star)}
+                >
+                  <Ionicons
+                    name={star <= reviewRating ? 'star' : 'star-outline'}
+                    size={32}
+                    color={star <= reviewRating ? '#fbbf24' : colors.textMuted}
+                  />
+                </TouchableOpacity>
+              ))}
+            </View>
+          </View>
+
+          {/* Review Title - only for full review */}
+          {!reviewModal.isConfirmReceipt && (
+            <View style={styles.inputSection}>
+              <Text style={styles.inputLabel}>Review Title</Text>
+              <TextInput
+                style={styles.textInput}
+                placeholder="Example: Easy to use"
+                value={reviewTitle}
+                onChangeText={setReviewTitle}
+              />
+            </View>
+          )}
+
+          {/* Recommend - only for full review */}
+          {!reviewModal.isConfirmReceipt && (
+            <View style={styles.inputSection}>
+              <Text style={styles.inputLabel}>Would you recommend this tailor?</Text>
+              <View style={styles.recommendContainer}>
+                <TouchableOpacity
+                  style={[styles.recommendBtn, recommend && styles.recommendBtnActive]}
+                  onPress={() => setRecommend(true)}
+                >
+                  <Ionicons name="thumbs-up" size={20} color={recommend ? colors.white : colors.success} />
+                  <Text style={[styles.recommendText, recommend && styles.recommendTextActive]}>Yes</Text>
+                </TouchableOpacity>
+                <TouchableOpacity
+                  style={[styles.recommendBtn, !recommend && styles.recommendBtnNo]}
+                  onPress={() => setRecommend(false)}
+                >
+                  <Ionicons name="thumbs-down" size={20} color={!recommend ? colors.white : colors.error} />
+                  <Text style={[styles.recommendText, !recommend && styles.recommendTextActive]}>No</Text>
+                </TouchableOpacity>
+              </View>
+            </View>
+          )}
+
+          {/* Comment */}
+          <View style={styles.inputSection}>
+            <Text style={styles.inputLabel}>
+              {reviewModal.isConfirmReceipt ? 'Feedback (optional)' : 'Your Review'}
+            </Text>
+            <TextInput
+              style={styles.textArea}
+              placeholder={reviewModal.isConfirmReceipt
+                ? 'Share your experience...'
+                : 'Share details about your experience with this tailor...'}
+              value={reviewComment}
+              onChangeText={setReviewComment}
+              multiline
+              numberOfLines={4}
+              textAlignVertical="top"
+            />
+          </View>
+        </ScrollView>
+
+        <View style={styles.modalFooter}>
+          <TouchableOpacity
+            style={[styles.actionButton, styles.cancelButton]}
+            onPress={resetReviewModal}
+          >
+            <Text style={styles.cancelButtonText}>Cancel</Text>
+          </TouchableOpacity>
+          <TouchableOpacity
+            style={[styles.actionButton, styles.successButton, submitting && styles.disabledButton]}
+            onPress={reviewModal.isConfirmReceipt ? handleConfirmReceipt : handleSubmitReview}
+            disabled={submitting}
+          >
+            {submitting ? (
+              <ActivityIndicator size="small" color={colors.white} />
+            ) : (
+              <>
+                <Ionicons
+                  name={reviewModal.isConfirmReceipt ? 'checkmark' : 'star'}
+                  size={16}
+                  color={colors.white}
+                />
+                <Text style={styles.actionButtonText}>
+                  {reviewModal.isConfirmReceipt ? 'Confirm' : 'Submit Review'}
+                </Text>
+              </>
+            )}
+          </TouchableOpacity>
+        </View>
+      </View>
+    </Modal>
+  );
+
   if (loading && !orders.length) {
     return (
       <View style={styles.loadingContainer}>
@@ -442,6 +673,7 @@ export default function OrdersScreen({ navigation }) {
       />
 
       <RejectModal />
+      <ReviewModal />
     </View>
   );
 }
@@ -487,7 +719,7 @@ const styles = StyleSheet.create({
   },
   card: {
     backgroundColor: colors.white,
-    borderRadius: borderRadius.lg,
+    borderRadius: 20,
     marginBottom: spacing.md,
     ...shadows.sm
   },
@@ -823,5 +1055,84 @@ const styles = StyleSheet.create({
     padding: spacing.md,
     borderTopWidth: 1,
     borderTopColor: colors.border
+  },
+
+  // Button styles
+  successButton: {
+    backgroundColor: colors.success
+  },
+  ratingButton: {
+    backgroundColor: '#fbbf24'
+  },
+  ratingButtonText: {
+    fontSize: fontSize.sm,
+    fontWeight: '600',
+    color: '#1a1a2e'
+  },
+
+  // Review modal styles
+  ratingSection: {
+    marginBottom: spacing.lg
+  },
+  ratingLabel: {
+    fontSize: fontSize.sm,
+    fontWeight: '600',
+    color: colors.textPrimary,
+    marginBottom: spacing.sm
+  },
+  starContainer: {
+    flexDirection: 'row',
+    gap: spacing.sm
+  },
+  starBtn: {
+    padding: spacing.xs
+  },
+  inputSection: {
+    marginBottom: spacing.lg
+  },
+  inputLabel: {
+    fontSize: fontSize.sm,
+    fontWeight: '500',
+    color: colors.textPrimary,
+    marginBottom: spacing.sm
+  },
+  textInput: {
+    backgroundColor: colors.bgSecondary,
+    borderWidth: 1,
+    borderColor: colors.border,
+    borderRadius: borderRadius.md,
+    padding: spacing.md,
+    fontSize: fontSize.sm
+  },
+  recommendContainer: {
+    flexDirection: 'row',
+    gap: spacing.md
+  },
+  recommendBtn: {
+    flex: 1,
+    flexDirection: 'row',
+    alignItems: 'center',
+    justifyContent: 'center',
+    padding: spacing.md,
+    borderRadius: borderRadius.md,
+    borderWidth: 1,
+    borderColor: colors.border,
+    gap: spacing.sm
+  },
+  recommendBtnActive: {
+    backgroundColor: colors.success,
+    borderColor: colors.success
+  },
+  recommendBtnNo: {
+    backgroundColor: colors.error,
+    borderColor: colors.error
+  },
+  recommendText: {
+    fontSize: fontSize.sm,
+    fontWeight: '600',
+    color: colors.textSecondary
+  },
+  recommendTextActive: {
+    color: colors.white
   }
 });
