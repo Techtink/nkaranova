@@ -15,10 +15,10 @@ $font-montserrat: 'Montserrat', sans-serif;
   }
 }
 
-// Header wrapper to center the pill
+// Header wrapper - aligned left
 .bookings-header-wrapper {
   display: flex;
-  justify-content: center;
+  justify-content: flex-start;
   margin-bottom: $spacing-xl;
 }
 
