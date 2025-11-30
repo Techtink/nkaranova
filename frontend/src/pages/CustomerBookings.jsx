@@ -23,7 +23,7 @@ import {
 import Header from '../components/layout/Header';
 import Button from '../components/common/Button';
 import ReviewModal from '../components/reviews/ReviewModal';
-import { bookingsAPI, ordersAPI } from '../services/api';
+import { bookingsAPI, ordersAPI, reviewsAPI } from '../services/api';
 import { useAuth } from '../context/AuthContext';
 import './CustomerBookings.scss';
 
@@ -695,6 +695,18 @@ export default function CustomerBookings() {
         />
       )}
 
+      {/* Review Modal - for completed orders */}
+      {reviewModalOpen && selectedBooking?.order?.status === 'completed' && (
+        <ReviewCompletedModal
+          booking={selectedBooking}
+          onClose={() => {
+            setReviewModalOpen(false);
+            setSelectedBooking(null);
+          }}
+          onSuccess={handleReviewSuccess}
+        />
+      )}
+
       {/* Reject Work Plan Modal */}
       {rejectModalOpen && selectedBooking && (
         <RejectPlanModal
@@ -817,6 +829,86 @@ function ConfirmReceiptModal({ booking, onClose, onSubmit }) {
               </Button>
               <Button type="submit" loading={submitting}>
                 <FiCheck /> Confirm Receipt
+              </Button>
+            </div>
+          </form>
+        </div>
+      </div>
+    </div>
+  );
+}
+
+// Review Completed Order Modal Component
+function ReviewCompletedModal({ booking, onClose, onSuccess }) {
+  const [rating, setRating] = useState(5);
+  const [comment, setComment] = useState('');
+  const [submitting, setSubmitting] = useState(false);
+
+  const handleSubmit = async (e) => {
+    e.preventDefault();
+    setSubmitting(true);
+    try {
+      // Submit review for the tailor
+      await reviewsAPI.createReview({
+        tailor: booking.tailor?._id,
+        booking: booking._id,
+        rating,
+        comment
+      });
+      toast.success('Review submitted successfully!');
+      onSuccess();
+      onClose();
+    } catch (error) {
+      toast.error(error.response?.data?.message || 'Failed to submit review');
+    } finally {
+      setSubmitting(false);
+    }
+  };
+
+  return (
+    <div className="modal-overlay" onClick={onClose}>
+      <div className="modal review-modal" onClick={e => e.stopPropagation()}>
+        <div className="modal-header">
+          <h2>Rate Your Experience</h2>
+          <button className="close-btn" onClick={onClose}>
+            <FiX />
+          </button>
+        </div>
+        <div className="modal-body">
+          <p>How was your experience with {booking.tailor?.businessName || 'this tailor'}?</p>
+          <form onSubmit={handleSubmit}>
+            <div className="rating-section">
+              <label>Rating</label>
+              <div className="star-rating">
+                {[1, 2, 3, 4, 5].map(star => (
+                  <button
+                    key={star}
+                    type="button"
+                    className={`star-btn ${star <= rating ? 'active' : ''}`}
+                    onClick={() => setRating(star)}
+                  >
+                    <FiStar />
+                  </button>
+                ))}
+              </div>
+            </div>
+
+            <div className="comment-section">
+              <label>Your Review (optional)</label>
+              <textarea
+                value={comment}
+                onChange={(e) => setComment(e.target.value)}
+                placeholder="Share your experience..."
+                rows={3}
+              />
+            </div>
+
+            <div className="modal-actions">
+              <Button variant="ghost" type="button" onClick={onClose}>
+                Cancel
+              </Button>
+              <Button type="submit" loading={submitting}>
+                <FiStar /> Submit Review
               </Button>
             </div>
           </form>
