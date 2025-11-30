@@ -199,9 +199,9 @@ $font-montserrat: 'Montserrat', sans-serif;
   margin-bottom: $spacing-lg;
 }
 
-// Progress Bar - 66% of half the row (33% total)
+// Progress Bar - reduced width
 .progress-bar {
-  width: 33%;
+  width: 26%;
   flex-shrink: 0;
   height: 6px;
   background: var(--bg-tertiary);
