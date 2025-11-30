@@ -306,9 +306,23 @@ export default function AdminReviews() {
                     </div>
                   </div>
 
+                  {selectedReview.title && (
+                    <div className="review-title">
+                      <strong>{selectedReview.title}</strong>
+                    </div>
+                  )}
+
                   <div className="review-text">
                     {selectedReview.comment || 'No comment provided'}
                   </div>
+
+                  {selectedReview.recommend !== undefined && (
+                    <div className="review-recommend">
+                      <span className={`recommend-badge ${selectedReview.recommend ? 'yes' : 'no'}`}>
+                        {selectedReview.recommend ? '✓ Would recommend' : '✗ Would not recommend'}
+                      </span>
+                    </div>
+                  )}
 
                   <div className="review-target">
                     <span className="target-label">Review for:</span>

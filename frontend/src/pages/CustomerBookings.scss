@@ -378,8 +378,8 @@ $font-montserrat: 'Montserrat', sans-serif;
   .connector {
     position: absolute;
     top: 23px;
-    left: calc(50% + 22px);
-    width: calc(100% + $spacing-md - 44px);
+    left: calc(50% + 24px);
+    width: calc(100% + $spacing-md);
     height: 2px;
     z-index: 0;
 
@@ -567,6 +567,16 @@ $font-montserrat: 'Montserrat', sans-serif;
 
     &:hover {
       background: darken(#312e81, 8%);
+    }
+  }
+
+  &.rating {
+    background: #fbbf24;
+    border-color: #fbbf24;
+    color: #1a1a2e;
+
+    &:hover {
+      background: darken(#fbbf24, 8%);
     }
   }
 }

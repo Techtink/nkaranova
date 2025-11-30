@@ -10,10 +10,12 @@ import {
   FiPackage,
   FiAlertCircle,
   FiChevronLeft,
-  FiChevronRight
+  FiChevronRight,
+  FiStar
 } from 'react-icons/fi';
 import Header from '../components/layout/Header';
 import Button from '../components/common/Button';
+import ReviewModal from '../components/reviews/ReviewModal';
 import { bookingsAPI } from '../services/api';
 import { useAuth } from '../context/AuthContext';
 import './CustomerBookings.scss';
@@ -40,6 +42,18 @@ export default function CustomerBookings() {
   const [bookings, setBookings] = useState([]);
   const [loading, setLoading] = useState(true);
   const [filter, setFilter] = useState('in-progress');
+  const [reviewModalOpen, setReviewModalOpen] = useState(false);
+  const [selectedBooking, setSelectedBooking] = useState(null);
+
+  const handleOpenReview = (booking) => {
+    setSelectedBooking(booking);
+    setReviewModalOpen(true);
+  };
+
+  const handleReviewSuccess = () => {
+    // Optionally refresh bookings or show a success message
+    alert('Thank you! Your review has been submitted and is pending approval.');
+  };
 
   useEffect(() => {
     fetchBookings();
@@ -340,6 +354,15 @@ export default function CustomerBookings() {
                       <FiMessageSquare />
                       Message
                     </Link>
+                    {booking.status === 'completed' && (
+                      <button
+                        className="action-btn rating"
+                        onClick={() => handleOpenReview(booking)}
+                      >
+                        <FiStar />
+                        Rate & Review
+                      </button>
+                    )}
                     {['pending', 'accepted'].includes(booking.status) && (
                       <button className="action-btn warning">
                         <FiAlertCircle />
@@ -353,6 +376,14 @@ export default function CustomerBookings() {
           </div>
         )}
       </div>
+
+      {/* Review Modal */}
+      <ReviewModal
+        isOpen={reviewModalOpen}
+        onClose={() => setReviewModalOpen(false)}
+        booking={selectedBooking}
+        onSuccess={handleReviewSuccess}
+      />
     </div>
   );
 }

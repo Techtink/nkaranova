@@ -1392,12 +1392,45 @@
     }
   }
 
+  .review-title {
+    font-size: 1.1rem;
+    margin-bottom: 0.75rem;
+
+    strong {
+      color: $text-primary;
+    }
+  }
+
   .review-text {
     background: $gray-50;
     padding: 1rem;
     border-radius: $radius-md;
     color: $text-primary;
     line-height: 1.6;
+  }
+
+  .review-recommend {
+    margin-top: 1rem;
+
+    .recommend-badge {
+      display: inline-flex;
+      align-items: center;
+      gap: 0.5rem;
+      padding: 0.5rem 1rem;
+      border-radius: $radius-md;
+      font-size: 0.875rem;
+      font-weight: 500;
+
+      &.yes {
+        background: rgba($success, 0.1);
+        color: $success;
+      }
+
+      &.no {
+        background: rgba($error, 0.1);
+        color: $error;
+      }
+    }
   }
 
   .review-target {
