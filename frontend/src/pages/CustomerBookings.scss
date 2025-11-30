@@ -271,8 +271,8 @@ $font-montserrat: 'Montserrat', sans-serif;
   .connector {
     position: absolute;
     top: 19px;
-    left: 50%;
-    width: 100%;
+    left: calc(50% + 20px);
+    width: calc(100% - 20px);
     height: 2px;
     background: var(--border-color);
     z-index: 0;
@@ -282,12 +282,13 @@ $font-montserrat: 'Montserrat', sans-serif;
     }
   }
 
-  .stage-code {
+  .stage-label {
     margin-top: 6px;
     font-family: $font-montserrat;
     font-size: $text-xs;
-    font-weight: 500;
-    color: var(--text-primary);
+    font-weight: 400;
+    color: var(--text-secondary);
+    white-space: nowrap;
   }
 }
 
@@ -524,11 +525,11 @@ $font-montserrat: 'Montserrat', sans-serif;
 
     .connector {
       top: 15px;
-      left: 50%;
-      width: 100%;
+      left: calc(50% + 16px);
+      width: calc(100% - 16px);
     }
 
-    .stage-code {
+    .stage-label {
       font-size: 10px;
     }
   }
@@ -554,8 +555,8 @@ $font-montserrat: 'Montserrat', sans-serif;
 
     .connector {
       top: 17px;
-      left: 50%;
-      width: 100%;
+      left: calc(50% + 18px);
+      width: calc(100% - 18px);
     }
   }
 }
