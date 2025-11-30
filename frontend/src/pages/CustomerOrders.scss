@@ -118,6 +118,11 @@ $font-montserrat: 'Montserrat', sans-serif;
       border-bottom: 1px solid var(--border-color);
     }
   }
+
+  // Explicit dark mode override for card background
+  [data-theme="dark"] & {
+    background: #1e293b;
+  }
 }
 
 .order-header {
