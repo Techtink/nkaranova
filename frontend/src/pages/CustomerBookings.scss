@@ -11,7 +11,7 @@ $font-montserrat: 'Montserrat', sans-serif;
   font-family: $font-montserrat;
 
   .container {
-    max-width: 1200px;
+    max-width: 1400px;
   }
 }
 
@@ -307,11 +307,11 @@ $font-montserrat: 'Montserrat', sans-serif;
     height: 2px;
     z-index: 0;
 
-    // Dashed line for pending
+    // Dashed line for pending - lighter color
     background: repeating-linear-gradient(
       90deg,
-      var(--border-color) 0,
-      var(--border-color) 6px,
+      rgba(0, 0, 0, 0.15) 0,
+      rgba(0, 0, 0, 0.15) 6px,
       transparent 6px,
       transparent 12px
     );
