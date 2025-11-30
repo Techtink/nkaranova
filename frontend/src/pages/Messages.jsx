@@ -1,6 +1,7 @@
 import { useState, useEffect, useRef, useCallback, useMemo } from 'react';
 import { useSearchParams } from 'react-router-dom';
 import { FiSend, FiArrowLeft } from 'react-icons/fi';
+import { toast } from 'react-hot-toast';
 import { useAuth } from '../context/AuthContext';
 import { useSocket } from '../context/SocketContext';
 import { conversationsAPI, tailorsAPI } from '../services/api';
@@ -92,7 +93,22 @@ export default function Messages() {
 
     const onNewMessage = (data) => {
       if (data.conversationId === activeConversation?._id) {
-        setMessages(prev => [...prev, data.message]);
+        // Only add if not already in the list (avoid duplicates from optimistic update)
+        setMessages(prev => {
+          const exists = prev.some(msg =>
+            msg._id === data.message._id ||
+            (msg.isOptimistic && msg.content === data.message.content && msg.sender?._id === data.message.sender?._id)
+          );
+          if (exists) {
+            // Replace optimistic message with real one
+            return prev.map(msg =>
+              msg.isOptimistic && msg.content === data.message.content
+                ? data.message
+                : msg
+            );
+          }
+          return [...prev, data.message];
+        });
         // Stop typing indicator when message received
         setIsOtherTyping(false);
       }
@@ -212,14 +228,40 @@ export default function Messages() {
       clearTimeout(typingTimeoutRef.current);
     }
 
+    const messageContent = newMessage.trim();
+    const tempId = `temp-${Date.now()}`;
+
+    // Optimistically add message to UI
+    const optimisticMessage = {
+      _id: tempId,
+      content: messageContent,
+      sender: { _id: user._id, firstName: user.firstName, lastName: user.lastName },
+      createdAt: new Date().toISOString(),
+      isOptimistic: true
+    };
+
+    setMessages(prev => [...prev, optimisticMessage]);
+    setNewMessage('');
+
     setSending(true);
     try {
-      await conversationsAPI.sendMessage(activeConversation._id, {
-        content: newMessage
+      const response = await conversationsAPI.sendMessage(activeConversation._id, {
+        content: messageContent
       });
-      setNewMessage('');
+
+      // Replace optimistic message with real one
+      setMessages(prev =>
+        prev.map(msg =>
+          msg._id === tempId ? response.data.data : msg
+        )
+      );
     } catch (error) {
       console.error('Error sending message:', error);
+      toast.error(error.response?.data?.message || 'Failed to send message');
+
+      // Remove optimistic message on error
+      setMessages(prev => prev.filter(msg => msg._id !== tempId));
+      setNewMessage(messageContent);
     } finally {
       setSending(false);
     }

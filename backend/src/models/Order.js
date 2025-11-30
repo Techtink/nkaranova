@@ -325,6 +325,52 @@ orderSchema.statics.createFromBooking = async function(booking, userId) {
   return order;
 };
 
+// Method to approve work plan
+orderSchema.methods.approveWorkPlan = function(userId) {
+  if (!this.workPlan) {
+    throw new Error('No work plan to approve');
+  }
+
+  this.workPlan.approvedAt = new Date();
+  this.status = 'in_progress';
+  this.workStartedAt = new Date();
+
+  // Start the first stage
+  if (this.workPlan.stages?.length > 0) {
+    this.workPlan.stages[0].status = 'in_progress';
+    this.workPlan.stages[0].startedAt = new Date();
+  }
+
+  this.statusHistory.push({
+    status: 'in_progress',
+    changedAt: new Date(),
+    changedBy: userId,
+    note: 'Work plan approved, work started'
+  });
+
+  return this;
+};
+
+// Method to reject work plan
+orderSchema.methods.rejectWorkPlan = function(reason, userId) {
+  if (!this.workPlan) {
+    throw new Error('No work plan to reject');
+  }
+
+  this.workPlan.rejectedAt = new Date();
+  this.workPlan.rejectionReason = reason;
+  this.status = 'plan_rejected';
+
+  this.statusHistory.push({
+    status: 'plan_rejected',
+    changedAt: new Date(),
+    changedBy: userId,
+    note: `Work plan rejected: ${reason}`
+  });
+
+  return this;
+};
+
 // Method to complete a stage
 orderSchema.methods.completeStage = function(stageIndex, notes, userId) {
   if (!this.workPlan?.stages?.[stageIndex]) {
