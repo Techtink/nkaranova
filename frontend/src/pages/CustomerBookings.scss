@@ -155,66 +155,53 @@ $font-montserrat: 'Montserrat', sans-serif;
   padding: $spacing-lg;
 }
 
-// Route Row - Names on same line with arrow, dates below
+// Route Row - Customer on left, Tailor on right
 .route-row {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
+  margin-bottom: $spacing-lg;
+}
+
+.endpoint {
   display: flex;
   flex-direction: column;
   gap: 4px;
-  margin-bottom: $spacing-lg;
 
-  .route-names {
-    display: flex;
-    align-items: center;
-    gap: $spacing-sm;
-
-    .endpoint-name {
-      font-family: $font-montserrat;
-      font-size: $text-base;
-      font-weight: 500;
-      color: var(--text-primary);
-    }
-
-    .route-arrow {
-      color: var(--text-tertiary);
-      font-size: $text-sm;
-    }
+  &.customer {
+    text-align: left;
   }
 
-  .route-dates {
-    display: flex;
-    align-items: center;
-    gap: $spacing-sm;
+  &.tailor {
+    text-align: right;
+  }
 
-    .endpoint-date {
-      font-family: $font-montserrat;
-      font-size: $text-sm;
-      font-weight: 300;
-      color: var(--text-secondary);
-    }
+  .endpoint-name {
+    font-family: $font-montserrat;
+    font-size: $text-base;
+    font-weight: 500;
+    color: var(--text-primary);
+  }
 
-    .date-separator {
-      color: var(--text-tertiary);
-      font-size: $text-xs;
-    }
+  .endpoint-date {
+    font-family: $font-montserrat;
+    font-size: $text-sm;
+    font-weight: 300;
+    color: var(--text-secondary);
   }
 }
 
-// Timeline Row - Timeline icons only
-.timeline-row {
-  margin-bottom: $spacing-lg;
-}
-
-// Progress Section - Progress bar with days indicator
-.progress-section {
+// Progress Timeline Row - Progress bar left, Timeline icons right
+.progress-timeline-row {
   display: flex;
   align-items: center;
-  gap: $spacing-md;
+  gap: $spacing-2xl;
   margin-bottom: $spacing-lg;
 }
 
-// Progress Bar - narrower width
+// Progress Bar - 66% of half the row (33% total)
 .progress-bar {
-  width: 120px;
+  width: 33%;
   flex-shrink: 0;
   height: 6px;
   background: var(--bg-tertiary);
@@ -226,28 +213,6 @@ $font-montserrat: 'Montserrat', sans-serif;
     background: linear-gradient(90deg, #10B981, #34D399);
     border-radius: 50px;
     transition: width 0.5s ease;
-  }
-}
-
-// Days Indicator - next to progress bar
-.days-indicator {
-  display: flex;
-  align-items: baseline;
-  gap: 4px;
-  flex-shrink: 0;
-
-  .days-count {
-    font-family: $font-montserrat;
-    font-size: $text-base;
-    font-weight: 600;
-    color: var(--text-primary);
-  }
-
-  .days-label {
-    font-family: $font-montserrat;
-    font-size: $text-xs;
-    font-weight: 400;
-    color: var(--text-secondary);
   }
 }
 
@@ -384,6 +349,29 @@ $font-montserrat: 'Montserrat', sans-serif;
   .stage-date {
     font-family: $font-montserrat;
     font-size: 11px;
+    font-weight: 300;
+    color: var(--text-secondary);
+  }
+}
+
+// Days Indicator
+.days-indicator {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  flex-shrink: 0;
+
+  .days-count {
+    font-family: $font-montserrat;
+    font-size: $text-xl;
+    font-weight: 500;
+    color: var(--text-primary);
+    line-height: 1;
+  }
+
+  .days-label {
+    font-family: $font-montserrat;
+    font-size: $text-xs;
     font-weight: 300;
     color: var(--text-secondary);
   }
