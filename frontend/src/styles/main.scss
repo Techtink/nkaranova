@@ -978,10 +978,10 @@ $grid-gutter-width: 1.5rem;
 }
 
 .page {
-  padding: $spacing-xl 0;
+  padding-bottom: $spacing-xl;
 
   @include md {
-    padding: $spacing-2xl 0;
+    padding-bottom: $spacing-2xl;
   }
 }
 
