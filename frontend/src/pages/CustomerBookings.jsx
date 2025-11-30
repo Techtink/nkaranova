@@ -18,7 +18,8 @@ import {
   FiClock,
   FiThumbsUp,
   FiThumbsDown,
-  FiX
+  FiX,
+  FiSearch
 } from 'react-icons/fi';
 import Header from '../components/layout/Header';
 import Button from '../components/common/Button';
@@ -58,6 +59,7 @@ export default function CustomerBookings() {
   const [page, setPage] = useState(1);
   const [totalPages, setTotalPages] = useState(1);
   const [totalCount, setTotalCount] = useState(0);
+  const [searchQuery, setSearchQuery] = useState('');
 
   const handleOpenReview = (booking) => {
     setSelectedBooking(booking);
@@ -71,12 +73,15 @@ export default function CustomerBookings() {
 
   useEffect(() => {
     fetchBookings();
-  }, [filter, page]);
+  }, [filter, page, searchQuery]);
 
   const fetchBookings = async () => {
     setLoading(true);
     try {
       let params = { page, limit: 10 };
+      if (searchQuery.trim()) {
+        params.search = searchQuery.trim();
+      }
       if (filter === 'pending-approval') {
         // Bookings with orders awaiting work plan approval
         params.status = 'converted';
@@ -172,6 +177,11 @@ export default function CustomerBookings() {
 
   const handleFilterChange = (newFilter) => {
     setFilter(newFilter);
+    setPage(1);
+  };
+
+  const handleSearchChange = (e) => {
+    setSearchQuery(e.target.value);
     setPage(1);
   };
 
@@ -378,6 +388,15 @@ export default function CustomerBookings() {
                 Cancelled
               </button>
             </div>
+          </div>
+          <div className="search-bar">
+            <FiSearch className="search-icon" />
+            <input
+              type="text"
+              placeholder="Search bookings..."
+              value={searchQuery}
+              onChange={handleSearchChange}
+            />
           </div>
         </div>
 
@@ -656,13 +675,53 @@ export default function CustomerBookings() {
                 </span>
                 <div className="pagination-buttons">
                   <button
+                    className="pagination-nav"
                     disabled={page === 1}
                     onClick={() => setPage(page - 1)}
                   >
                     <FiChevronLeft />
                   </button>
-                  <button className="active">{page}</button>
+                  {(() => {
+                    const pages = [];
+                    const maxVisible = 5;
+                    let startPage = Math.max(1, page - Math.floor(maxVisible / 2));
+                    let endPage = Math.min(totalPages, startPage + maxVisible - 1);
+                    if (endPage - startPage + 1 < maxVisible) {
+                      startPage = Math.max(1, endPage - maxVisible + 1);
+                    }
+                    if (startPage > 1) {
+                      pages.push(
+                        <button key={1} onClick={() => setPage(1)}>1</button>
+                      );
+                      if (startPage > 2) {
+                        pages.push(<span key="dots-start" className="pagination-dots">...</span>);
+                      }
+                    }
+                    for (let i = startPage; i <= endPage; i++) {
+                      pages.push(
+                        <button
+                          key={i}
+                          className={page === i ? 'active' : ''}
+                          onClick={() => setPage(i)}
+                        >
+                          {i}
+                        </button>
+                      );
+                    }
+                    if (endPage < totalPages) {
+                      if (endPage < totalPages - 1) {
+                        pages.push(<span key="dots-end" className="pagination-dots">...</span>);
+                      }
+                      pages.push(
+                        <button key={totalPages} onClick={() => setPage(totalPages)}>
+                          {totalPages}
+                        </button>
+                      );
+                    }
+                    return pages;
+                  })()}
                   <button
+                    className="pagination-nav"
                     disabled={page === totalPages}
                     onClick={() => setPage(page + 1)}
                   >
