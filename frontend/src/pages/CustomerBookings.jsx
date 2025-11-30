@@ -281,37 +281,44 @@ export default function CustomerBookings() {
                       </div>
                     </div>
 
-                    {/* Reference Grid - 3 columns, 2 rows */}
+                    {/* Reference Grid - 3 columns, 2 rows per column */}
                     <div className="reference-grid">
-                      {/* Row 1 */}
-                      <div className="ref-item">
-                        <span className="ref-label">Booking Ref:</span>
-                        <span className="ref-value">{booking._id.slice(-8).toUpperCase()}</span>
+                      {/* Column 1 */}
+                      <div className="ref-column">
+                        <div className="ref-item">
+                          <span className="ref-label">Booking Ref:</span>
+                          <span className="ref-value">{booking._id.slice(-8).toUpperCase()}</span>
+                        </div>
+                        <div className="ref-item">
+                          <span className="ref-label">Customer Ref:</span>
+                          <span className="ref-value">{user?._id?.slice(-8).toUpperCase() || 'N/A'}</span>
+                        </div>
                       </div>
-                      <div className="ref-item">
-                        <span className="ref-label">Shipper:</span>
-                        <span className="ref-value">
-                          {user?.firstName && user?.lastName
-                            ? `${user.firstName} ${user.lastName}`
-                            : user?.username || 'Customer'}
-                        </span>
+                      {/* Column 2 */}
+                      <div className="ref-column">
+                        <div className="ref-item">
+                          <span className="ref-label">Shipper:</span>
+                          <span className="ref-value">
+                            {user?.firstName && user?.lastName
+                              ? `${user.firstName} ${user.lastName}`
+                              : user?.username || 'Customer'}
+                          </span>
+                        </div>
+                        <div className="ref-item">
+                          <span className="ref-label">Consignee:</span>
+                          <span className="ref-value">{booking.tailor?.businessName || booking.tailor?.username || 'N/A'}</span>
+                        </div>
                       </div>
-                      <div className="ref-item">
-                        <span className="ref-label">Appointment:</span>
-                        <span className="ref-value">{formatDate(booking.date)}</span>
-                      </div>
-                      {/* Row 2 */}
-                      <div className="ref-item">
-                        <span className="ref-label">Customer Ref:</span>
-                        <span className="ref-value">{user?._id?.slice(-8).toUpperCase() || 'N/A'}</span>
-                      </div>
-                      <div className="ref-item">
-                        <span className="ref-label">Consignee:</span>
-                        <span className="ref-value">{booking.tailor?.businessName || booking.tailor?.username || 'N/A'}</span>
-                      </div>
-                      <div className="ref-item">
-                        <span className="ref-label">Time:</span>
-                        <span className="ref-value">{booking.startTime} - {booking.endTime}</span>
+                      {/* Column 3 */}
+                      <div className="ref-column">
+                        <div className="ref-item">
+                          <span className="ref-label">Appointment:</span>
+                          <span className="ref-value">{formatDate(booking.date)}</span>
+                        </div>
+                        <div className="ref-item">
+                          <span className="ref-label">Time:</span>
+                          <span className="ref-value">{booking.startTime} - {booking.endTime}</span>
+                        </div>
                       </div>
                     </div>
                   </div>
