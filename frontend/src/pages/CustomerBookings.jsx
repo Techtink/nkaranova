@@ -516,45 +516,24 @@ export default function CustomerBookings() {
                           <span className="ref-value">{booking.startTime} - {booking.endTime}</span>
                         </div>
                       </div>
-                      {/* Column 4 - Work Stages Grid (only when order exists) */}
+                      {/* Column 4 - Work Stages (only when order exists) */}
                       {workStages.length > 0 && (
                         <div className="ref-column work-stages-column">
                           <div className="ref-item work-stages-header">
-                            <span className="ref-label">Work Progress</span>
+                            <span className="ref-label">Work Progress:</span>
                           </div>
-                          <div className="work-stages-grid">
-                            {workStages.map((stage, idx) => {
-                              const completedCount = workStages.filter(s => s.status === 'completed').length;
-                              const totalCount = workStages.length;
-                              return (
-                                <div key={stage._id || idx} className={`stage-card ${stage.status}`}>
-                                  <div className="stage-icon">
-                                    {stage.status === 'completed' ? <FiCheck /> :
-                                     stage.status === 'in_progress' ? <FiScissors /> :
-                                     <span className="stage-num">{idx + 1}</span>}
-                                  </div>
-                                  <div className="stage-info">
-                                    <span className="stage-name">{stage.name}</span>
-                                    <span className="stage-duration">{stage.estimatedDays} {stage.estimatedDays === 1 ? 'day' : 'days'}</span>
-                                  </div>
-                                  {idx < workStages.length - 1 && (
-                                    <div className={`stage-connector ${workStages[idx + 1].status !== 'pending' ? 'active' : ''}`} />
-                                  )}
-                                </div>
-                              );
-                            })}
-                          </div>
-                          {/* Progress summary */}
-                          <div className="progress-summary">
-                            <div className="progress-bar">
-                              <div
-                                className="progress-fill"
-                                style={{ width: `${(workStages.filter(s => s.status === 'completed').length / workStages.length) * 100}%` }}
-                              />
-                            </div>
-                            <span className="progress-text">
-                              {workStages.filter(s => s.status === 'completed').length}/{workStages.length} complete
-                            </span>
+                          <div className="work-stages-list">
+                            {workStages.map((stage, idx) => (
+                              <div key={stage._id || idx} className={`work-stage ${stage.status}`}>
+                                <span className="stage-marker">
+                                  {stage.status === 'completed' ? <FiCheck /> :
+                                   stage.status === 'in_progress' ? <FiScissors /> :
+                                   <span className="stage-num">{idx + 1}</span>}
+                                </span>
+                                <span className="stage-name">{stage.name}</span>
+                                <span className="stage-days">{stage.estimatedDays}d</span>
+                              </div>
+                            ))}
                           </div>
                         </div>
                       )}
