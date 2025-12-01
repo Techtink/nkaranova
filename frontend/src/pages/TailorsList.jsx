@@ -1,26 +1,70 @@
 import { useState, useEffect } from 'react';
-import { useSearchParams } from 'react-router-dom';
-import { FiFilter, FiX } from 'react-icons/fi';
-import TailorCard from '../components/cards/TailorCard';
-import Button from '../components/common/Button';
+import { useSearchParams, Link } from 'react-router-dom';
+import {
+  FiSearch,
+  FiStar,
+  FiMapPin,
+  FiCalendar,
+  FiHeart,
+  FiEye,
+  FiChevronLeft,
+  FiChevronRight,
+  FiGrid,
+  FiUsers,
+  FiAward,
+  FiScissors,
+  FiHexagon,
+  FiPenTool,
+  FiLayers,
+  FiTarget,
+  FiTrello,
+  FiCpu
+} from 'react-icons/fi';
+import Header from '../components/layout/Header';
 import { tailorsAPI } from '../services/api';
 import { SPECIALTIES } from '../utils/constants';
 import './TailorsList.scss';
+
+// Category icons mapping
+const CATEGORY_ICONS = {
+  'All': FiGrid,
+  'Wedding Dresses': FiHeart,
+  'Men\'s Suits': FiUsers,
+  'Traditional African': FiHexagon,
+  'Traditional Asian': FiLayers,
+  'Formal Wear': FiAward,
+  'Casual Wear': FiTarget,
+  'Alterations & Repairs': FiScissors,
+  'Custom Design': FiPenTool,
+  'Embroidery': FiTrello,
+  'Leather Work': FiCpu
+};
+
+// Category colors for icons
+const CATEGORY_COLORS = {
+  'All': '#6366F1',
+  'Wedding Dresses': '#EC4899',
+  'Men\'s Suits': '#3B82F6',
+  'Traditional African': '#F59E0B',
+  'Traditional Asian': '#10B981',
+  'Formal Wear': '#8B5CF6',
+  'Casual Wear': '#06B6D4',
+  'Alterations & Repairs': '#EF4444',
+  'Custom Design': '#F97316',
+  'Embroidery': '#84CC16',
+  'Leather Work': '#78716C'
+};
 
 export default function TailorsList() {
   const [searchParams, setSearchParams] = useSearchParams();
   const [tailors, setTailors] = useState([]);
   const [loading, setLoading] = useState(true);
   const [pagination, setPagination] = useState({});
-  const [showFilters, setShowFilters] = useState(false);
+  const [searchQuery, setSearchQuery] = useState(searchParams.get('search') || '');
 
-  const [filters, setFilters] = useState({
-    search: searchParams.get('search') || '',
-    specialty: searchParams.get('specialty') || '',
-    location: searchParams.get('location') || '',
-    minRating: searchParams.get('minRating') || '',
-    sortBy: searchParams.get('sortBy') || 'rating'
-  });
+  const activeCategory = searchParams.get('specialty') || '';
+  const currentPage = parseInt(searchParams.get('page')) || 1;
+  const sortBy = searchParams.get('sortBy') || 'rating';
 
   useEffect(() => {
     fetchTailors();
@@ -30,13 +74,11 @@ export default function TailorsList() {
     setLoading(true);
     try {
       const params = {
-        page: searchParams.get('page') || 1,
-        limit: 12,
+        page: currentPage,
+        limit: 10,
         search: searchParams.get('search'),
         specialty: searchParams.get('specialty'),
-        location: searchParams.get('location'),
-        minRating: searchParams.get('minRating'),
-        sortBy: searchParams.get('sortBy') || 'rating'
+        sortBy
       };
 
       const response = await tailorsAPI.getAll(params);
@@ -49,175 +91,269 @@ export default function TailorsList() {
     }
   };
 
-  const handleFilterChange = (key, value) => {
-    setFilters(prev => ({ ...prev, [key]: value }));
-  };
-
-  const applyFilters = () => {
-    const newParams = new URLSearchParams();
-    Object.entries(filters).forEach(([key, value]) => {
-      if (value) newParams.set(key, value);
-    });
+  const handleCategoryChange = (category) => {
+    const newParams = new URLSearchParams(searchParams);
+    if (category) {
+      newParams.set('specialty', category);
+    } else {
+      newParams.delete('specialty');
+    }
+    newParams.delete('page');
     setSearchParams(newParams);
-    setShowFilters(false);
   };
 
-  const clearFilters = () => {
-    setFilters({
-      search: '',
-      specialty: '',
-      location: '',
-      minRating: '',
-      sortBy: 'rating'
-    });
-    setSearchParams(new URLSearchParams());
+  const handleSearch = (e) => {
+    e.preventDefault();
+    const newParams = new URLSearchParams(searchParams);
+    if (searchQuery.trim()) {
+      newParams.set('search', searchQuery.trim());
+    } else {
+      newParams.delete('search');
+    }
+    newParams.delete('page');
+    setSearchParams(newParams);
   };
 
   const handlePageChange = (page) => {
     const newParams = new URLSearchParams(searchParams);
     newParams.set('page', page);
     setSearchParams(newParams);
+    window.scrollTo({ top: 0, behavior: 'smooth' });
   };
 
-  return (
-    <div className="tailors-page page">
-      <div className="container">
-        <div className="page-header">
-          <div>
-            <h1>Find Tailors</h1>
-            <p>Browse talented tailors from around the world</p>
-          </div>
+  const renderPagination = () => {
+    const { totalPages, total } = pagination;
+    const totalPagesNum = totalPages || 1;
+
+    const pages = [];
+    const maxVisible = 4;
+    let startPage = Math.max(1, currentPage - Math.floor(maxVisible / 2));
+    let endPage = Math.min(totalPagesNum, startPage + maxVisible - 1);
+
+    if (endPage - startPage + 1 < maxVisible) {
+      startPage = Math.max(1, endPage - maxVisible + 1);
+    }
+
+    for (let i = startPage; i <= endPage; i++) {
+      pages.push(i);
+    }
+
+    return (
+      <div className="tailors-pagination">
+        <span className="pagination-info">
+          Showing page {currentPage} of {totalPagesNum} ({total || tailors.length} tailors)
+        </span>
+
+        <div className="pagination-controls">
           <button
-            className="filter-toggle"
-            onClick={() => setShowFilters(!showFilters)}
+            className="pagination-btn pagination-nav"
+            disabled={currentPage === 1}
+            onClick={() => handlePageChange(currentPage - 1)}
           >
-            <FiFilter /> Filters
+            <FiChevronLeft /> Previous
+          </button>
+
+          <div className="pagination-numbers">
+            {pages.map(page => (
+              <button
+                key={page}
+                className={`pagination-btn ${currentPage === page ? 'active' : ''}`}
+                onClick={() => handlePageChange(page)}
+              >
+                {page}
+              </button>
+            ))}
+          </div>
+
+          <button
+            className="pagination-btn pagination-nav"
+            disabled={currentPage === totalPagesNum}
+            onClick={() => handlePageChange(currentPage + 1)}
+          >
+            Next <FiChevronRight />
           </button>
         </div>
+      </div>
+    );
+  };
 
-        {/* Filters */}
-        <div className={`filters-panel ${showFilters ? 'open' : ''}`}>
-          <div className="filters-header">
-            <h3>Filters</h3>
-            <button onClick={() => setShowFilters(false)}>
-              <FiX />
-            </button>
-          </div>
+  // Simplified categories for tabs
+  const displayCategories = ['All', 'Wedding Dresses', 'Men\'s Suits', 'Traditional African', 'Formal Wear', 'Custom Design'];
 
-          <div className="filters-body">
-            <div className="filter-group">
-              <label>Search</label>
+  return (
+    <>
+      <Header />
+      <div className="tailors-list-page">
+        {/* Category Tabs Bar */}
+        <div className="category-tabs-bar">
+          <div className="container">
+            <div className="category-tabs">
+              {displayCategories.map(cat => {
+                const IconComponent = CATEGORY_ICONS[cat] || FiGrid;
+                const iconColor = CATEGORY_COLORS[cat] || '#6366F1';
+                const isActive = cat === 'All' ? !activeCategory : activeCategory === cat;
+
+                return (
+                  <button
+                    key={cat}
+                    className={`category-tab ${isActive ? 'active' : ''}`}
+                    onClick={() => handleCategoryChange(cat === 'All' ? '' : cat)}
+                  >
+                    <span className="tab-icon" style={{ backgroundColor: `${iconColor}15`, color: iconColor }}>
+                      <IconComponent />
+                    </span>
+                    <span className="tab-label">{cat === 'All' ? 'All Tailors' : cat}</span>
+                  </button>
+                );
+              })}
+            </div>
+
+            {/* Search Bar */}
+            <form className="search-bar" onSubmit={handleSearch}>
+              <FiSearch className="search-icon" />
               <input
                 type="text"
-                placeholder="Search by name, bio..."
-                value={filters.search}
-                onChange={(e) => handleFilterChange('search', e.target.value)}
+                placeholder="Search tailors..."
+                value={searchQuery}
+                onChange={(e) => setSearchQuery(e.target.value)}
               />
-            </div>
-
-            <div className="filter-group">
-              <label>Specialty</label>
-              <select
-                value={filters.specialty}
-                onChange={(e) => handleFilterChange('specialty', e.target.value)}
-              >
-                <option value="">All Specialties</option>
-                {SPECIALTIES.map(spec => (
-                  <option key={spec} value={spec}>{spec}</option>
-                ))}
-              </select>
-            </div>
-
-            <div className="filter-group">
-              <label>Location</label>
-              <input
-                type="text"
-                placeholder="City or country"
-                value={filters.location}
-                onChange={(e) => handleFilterChange('location', e.target.value)}
-              />
-            </div>
-
-            <div className="filter-group">
-              <label>Minimum Rating</label>
-              <select
-                value={filters.minRating}
-                onChange={(e) => handleFilterChange('minRating', e.target.value)}
-              >
-                <option value="">Any Rating</option>
-                <option value="4">4+ Stars</option>
-                <option value="4.5">4.5+ Stars</option>
-              </select>
-            </div>
-
-            <div className="filter-group">
-              <label>Sort By</label>
-              <select
-                value={filters.sortBy}
-                onChange={(e) => handleFilterChange('sortBy', e.target.value)}
-              >
-                <option value="rating">Top Rated</option>
-                <option value="reviews">Most Reviews</option>
-                <option value="newest">Newest</option>
-                <option value="works">Most Works</option>
-              </select>
-            </div>
-          </div>
-
-          <div className="filters-actions">
-            <Button variant="ghost" onClick={clearFilters}>Clear All</Button>
-            <Button onClick={applyFilters}>Apply Filters</Button>
+            </form>
           </div>
         </div>
 
-        {/* Results */}
-        {loading ? (
-          <div className="loading-container">
-            <div className="spinner" />
-          </div>
-        ) : tailors.length === 0 ? (
-          <div className="empty-state">
-            <h3>No tailors found</h3>
-            <p>Try adjusting your filters or search criteria</p>
-            <Button onClick={clearFilters}>Clear Filters</Button>
-          </div>
-        ) : (
-          <>
-            <p className="results-count">
-              Showing {tailors.length} of {pagination.total || 0} tailors
-            </p>
-
-            <div className="grid grid-4">
-              {tailors.map(tailor => (
-                <TailorCard key={tailor._id} tailor={tailor} />
-              ))}
-            </div>
-
-            {/* Pagination */}
-            {pagination.totalPages > 1 && (
-              <div className="pagination">
-                <Button
-                  variant="ghost"
-                  disabled={!pagination.hasPrevPage}
-                  onClick={() => handlePageChange(pagination.page - 1)}
-                >
-                  Previous
-                </Button>
-                <span className="page-info">
-                  Page {pagination.page} of {pagination.totalPages}
-                </span>
-                <Button
-                  variant="ghost"
-                  disabled={!pagination.hasNextPage}
-                  onClick={() => handlePageChange(pagination.page + 1)}
-                >
-                  Next
-                </Button>
+        {/* Main Content */}
+        <div className="tailors-content">
+          <div className="container">
+            {loading ? (
+              <div className="loading-container">
+                <div className="spinner" />
               </div>
+            ) : tailors.length === 0 ? (
+              <div className="empty-state">
+                <h3>No tailors found</h3>
+                <p>Try adjusting your filters or search criteria</p>
+                <button
+                  className="btn-primary"
+                  onClick={() => {
+                    setSearchQuery('');
+                    setSearchParams(new URLSearchParams());
+                  }}
+                >
+                  Clear Filters
+                </button>
+              </div>
+            ) : (
+              <>
+                {/* Tailors List */}
+                <div className="tailors-list">
+                  {tailors.map(tailor => {
+                    const displayName = tailor.businessName || `${tailor.user?.firstName} ${tailor.user?.lastName}`;
+                    const primarySpecialty = tailor.specialties?.[0] || 'Custom Design';
+
+                    return (
+                      <div key={tailor._id} className="tailor-row">
+                        {/* Profile Column */}
+                        <div className="tailor-profile">
+                          <Link to={`/tailor/${tailor.username}`} className="profile-photo">
+                            {tailor.profilePhoto ? (
+                              <img src={tailor.profilePhoto} alt={displayName} />
+                            ) : (
+                              <span className="photo-placeholder">{displayName.charAt(0)}</span>
+                            )}
+                          </Link>
+                          <div className="profile-info">
+                            <Link to={`/tailor/${tailor.username}`} className="profile-name">
+                              {displayName}
+                            </Link>
+                            <span className="profile-title">{tailor.bio?.substring(0, 40) || 'Professional Tailor'}</span>
+                          </div>
+                          <div className="profile-stats">
+                            <FiStar className="star-icon" />
+                            <span className="stat-value">{tailor.averageRating?.toFixed(1) || '5.0'}</span>
+                            <span className="stat-label">({tailor.reviewCount || 0} reviews)</span>
+                          </div>
+                        </div>
+
+                        {/* Skills Column */}
+                        <div className="tailor-skills">
+                          <div className="key-specialty">
+                            <span className="specialty-label">Key specialty</span>
+                            <span className="specialty-value">{primarySpecialty}</span>
+                          </div>
+                          <div className="skills-list">
+                            {(tailor.specialties || []).slice(0, 4).map((skill, idx) => (
+                              <div key={idx} className="skill-item">
+                                <span className="skill-name">{skill}</span>
+                                <div className="skill-bar">
+                                  <div
+                                    className="skill-progress"
+                                    style={{ width: `${Math.min(100, 60 + idx * 10)}%` }}
+                                  />
+                                </div>
+                              </div>
+                            ))}
+                          </div>
+                        </div>
+
+                        {/* Recent Works Column */}
+                        <div className="tailor-works">
+                          <div className="works-header">
+                            <span className="works-title">RECENT WORKS</span>
+                          </div>
+                          <div className="works-cards">
+                            {(tailor.recentWorks || []).length > 0 ? (
+                              tailor.recentWorks.slice(0, 3).map((work, idx) => (
+                                <Link
+                                  key={work._id || idx}
+                                  to={`/work/${work._id}`}
+                                  className="work-card"
+                                >
+                                  <span className={`work-badge badge-${idx % 3}`}>
+                                    {work.category || 'Custom'}
+                                  </span>
+                                  <span className="work-date">
+                                    <FiCalendar /> {new Date(work.createdAt).toLocaleDateString('en-US', { month: '2-digit', day: '2-digit' })}
+                                  </span>
+                                  <h4 className="work-title">{work.title}</h4>
+                                  <p className="work-desc">{work.description?.substring(0, 60) || 'Beautiful custom work'}</p>
+                                </Link>
+                              ))
+                            ) : (
+                              <>
+                                <div className="work-card placeholder-card">
+                                  <span className="work-badge badge-0">Portfolio</span>
+                                  <h4 className="work-title">View Full Portfolio</h4>
+                                  <p className="work-desc">See all works by this tailor</p>
+                                </div>
+                                <div className="work-card placeholder-card">
+                                  <span className="work-badge badge-1">Reviews</span>
+                                  <h4 className="work-title">{tailor.reviewCount || 0} Reviews</h4>
+                                  <p className="work-desc">Read what clients say</p>
+                                </div>
+                              </>
+                            )}
+                          </div>
+                        </div>
+
+                        {/* Location Badge */}
+                        {tailor.location?.city && (
+                          <div className="tailor-location">
+                            <FiMapPin />
+                            <span>{tailor.location.city}</span>
+                          </div>
+                        )}
+                      </div>
+                    );
+                  })}
+                </div>
+
+                {/* Pagination */}
+                {pagination.totalPages > 1 && renderPagination()}
+              </>
             )}
-          </>
-        )}
+          </div>
+        </div>
       </div>
-    </div>
+    </>
   );
 }
