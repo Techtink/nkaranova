@@ -186,29 +186,48 @@
 
   .tag-dropdown {
     position: absolute;
-    top: calc(100% + 8px);
+    top: calc(100% + 12px);
     left: 0;
-    min-width: 180px;
-    background: $white;
-    border-radius: 12px;
-    box-shadow: 0 4px 20px rgba(0, 0, 0, 0.15);
+    min-width: 220px;
+    background: var(--card-bg);
+    border: 1px solid var(--border-color);
+    border-radius: 16px;
+    box-shadow: 0 10px 40px rgba(0, 0, 0, 0.15);
     z-index: 100;
+    padding: $spacing-sm 0;
     overflow: hidden;
 
     button {
-      display: block;
+      display: flex;
+      align-items: center;
+      gap: $spacing-md;
       width: 100%;
-      padding: $spacing-sm $spacing-md;
+      padding: $spacing-md $spacing-lg;
       text-align: left;
       border: none;
       background: none;
-      font-size: $text-sm;
+      font-size: $text-base;
+      font-weight: $font-medium;
       color: var(--text-primary);
       cursor: pointer;
-      transition: background 0.15s ease;
+      transition: all 0.15s ease;
 
       &:hover {
-        background: $gray-50;
+        background: var(--bg-secondary);
+      }
+
+      &::before {
+        content: '';
+        width: 8px;
+        height: 8px;
+        background: $primary;
+        border-radius: 50%;
+        opacity: 0;
+        transition: opacity 0.15s ease;
+      }
+
+      &:hover::before {
+        opacity: 1;
       }
     }
   }
