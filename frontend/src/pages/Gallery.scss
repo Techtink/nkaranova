@@ -2,11 +2,7 @@
 @import '../styles/mixins';
 
 .gallery-page {
-  padding: $spacing-lg $spacing-xl $spacing-2xl;
-
-  @include mobile {
-    padding: $spacing-lg $spacing-md $spacing-2xl;
-  }
+  padding: $spacing-lg 0 $spacing-2xl;
 }
 
 // Breadcrumb
@@ -259,13 +255,19 @@
 // Gallery Card
 .gallery-card {
   background: var(--card-bg);
+  border: 1px solid var(--border-color);
+  border-radius: $radius-md;
+  overflow: hidden;
+}
+
+.gallery-card-content {
+  padding: $spacing-md;
 }
 
 .gallery-card-image {
   position: relative;
   aspect-ratio: 4 / 3;
   overflow: hidden;
-  border-radius: $radius-md;
   background: var(--bg-secondary);
 
   img {
@@ -350,7 +352,7 @@
   display: flex;
   align-items: center;
   gap: $spacing-lg;
-  padding: $spacing-md 0 $spacing-sm;
+  margin-bottom: $spacing-sm;
   font-size: $text-xs;
   color: var(--text-muted);
 
@@ -386,6 +388,7 @@
   display: flex;
   align-items: center;
   justify-content: space-between;
+  margin-top: $spacing-md;
   padding-top: $spacing-md;
   border-top: 1px solid var(--border-color);
 }

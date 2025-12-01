@@ -285,55 +285,58 @@ export default function Gallery() {
                         </Link>
                       </div>
 
-                      {/* Stats Row */}
-                      <div className="gallery-card-stats">
-                        <span className="stat-item">
-                          <FiEye /> {work.viewCount || 0}
-                        </span>
-                        <span className="stat-item">
-                          <FiHeart /> {work.likeCount || 0}
-                        </span>
-                        {work.completionTime?.value && (
+                      {/* Card Content */}
+                      <div className="gallery-card-content">
+                        {/* Stats Row */}
+                        <div className="gallery-card-stats">
                           <span className="stat-item">
-                            <FiClock /> {work.completionTime.value} {work.completionTime.unit}
+                            <FiEye /> {work.viewCount || 0}
                           </span>
-                        )}
-                      </div>
-
-                      {/* Title */}
-                      <h3 className="gallery-card-title">{work.title}</h3>
-
-                      {/* Description */}
-                      {work.description && (
-                        <p className="gallery-card-description">
-                          {work.description.substring(0, 80)}
-                          {work.description.length > 80 ? '...' : ''}
-                        </p>
-                      )}
-
-                      {/* Footer: Tailor + Price */}
-                      <div className="gallery-card-footer">
-                        {work.tailor && (
-                          <Link to={`/tailor/${work.tailor.username}`} className="gallery-card-tailor">
-                            <div className="tailor-avatar">
-                              {work.tailor.profilePhoto ? (
-                                <img src={work.tailor.profilePhoto} alt={work.tailor.username} />
-                              ) : (
-                                work.tailor.username?.charAt(0).toUpperCase()
-                              )}
-                            </div>
-                            <span className="tailor-name">
-                              {work.tailor.businessName || work.tailor.username}
+                          <span className="stat-item">
+                            <FiHeart /> {work.likeCount || 0}
+                          </span>
+                          {work.completionTime?.value && (
+                            <span className="stat-item">
+                              <FiClock /> {work.completionTime.value} {work.completionTime.unit}
                             </span>
-                          </Link>
+                          )}
+                        </div>
+
+                        {/* Title */}
+                        <h3 className="gallery-card-title">{work.title}</h3>
+
+                        {/* Description */}
+                        {work.description && (
+                          <p className="gallery-card-description">
+                            {work.description.substring(0, 80)}
+                            {work.description.length > 80 ? '...' : ''}
+                          </p>
                         )}
-                        {work.price?.amount && (
-                          <span className="gallery-card-price">
-                            <FiClock />
-                            {work.price.isStartingPrice && 'From '}
-                            ${work.price.amount.toLocaleString()}
-                          </span>
-                        )}
+
+                        {/* Footer: Tailor + Price */}
+                        <div className="gallery-card-footer">
+                          {work.tailor && (
+                            <Link to={`/tailor/${work.tailor.username}`} className="gallery-card-tailor">
+                              <div className="tailor-avatar">
+                                {work.tailor.profilePhoto ? (
+                                  <img src={work.tailor.profilePhoto} alt={work.tailor.username} />
+                                ) : (
+                                  work.tailor.username?.charAt(0).toUpperCase()
+                                )}
+                              </div>
+                              <span className="tailor-name">
+                                {work.tailor.businessName || work.tailor.username}
+                              </span>
+                            </Link>
+                          )}
+                          {work.price?.amount && (
+                            <span className="gallery-card-price">
+                              <FiClock />
+                              {work.price.isStartingPrice && 'From '}
+                              ${work.price.amount.toLocaleString()}
+                            </span>
+                          )}
+                        </div>
                       </div>
                     </div>
                   );
