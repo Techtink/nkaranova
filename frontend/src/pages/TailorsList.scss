@@ -81,18 +81,10 @@
 
 // Tailors Grid
 .tailors-grid {
-  display: grid;
-  grid-template-columns: repeat(3, 1fr);
-  gap: $spacing-xl;
-
-  @include sm {
-    grid-template-columns: repeat(2, 1fr);
-  }
-
-  @include mobile {
-    grid-template-columns: repeat(2, 1fr);
-    gap: $spacing-md;
-  }
+  display: flex;
+  flex-wrap: wrap;
+  gap: $spacing-lg;
+  justify-content: flex-start;
 }
 
 // Tailor Card
@@ -100,11 +92,20 @@
   background: var(--card-bg);
   border: 1px solid var(--border-color);
   border-radius: 12px;
-  padding: $spacing-xl $spacing-md;
+  padding: $spacing-lg $spacing-md;
   text-decoration: none;
   text-align: center;
   transition: all 0.2s ease;
-  width: 100%;
+  width: calc(33.333% - 14px);
+  min-width: 160px;
+
+  @include sm {
+    width: calc(50% - 12px);
+  }
+
+  @include mobile {
+    width: calc(50% - 8px);
+  }
 
   &:hover {
     box-shadow: var(--shadow-md);
