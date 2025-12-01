@@ -287,9 +287,9 @@ export default function Gallery() {
                         <span className="stat-item">
                           <FiHeart /> {work.likeCount || 0}
                         </span>
-                        {work.completionTime && (
+                        {work.completionTime?.value && (
                           <span className="stat-item">
-                            <FiClock /> {work.completionTime}
+                            <FiClock /> {work.completionTime.value} {work.completionTime.unit}
                           </span>
                         )}
                       </div>
