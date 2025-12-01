@@ -275,6 +275,8 @@
     height: 100%;
     object-fit: cover;
     transition: transform 0.3s ease;
+    padding: $spacing-md;
+    box-sizing: border-box;
   }
 
   &:hover img {
@@ -298,8 +300,8 @@
 
 .gallery-card-badge {
   position: absolute;
-  top: $spacing-xl;
-  right: $spacing-xl;
+  top: $spacing-md;
+  right: $spacing-md;
   display: flex;
   align-items: center;
   gap: $spacing-xs;
