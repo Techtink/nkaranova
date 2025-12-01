@@ -1,8 +1,7 @@
 import { useState, useEffect } from 'react';
-import { useSearchParams } from 'react-router-dom';
-import { FiFilter, FiX } from 'react-icons/fi';
-import TailorCard from '../components/cards/TailorCard';
-import Button from '../components/common/Button';
+import { useSearchParams, Link } from 'react-router-dom';
+import { FiStar, FiChevronLeft, FiChevronRight } from 'react-icons/fi';
+import Header from '../components/layout/Header';
 import { tailorsAPI } from '../services/api';
 import { SPECIALTIES } from '../utils/constants';
 import './TailorsList.scss';
@@ -12,15 +11,10 @@ export default function TailorsList() {
   const [tailors, setTailors] = useState([]);
   const [loading, setLoading] = useState(true);
   const [pagination, setPagination] = useState({});
-  const [showFilters, setShowFilters] = useState(false);
 
-  const [filters, setFilters] = useState({
-    search: searchParams.get('search') || '',
-    specialty: searchParams.get('specialty') || '',
-    location: searchParams.get('location') || '',
-    minRating: searchParams.get('minRating') || '',
-    sortBy: searchParams.get('sortBy') || 'rating'
-  });
+  const activeSpecialty = searchParams.get('specialty') || '';
+  const currentPage = parseInt(searchParams.get('page')) || 1;
+  const sortBy = searchParams.get('sortBy') || 'rating';
 
   useEffect(() => {
     fetchTailors();
@@ -30,13 +24,10 @@ export default function TailorsList() {
     setLoading(true);
     try {
       const params = {
-        page: searchParams.get('page') || 1,
+        page: currentPage,
         limit: 12,
-        search: searchParams.get('search'),
         specialty: searchParams.get('specialty'),
-        location: searchParams.get('location'),
-        minRating: searchParams.get('minRating'),
-        sortBy: searchParams.get('sortBy') || 'rating'
+        sortBy
       };
 
       const response = await tailorsAPI.getAll(params);
@@ -49,175 +40,177 @@ export default function TailorsList() {
     }
   };
 
-  const handleFilterChange = (key, value) => {
-    setFilters(prev => ({ ...prev, [key]: value }));
-  };
-
-  const applyFilters = () => {
-    const newParams = new URLSearchParams();
-    Object.entries(filters).forEach(([key, value]) => {
-      if (value) newParams.set(key, value);
-    });
+  const handleSpecialtyChange = (specialty) => {
+    const newParams = new URLSearchParams(searchParams);
+    if (specialty) {
+      newParams.set('specialty', specialty);
+    } else {
+      newParams.delete('specialty');
+    }
+    newParams.delete('page');
     setSearchParams(newParams);
-    setShowFilters(false);
   };
 
-  const clearFilters = () => {
-    setFilters({
-      search: '',
-      specialty: '',
-      location: '',
-      minRating: '',
-      sortBy: 'rating'
-    });
-    setSearchParams(new URLSearchParams());
+  const handleSortChange = (sort) => {
+    const newParams = new URLSearchParams(searchParams);
+    newParams.set('sortBy', sort);
+    newParams.delete('page');
+    setSearchParams(newParams);
   };
 
   const handlePageChange = (page) => {
     const newParams = new URLSearchParams(searchParams);
     newParams.set('page', page);
     setSearchParams(newParams);
+    window.scrollTo({ top: 0, behavior: 'smooth' });
   };
 
-  return (
-    <div className="tailors-page page">
-      <div className="container">
-        <div className="page-header">
-          <div>
-            <h1>Find Tailors</h1>
-            <p>Browse talented tailors from around the world</p>
-          </div>
+  const renderPagination = () => {
+    const { totalPages, total } = pagination;
+    const totalPagesNum = totalPages || 1;
+
+    const pages = [];
+    const maxVisible = 5;
+    let startPage = Math.max(1, currentPage - Math.floor(maxVisible / 2));
+    let endPage = Math.min(totalPagesNum, startPage + maxVisible - 1);
+
+    if (endPage - startPage + 1 < maxVisible) {
+      startPage = Math.max(1, endPage - maxVisible + 1);
+    }
+
+    for (let i = startPage; i <= endPage; i++) {
+      pages.push(i);
+    }
+
+    return (
+      <div className="tailors-pagination">
+        <span className="pagination-info">
+          Page {currentPage} of {totalPagesNum} ({total || tailors.length} tailors)
+        </span>
+
+        <div className="pagination-controls">
           <button
-            className="filter-toggle"
-            onClick={() => setShowFilters(!showFilters)}
+            className="pagination-btn"
+            disabled={currentPage === 1}
+            onClick={() => handlePageChange(currentPage - 1)}
           >
-            <FiFilter /> Filters
+            <FiChevronLeft />
+          </button>
+
+          {pages.map(page => (
+            <button
+              key={page}
+              className={`pagination-btn ${currentPage === page ? 'active' : ''}`}
+              onClick={() => handlePageChange(page)}
+            >
+              {page}
+            </button>
+          ))}
+
+          <button
+            className="pagination-btn"
+            disabled={currentPage === totalPagesNum}
+            onClick={() => handlePageChange(currentPage + 1)}
+          >
+            <FiChevronRight />
           </button>
         </div>
-
-        {/* Filters */}
-        <div className={`filters-panel ${showFilters ? 'open' : ''}`}>
-          <div className="filters-header">
-            <h3>Filters</h3>
-            <button onClick={() => setShowFilters(false)}>
-              <FiX />
-            </button>
-          </div>
-
-          <div className="filters-body">
-            <div className="filter-group">
-              <label>Search</label>
-              <input
-                type="text"
-                placeholder="Search by name, bio..."
-                value={filters.search}
-                onChange={(e) => handleFilterChange('search', e.target.value)}
-              />
-            </div>
-
-            <div className="filter-group">
-              <label>Specialty</label>
-              <select
-                value={filters.specialty}
-                onChange={(e) => handleFilterChange('specialty', e.target.value)}
-              >
-                <option value="">All Specialties</option>
-                {SPECIALTIES.map(spec => (
-                  <option key={spec} value={spec}>{spec}</option>
-                ))}
-              </select>
-            </div>
-
-            <div className="filter-group">
-              <label>Location</label>
-              <input
-                type="text"
-                placeholder="City or country"
-                value={filters.location}
-                onChange={(e) => handleFilterChange('location', e.target.value)}
-              />
-            </div>
-
-            <div className="filter-group">
-              <label>Minimum Rating</label>
-              <select
-                value={filters.minRating}
-                onChange={(e) => handleFilterChange('minRating', e.target.value)}
-              >
-                <option value="">Any Rating</option>
-                <option value="4">4+ Stars</option>
-                <option value="4.5">4.5+ Stars</option>
-              </select>
-            </div>
-
-            <div className="filter-group">
-              <label>Sort By</label>
-              <select
-                value={filters.sortBy}
-                onChange={(e) => handleFilterChange('sortBy', e.target.value)}
-              >
-                <option value="rating">Top Rated</option>
-                <option value="reviews">Most Reviews</option>
-                <option value="newest">Newest</option>
-                <option value="works">Most Works</option>
-              </select>
-            </div>
-          </div>
-
-          <div className="filters-actions">
-            <Button variant="ghost" onClick={clearFilters}>Clear All</Button>
-            <Button onClick={applyFilters}>Apply Filters</Button>
-          </div>
-        </div>
-
-        {/* Results */}
-        {loading ? (
-          <div className="loading-container">
-            <div className="spinner" />
-          </div>
-        ) : tailors.length === 0 ? (
-          <div className="empty-state">
-            <h3>No tailors found</h3>
-            <p>Try adjusting your filters or search criteria</p>
-            <Button onClick={clearFilters}>Clear Filters</Button>
-          </div>
-        ) : (
-          <>
-            <p className="results-count">
-              Showing {tailors.length} of {pagination.total || 0} tailors
-            </p>
-
-            <div className="grid grid-4">
-              {tailors.map(tailor => (
-                <TailorCard key={tailor._id} tailor={tailor} />
-              ))}
-            </div>
-
-            {/* Pagination */}
-            {pagination.totalPages > 1 && (
-              <div className="pagination">
-                <Button
-                  variant="ghost"
-                  disabled={!pagination.hasPrevPage}
-                  onClick={() => handlePageChange(pagination.page - 1)}
-                >
-                  Previous
-                </Button>
-                <span className="page-info">
-                  Page {pagination.page} of {pagination.totalPages}
-                </span>
-                <Button
-                  variant="ghost"
-                  disabled={!pagination.hasNextPage}
-                  onClick={() => handlePageChange(pagination.page + 1)}
-                >
-                  Next
-                </Button>
-              </div>
-            )}
-          </>
-        )}
       </div>
-    </div>
+    );
+  };
+
+  // Group specialties for display
+  const topSpecialties = ['Wedding Dresses', 'Men\'s Suits', 'Traditional African', 'Custom Design', 'Formal Wear'];
+
+  return (
+    <>
+      <Header />
+      <div className="tailors-list-page">
+        <div className="container">
+          {/* Section Header */}
+          <div className="section-title-row">
+            <h2>Recommended by Rating</h2>
+            <select
+              className="sort-select"
+              value={sortBy}
+              onChange={(e) => handleSortChange(e.target.value)}
+            >
+              <option value="rating">Top Rated</option>
+              <option value="reviews">Most Reviews</option>
+              <option value="newest">Newest</option>
+            </select>
+          </div>
+
+          {/* Specialty Filter Pills */}
+          <div className="specialty-pills">
+            <button
+              className={`pill ${!activeSpecialty ? 'active' : ''}`}
+              onClick={() => handleSpecialtyChange('')}
+            >
+              All
+            </button>
+            {topSpecialties.map(spec => (
+              <button
+                key={spec}
+                className={`pill ${activeSpecialty === spec ? 'active' : ''}`}
+                onClick={() => handleSpecialtyChange(spec)}
+              >
+                {spec}
+              </button>
+            ))}
+          </div>
+
+          {/* Tailors Grid */}
+          {loading ? (
+            <div className="loading-container">
+              <div className="spinner" />
+            </div>
+          ) : tailors.length === 0 ? (
+            <div className="empty-state">
+              <h3>No tailors found</h3>
+              <p>Try selecting a different specialty</p>
+            </div>
+          ) : (
+            <>
+              <div className="tailors-grid">
+                {tailors.map(tailor => {
+                  const displayName = tailor.businessName || `${tailor.user?.firstName || ''} ${tailor.user?.lastName || ''}`.trim() || 'Tailor';
+                  const rating = tailor.averageRating || 5.0;
+                  const reviewCount = tailor.reviewCount || 0;
+
+                  return (
+                    <Link
+                      key={tailor._id}
+                      to={`/tailor/${tailor.username}`}
+                      className="tailor-card"
+                    >
+                      <div className="card-photo">
+                        {tailor.profilePhoto ? (
+                          <img src={tailor.profilePhoto} alt={displayName} />
+                        ) : (
+                          <span className="photo-placeholder">{displayName.charAt(0)}</span>
+                        )}
+                      </div>
+                      <h3 className="card-name">{displayName}</h3>
+                      <p className="card-reviews">
+                        <FiStar className="star-icon" />
+                        {reviewCount} reviews
+                      </p>
+                      <div className="card-stat">
+                        <span className="stat-label">Rating</span>
+                        <span className="stat-value">{rating.toFixed(1)}</span>
+                      </div>
+                    </Link>
+                  );
+                })}
+              </div>
+
+              {/* Pagination */}
+              {pagination.totalPages > 1 && renderPagination()}
+            </>
+          )}
+        </div>
+      </div>
+    </>
   );
 }
