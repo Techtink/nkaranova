@@ -1,6 +1,6 @@
 import { useState, useEffect, useRef } from 'react';
 import { useSearchParams, Link } from 'react-router-dom';
-import { FiStar, FiChevronLeft, FiChevronRight, FiSearch, FiHeart, FiTrendingUp } from 'react-icons/fi';
+import { FiStar, FiChevronLeft, FiChevronRight, FiSearch, FiMapPin, FiX, FiClock, FiTrendingUp } from 'react-icons/fi';
 import Header from '../components/layout/Header';
 import { tailorsAPI } from '../services/api';
 import { SPECIALTIES } from '../utils/constants';
@@ -11,14 +11,15 @@ export default function TailorsList() {
   const [tailors, setTailors] = useState([]);
   const [loading, setLoading] = useState(true);
   const [pagination, setPagination] = useState({});
-  const [searchQuery, setSearchQuery] = useState('');
+
+  // Search state
+  const [searchQuery, setSearchQuery] = useState(searchParams.get('search') || '');
+  const [locationQuery, setLocationQuery] = useState(searchParams.get('location') || '');
   const [showSuggestions, setShowSuggestions] = useState(false);
   const [recentSearches, setRecentSearches] = useState([]);
   const searchRef = useRef(null);
 
-  const activeSpecialty = searchParams.get('specialty') || '';
   const currentPage = parseInt(searchParams.get('page')) || 1;
-  const sortBy = searchParams.get('sortBy') || 'rating';
 
   // Load recent searches from localStorage
   useEffect(() => {
@@ -49,9 +50,17 @@ export default function TailorsList() {
       const params = {
         page: currentPage,
         limit: 12,
-        specialty: searchParams.get('specialty'),
-        sortBy
+        sortBy: 'rating'
       };
+
+      // Add search params if they exist
+      const search = searchParams.get('search');
+      const specialty = searchParams.get('specialty');
+      const location = searchParams.get('location');
+
+      if (search) params.search = search;
+      if (specialty) params.specialty = specialty;
+      if (location) params.location = location;
 
       const response = await tailorsAPI.getAll(params);
       setTailors(response.data.data || []);
@@ -63,7 +72,40 @@ export default function TailorsList() {
     }
   };
 
-  const handleSpecialtyChange = (specialty) => {
+  const handlePageChange = (page) => {
+    const newParams = new URLSearchParams(searchParams);
+    newParams.set('page', page);
+    setSearchParams(newParams);
+    window.scrollTo({ top: 0, behavior: 'smooth' });
+  };
+
+  const handleSearch = (e) => {
+    e.preventDefault();
+    const newParams = new URLSearchParams(searchParams);
+
+    // Update search params
+    if (searchQuery.trim()) {
+      newParams.set('search', searchQuery.trim());
+      // Save to recent searches
+      const updated = [searchQuery.trim(), ...recentSearches.filter(s => s !== searchQuery.trim())].slice(0, 4);
+      setRecentSearches(updated);
+      localStorage.setItem('recentTailorSearches', JSON.stringify(updated));
+    } else {
+      newParams.delete('search');
+    }
+
+    if (locationQuery.trim()) {
+      newParams.set('location', locationQuery.trim());
+    } else {
+      newParams.delete('location');
+    }
+
+    newParams.delete('page');
+    setSearchParams(newParams);
+    setShowSuggestions(false);
+  };
+
+  const handleSpecialtyClick = (specialty) => {
     const newParams = new URLSearchParams(searchParams);
     if (specialty) {
       newParams.set('specialty', specialty);
@@ -72,46 +114,27 @@ export default function TailorsList() {
     }
     newParams.delete('page');
     setSearchParams(newParams);
-  };
-
-  const handleSortChange = (sort) => {
-    const newParams = new URLSearchParams(searchParams);
-    newParams.set('sortBy', sort);
-    newParams.delete('page');
-    setSearchParams(newParams);
-  };
-
-  const handlePageChange = (page) => {
-    const newParams = new URLSearchParams(searchParams);
-    newParams.set('page', page);
-    setSearchParams(newParams);
-    window.scrollTo({ top: 0, behavior: 'smooth' });
-  };
-
-  const handleSearch = (query) => {
-    if (!query.trim()) return;
-
-    // Save to recent searches
-    const updated = [query, ...recentSearches.filter(s => s !== query)].slice(0, 4);
-    setRecentSearches(updated);
-    localStorage.setItem('recentTailorSearches', JSON.stringify(updated));
-
-    // Apply as specialty filter
-    handleSpecialtyChange(query);
-    setSearchQuery('');
     setShowSuggestions(false);
   };
 
-  const handleSearchSubmit = (e) => {
-    e.preventDefault();
-    handleSearch(searchQuery);
+  const handleRecentSearchClick = (search) => {
+    setSearchQuery(search);
+    const newParams = new URLSearchParams(searchParams);
+    newParams.set('search', search);
+    newParams.delete('page');
+    setSearchParams(newParams);
+    setShowSuggestions(false);
   };
 
-  const popularSpecialties = [
-    'Wedding Dresses', 'Men\'s Suits', 'Traditional African',
-    'Alterations & Repairs', 'Custom Design', 'Formal Wear',
-    'Children\'s Clothing', 'Embroidery'
-  ];
+  const clearFilters = () => {
+    setSearchQuery('');
+    setLocationQuery('');
+    setSearchParams({});
+  };
+
+  const hasActiveFilters = searchParams.get('search') || searchParams.get('location') || searchParams.get('specialty');
+
+  const popularSpecialties = SPECIALTIES.slice(0, 8);
 
   const renderPagination = () => {
     const { totalPages, total } = pagination;
@@ -174,16 +197,30 @@ export default function TailorsList() {
         <div className="container">
           {/* Search Bar */}
           <div className="search-wrapper" ref={searchRef}>
-            <form className="search-bar-large" onSubmit={handleSearchSubmit}>
-              <input
-                type="text"
-                placeholder="Search for specialty..."
-                value={searchQuery}
-                onChange={(e) => setSearchQuery(e.target.value)}
-                onFocus={() => setShowSuggestions(true)}
-              />
+            <form className="search-form" onSubmit={handleSearch}>
+              <div className="search-input-group">
+                <FiSearch className="input-icon" />
+                <input
+                  type="text"
+                  placeholder="Search by name or specialty..."
+                  value={searchQuery}
+                  onChange={(e) => setSearchQuery(e.target.value)}
+                  onFocus={() => setShowSuggestions(true)}
+                />
+              </div>
+              <div className="search-divider" />
+              <div className="search-input-group">
+                <FiMapPin className="input-icon" />
+                <input
+                  type="text"
+                  placeholder="City or country..."
+                  value={locationQuery}
+                  onChange={(e) => setLocationQuery(e.target.value)}
+                />
+              </div>
               <button type="submit" className="search-btn">
                 <FiSearch />
+                <span>Search</span>
               </button>
             </form>
 
@@ -193,12 +230,12 @@ export default function TailorsList() {
                 {recentSearches.length > 0 && (
                   <div className="suggestion-column">
                     <div className="suggestion-header">
-                      <FiHeart className="suggestion-icon" />
+                      <FiClock className="suggestion-icon" />
                       <span>Recent Searches</span>
                     </div>
                     <div className="suggestion-list">
                       {recentSearches.map((search, idx) => (
-                        <button key={idx} type="button" onClick={() => handleSearch(search)}>
+                        <button key={idx} type="button" onClick={() => handleRecentSearchClick(search)}>
                           {search}
                         </button>
                       ))}
@@ -212,7 +249,7 @@ export default function TailorsList() {
                   </div>
                   <div className="suggestion-list">
                     {popularSpecialties.map((spec, idx) => (
-                      <button key={idx} type="button" onClick={() => handleSearch(spec)}>
+                      <button key={idx} type="button" onClick={() => handleSpecialtyClick(spec)}>
                         {spec}
                       </button>
                     ))}
@@ -222,19 +259,46 @@ export default function TailorsList() {
             )}
           </div>
 
-          {/* Section Header */}
-          <div className="section-title-row">
-            <h2>{activeSpecialty || 'All Tailors'}</h2>
-            <select
-              className="sort-select"
-              value={sortBy}
-              onChange={(e) => handleSortChange(e.target.value)}
-            >
-              <option value="rating">Top Rated</option>
-              <option value="reviews">Most Reviews</option>
-              <option value="newest">Newest</option>
-            </select>
-          </div>
+          {/* Active Filters */}
+          {hasActiveFilters && (
+            <div className="active-filters">
+              {searchParams.get('search') && (
+                <span className="filter-tag">
+                  Search: {searchParams.get('search')}
+                  <button onClick={() => {
+                    setSearchQuery('');
+                    const newParams = new URLSearchParams(searchParams);
+                    newParams.delete('search');
+                    setSearchParams(newParams);
+                  }}><FiX /></button>
+                </span>
+              )}
+              {searchParams.get('location') && (
+                <span className="filter-tag">
+                  <FiMapPin /> {searchParams.get('location')}
+                  <button onClick={() => {
+                    setLocationQuery('');
+                    const newParams = new URLSearchParams(searchParams);
+                    newParams.delete('location');
+                    setSearchParams(newParams);
+                  }}><FiX /></button>
+                </span>
+              )}
+              {searchParams.get('specialty') && (
+                <span className="filter-tag">
+                  {searchParams.get('specialty')}
+                  <button onClick={() => {
+                    const newParams = new URLSearchParams(searchParams);
+                    newParams.delete('specialty');
+                    setSearchParams(newParams);
+                  }}><FiX /></button>
+                </span>
+              )}
+              <button className="clear-all-btn" onClick={clearFilters}>
+                Clear all
+              </button>
+            </div>
+          )}
 
           {/* Tailors Grid */}
           {loading ? (
@@ -244,7 +308,10 @@ export default function TailorsList() {
           ) : tailors.length === 0 ? (
             <div className="empty-state">
               <h3>No tailors found</h3>
-              <p>Try selecting a different specialty</p>
+              <p>Try adjusting your search or filters</p>
+              {hasActiveFilters && (
+                <button className="btn-clear" onClick={clearFilters}>Clear filters</button>
+              )}
             </div>
           ) : (
             <>
