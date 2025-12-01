@@ -1,6 +1,6 @@
 import { useState, useEffect } from 'react';
 import { useSearchParams, Link } from 'react-router-dom';
-import { FiStar, FiChevronLeft, FiChevronRight } from 'react-icons/fi';
+import { FiStar, FiChevronLeft, FiChevronRight, FiSearch, FiHeart, FiTrendingUp } from 'react-icons/fi';
 import Header from '../components/layout/Header';
 import { tailorsAPI } from '../services/api';
 import { SPECIALTIES } from '../utils/constants';
@@ -11,10 +11,20 @@ export default function TailorsList() {
   const [tailors, setTailors] = useState([]);
   const [loading, setLoading] = useState(true);
   const [pagination, setPagination] = useState({});
+  const [searchQuery, setSearchQuery] = useState('');
+  const [recentSearches, setRecentSearches] = useState([]);
 
   const activeSpecialty = searchParams.get('specialty') || '';
   const currentPage = parseInt(searchParams.get('page')) || 1;
   const sortBy = searchParams.get('sortBy') || 'rating';
+
+  // Load recent searches from localStorage
+  useEffect(() => {
+    const saved = localStorage.getItem('recentTailorSearches');
+    if (saved) {
+      setRecentSearches(JSON.parse(saved).slice(0, 4));
+    }
+  }, []);
 
   useEffect(() => {
     fetchTailors();
@@ -64,6 +74,30 @@ export default function TailorsList() {
     setSearchParams(newParams);
     window.scrollTo({ top: 0, behavior: 'smooth' });
   };
+
+  const handleSearch = (query) => {
+    if (!query.trim()) return;
+
+    // Save to recent searches
+    const updated = [query, ...recentSearches.filter(s => s !== query)].slice(0, 4);
+    setRecentSearches(updated);
+    localStorage.setItem('recentTailorSearches', JSON.stringify(updated));
+
+    // Apply as specialty filter
+    handleSpecialtyChange(query);
+    setSearchQuery('');
+  };
+
+  const handleSearchSubmit = (e) => {
+    e.preventDefault();
+    handleSearch(searchQuery);
+  };
+
+  const popularSpecialties = [
+    'Wedding Dresses', 'Men\'s Suits', 'Traditional African',
+    'Alterations & Repairs', 'Custom Design', 'Formal Wear',
+    'Children\'s Clothing', 'Embroidery'
+  ];
 
   const renderPagination = () => {
     const { totalPages, total } = pagination;
@@ -119,17 +153,61 @@ export default function TailorsList() {
     );
   };
 
-  // Group specialties for display
-  const topSpecialties = ['Wedding Dresses', 'Men\'s Suits', 'Traditional African', 'Custom Design', 'Formal Wear'];
-
   return (
     <>
       <Header />
       <div className="tailors-list-page">
+        {/* Search Header */}
+        <div className="search-header">
+          <form className="search-bar-large" onSubmit={handleSearchSubmit}>
+            <input
+              type="text"
+              placeholder="Search for specialty..."
+              value={searchQuery}
+              onChange={(e) => setSearchQuery(e.target.value)}
+            />
+            <button type="submit" className="search-btn">
+              <FiSearch />
+            </button>
+          </form>
+
+          {/* Search Suggestions */}
+          <div className="search-suggestions">
+            {recentSearches.length > 0 && (
+              <div className="suggestion-column">
+                <div className="suggestion-header">
+                  <FiHeart className="suggestion-icon" />
+                  <span>Recent Searches</span>
+                </div>
+                <div className="suggestion-list">
+                  {recentSearches.map((search, idx) => (
+                    <button key={idx} onClick={() => handleSearch(search)}>
+                      {search}
+                    </button>
+                  ))}
+                </div>
+              </div>
+            )}
+            <div className="suggestion-column popular">
+              <div className="suggestion-header">
+                <FiTrendingUp className="suggestion-icon" />
+                <span>Popular Specialties</span>
+              </div>
+              <div className="suggestion-list">
+                {popularSpecialties.map((spec, idx) => (
+                  <button key={idx} onClick={() => handleSearch(spec)}>
+                    {spec}
+                  </button>
+                ))}
+              </div>
+            </div>
+          </div>
+        </div>
+
         <div className="container">
           {/* Section Header */}
           <div className="section-title-row">
-            <h2>Recommended by Rating</h2>
+            <h2>{activeSpecialty || 'All Tailors'}</h2>
             <select
               className="sort-select"
               value={sortBy}
@@ -139,25 +217,6 @@ export default function TailorsList() {
               <option value="reviews">Most Reviews</option>
               <option value="newest">Newest</option>
             </select>
-          </div>
-
-          {/* Specialty Filter Pills */}
-          <div className="specialty-pills">
-            <button
-              className={`pill ${!activeSpecialty ? 'active' : ''}`}
-              onClick={() => handleSpecialtyChange('')}
-            >
-              All
-            </button>
-            {topSpecialties.map(spec => (
-              <button
-                key={spec}
-                className={`pill ${activeSpecialty === spec ? 'active' : ''}`}
-                onClick={() => handleSpecialtyChange(spec)}
-              >
-                {spec}
-              </button>
-            ))}
           </div>
 
           {/* Tailors Grid */}
