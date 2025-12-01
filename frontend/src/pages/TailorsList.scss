@@ -82,20 +82,20 @@
 // Tailors Grid
 .tailors-grid {
   display: grid;
-  grid-template-columns: repeat(4, 1fr);
-  gap: $spacing-lg;
-  justify-items: center;
+  grid-template-columns: repeat(3, minmax(0, 200px));
+  gap: $spacing-xl;
+  justify-content: center;
 
   @include md {
-    grid-template-columns: repeat(3, 1fr);
+    grid-template-columns: repeat(3, minmax(0, 180px));
   }
 
   @include sm {
-    grid-template-columns: repeat(2, 1fr);
+    grid-template-columns: repeat(2, minmax(0, 180px));
   }
 
   @include mobile {
-    grid-template-columns: repeat(2, 1fr);
+    grid-template-columns: repeat(2, minmax(0, 150px));
     gap: $spacing-md;
   }
 }
@@ -110,7 +110,6 @@
   text-align: center;
   transition: all 0.2s ease;
   width: 100%;
-  max-width: 180px;
 
   &:hover {
     box-shadow: var(--shadow-md);
