@@ -90,13 +90,13 @@ export default function Gallery() {
   };
 
   const renderPagination = () => {
-    const { totalPages } = pagination;
-    if (!totalPages || totalPages <= 1) return null;
+    const { totalPages, total } = pagination;
+    const totalPagesNum = totalPages || 1;
 
     const pages = [];
     const maxVisible = 4;
     let startPage = Math.max(1, currentPage - Math.floor(maxVisible / 2));
-    let endPage = Math.min(totalPages, startPage + maxVisible - 1);
+    let endPage = Math.min(totalPagesNum, startPage + maxVisible - 1);
 
     if (endPage - startPage + 1 < maxVisible) {
       startPage = Math.max(1, endPage - maxVisible + 1);
@@ -108,33 +108,39 @@ export default function Gallery() {
 
     return (
       <div className="gallery-pagination">
-        <button
-          className="pagination-btn pagination-nav"
-          disabled={currentPage === 1}
-          onClick={() => handlePageChange(currentPage - 1)}
-        >
-          <FiChevronLeft /> Previous
-        </button>
+        <span className="pagination-info">
+          Showing page {currentPage} of {totalPagesNum} ({total || works.length} works)
+        </span>
 
-        <div className="pagination-numbers">
-          {pages.map(page => (
-            <button
-              key={page}
-              className={`pagination-btn ${currentPage === page ? 'active' : ''}`}
-              onClick={() => handlePageChange(page)}
-            >
-              {page}
-            </button>
-          ))}
+        <div className="pagination-controls">
+          <button
+            className="pagination-btn pagination-nav"
+            disabled={currentPage === 1}
+            onClick={() => handlePageChange(currentPage - 1)}
+          >
+            <FiChevronLeft /> Previous
+          </button>
+
+          <div className="pagination-numbers">
+            {pages.map(page => (
+              <button
+                key={page}
+                className={`pagination-btn ${currentPage === page ? 'active' : ''}`}
+                onClick={() => handlePageChange(page)}
+              >
+                {page}
+              </button>
+            ))}
+          </div>
+
+          <button
+            className="pagination-btn pagination-nav"
+            disabled={currentPage === totalPagesNum}
+            onClick={() => handlePageChange(currentPage + 1)}
+          >
+            Next <FiChevronRight />
+          </button>
         </div>
-
-        <button
-          className="pagination-btn pagination-nav"
-          disabled={currentPage === totalPages}
-          onClick={() => handlePageChange(currentPage + 1)}
-        >
-          Next <FiChevronRight />
-        </button>
       </div>
     );
   };

@@ -2,7 +2,11 @@
 @import '../styles/mixins';
 
 .gallery-page {
-  padding: $spacing-lg 0 $spacing-2xl;
+  padding: $spacing-lg $spacing-xl $spacing-2xl;
+
+  @include mobile {
+    padding: $spacing-lg $spacing-md $spacing-2xl;
+  }
 }
 
 // Breadcrumb
@@ -442,12 +446,31 @@
 .gallery-pagination {
   display: flex;
   align-items: center;
-  justify-content: center;
+  justify-content: space-between;
+  gap: $spacing-lg;
+  margin-top: $spacing-2xl;
+  padding-top: $spacing-xl;
+  border-top: 1px solid var(--border-color);
+
+  @include mobile {
+    flex-direction: column;
+    gap: $spacing-md;
+  }
+}
+
+.pagination-info {
+  font-size: $text-sm;
+  color: var(--text-secondary);
+}
+
+.pagination-controls {
+  display: flex;
+  align-items: center;
   gap: $spacing-md;
-  margin-top: $spacing-xl;
 
   @include mobile {
     flex-wrap: wrap;
+    justify-content: center;
   }
 }
 
