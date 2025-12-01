@@ -92,7 +92,7 @@
   background: var(--card-bg);
   border: 1px solid var(--border-color);
   border-radius: 12px;
-  padding: $spacing-lg $spacing-md;
+  padding: $spacing-xl $spacing-md $spacing-lg;
   text-decoration: none;
   text-align: center;
   transition: all 0.2s ease;
@@ -109,9 +109,9 @@
 }
 
 .card-photo {
-  width: 64px;
-  height: 64px;
-  margin: 0 auto $spacing-md;
+  width: 72px;
+  height: 72px;
+  margin: 0 auto $spacing-lg;
   border-radius: 50%;
   overflow: hidden;
   border: 2px solid var(--border-color);
@@ -167,9 +167,9 @@
   display: flex;
   flex-direction: column;
   align-items: center;
-  gap: 2px;
-  margin-top: $spacing-md;
-  padding-top: $spacing-md;
+  gap: 4px;
+  margin-top: $spacing-lg;
+  padding-top: $spacing-lg;
   border-top: 1px solid var(--border-color);
 
   .stat-label {
