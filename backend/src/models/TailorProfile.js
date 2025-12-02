@@ -29,6 +29,10 @@ const tailorProfileSchema = new mongoose.Schema({
     type: String,
     default: null
   },
+  coverPhoto: {
+    type: String,
+    default: null
+  },
   specialties: [{
     type: String
   }],

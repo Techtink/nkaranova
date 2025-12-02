@@ -1,21 +1,27 @@
 import { useState, useEffect, useRef, useCallback } from 'react';
 import { toast } from 'react-hot-toast';
-import { FiCheck, FiX, FiLoader } from 'react-icons/fi';
+import { FiCheck, FiX, FiLoader, FiCamera, FiUpload } from 'react-icons/fi';
 import { useAuth } from '../../context/AuthContext';
 import Button from '../../components/common/Button';
 import Input from '../../components/common/Input';
-import { tailorsAPI } from '../../services/api';
+import { tailorsAPI, uploadsAPI } from '../../services/api';
 import { SPECIALTIES } from '../../utils/constants';
 import './Settings.scss';
 
 export default function TailorSettings() {
   const { tailorProfile, updateTailorProfile } = useAuth();
   const [saving, setSaving] = useState(false);
+  const [uploadingProfile, setUploadingProfile] = useState(false);
+  const [uploadingCover, setUploadingCover] = useState(false);
+  const profileInputRef = useRef(null);
+  const coverInputRef = useRef(null);
 
   const [formData, setFormData] = useState({
     username: tailorProfile?.username || '',
     businessName: tailorProfile?.businessName || '',
     bio: tailorProfile?.bio || '',
+    profilePhoto: tailorProfile?.profilePhoto || '',
+    coverPhoto: tailorProfile?.coverPhoto || '',
     specialties: tailorProfile?.specialties || [],
     location: {
       city: tailorProfile?.location?.city || '',
@@ -113,6 +119,30 @@ export default function TailorSettings() {
     }));
   };
 
+  const handlePhotoUpload = async (e, type) => {
+    const file = e.target.files?.[0];
+    if (!file) return;
+
+    const setUploading = type === 'profile' ? setUploadingProfile : setUploadingCover;
+    setUploading(true);
+
+    try {
+      const response = await uploadsAPI.uploadProfilePhoto(file);
+      const photoUrl = response.data.url;
+
+      setFormData(prev => ({
+        ...prev,
+        [type === 'profile' ? 'profilePhoto' : 'coverPhoto']: photoUrl
+      }));
+
+      toast.success(`${type === 'profile' ? 'Profile' : 'Cover'} photo uploaded`);
+    } catch (error) {
+      toast.error('Failed to upload photo');
+    } finally {
+      setUploading(false);
+    }
+  };
+
   const handleSubmit = async (e) => {
     e.preventDefault();
 
@@ -152,6 +182,76 @@ export default function TailorSettings() {
         </div>
 
         <form onSubmit={handleSubmit} className="settings-form">
+          {/* Photo Upload Section */}
+          <section className="settings-section photos-section">
+            <h2>Profile Photos</h2>
+
+            <div className="photos-grid">
+              {/* Cover Photo */}
+              <div className="photo-upload cover-upload">
+                <label>Cover Photo</label>
+                <div
+                  className="upload-area cover"
+                  onClick={() => coverInputRef.current?.click()}
+                  style={formData.coverPhoto ? { backgroundImage: `url(${formData.coverPhoto})` } : {}}
+                >
+                  {uploadingCover ? (
+                    <FiLoader className="spinner" />
+                  ) : formData.coverPhoto ? (
+                    <div className="upload-overlay">
+                      <FiCamera />
+                      <span>Change Cover</span>
+                    </div>
+                  ) : (
+                    <div className="upload-placeholder">
+                      <FiUpload />
+                      <span>Upload Cover Photo</span>
+                    </div>
+                  )}
+                </div>
+                <input
+                  ref={coverInputRef}
+                  type="file"
+                  accept="image/*"
+                  onChange={(e) => handlePhotoUpload(e, 'cover')}
+                  hidden
+                />
+              </div>
+
+              {/* Profile Photo */}
+              <div className="photo-upload profile-upload">
+                <label>Profile Photo</label>
+                <div
+                  className="upload-area profile"
+                  onClick={() => profileInputRef.current?.click()}
+                >
+                  {uploadingProfile ? (
+                    <FiLoader className="spinner" />
+                  ) : formData.profilePhoto ? (
+                    <>
+                      <img src={formData.profilePhoto} alt="Profile" />
+                      <div className="upload-overlay">
+                        <FiCamera />
+                      </div>
+                    </>
+                  ) : (
+                    <div className="upload-placeholder">
+                      <FiCamera />
+                      <span>Add Photo</span>
+                    </div>
+                  )}
+                </div>
+                <input
+                  ref={profileInputRef}
+                  type="file"
+                  accept="image/*"
+                  onChange={(e) => handlePhotoUpload(e, 'profile')}
+                  hidden
+                />
+              </div>
+            </div>
+          </section>
+
           <section className="settings-section">
             <h2>Basic Information</h2>
 

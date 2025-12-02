@@ -24,6 +24,12 @@
     height: 220px;
   }
 
+  .cover-image {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+  }
+
   .cover-gradient {
     width: 100%;
     height: 100%;
@@ -131,13 +137,13 @@
 
   h1 {
     font-family: $font-display;
-    font-size: $text-2xl;
+    font-size: $text-xl;
     font-weight: $font-semibold;
     color: var(--text-primary);
     margin: 0;
 
     @include md {
-      font-size: $text-3xl;
+      font-size: $text-2xl;
     }
   }
 
@@ -174,20 +180,22 @@
 // Stats Row
 .profile-stats-row {
   display: flex;
-  gap: $spacing-2xl;
+  gap: $spacing-3xl;
   flex-wrap: wrap;
+  margin-top: $spacing-md;
 
   @include mobile {
-    gap: $spacing-lg;
+    gap: $spacing-xl;
   }
 
   .stat-item {
     display: flex;
     flex-direction: column;
-    gap: 2px;
+    gap: 4px;
+    min-width: 80px;
 
     .stat-label {
-      font-size: $text-xs;
+      font-size: $text-sm;
       color: var(--text-muted);
     }
 
@@ -195,13 +203,13 @@
       display: flex;
       align-items: center;
       gap: $spacing-xs;
-      font-size: $text-lg;
-      font-weight: $font-semibold;
+      font-size: $text-2xl;
+      font-weight: $font-bold;
       color: var(--text-primary);
 
       .star-icon {
-        width: 16px;
-        height: 16px;
+        width: 20px;
+        height: 20px;
         color: #F59E0B;
       }
     }

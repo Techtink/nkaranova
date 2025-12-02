@@ -88,7 +88,11 @@ export default function TailorProfile() {
           <div className="container">
             {/* Cover Banner */}
             <div className="profile-cover">
-              <div className="cover-gradient" />
+              {tailor.coverPhoto ? (
+                <img src={tailor.coverPhoto} alt="Cover" className="cover-image" />
+              ) : (
+                <div className="cover-gradient" />
+              )}
             </div>
 
             {/* Profile Header */}

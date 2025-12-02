@@ -204,3 +204,117 @@
     transform: rotate(360deg);
   }
 }
+
+// Photo Upload Section
+.photos-section {
+  .photos-grid {
+    display: grid;
+    grid-template-columns: 1fr;
+    gap: $spacing-lg;
+
+    @include md {
+      grid-template-columns: 2fr 1fr;
+    }
+  }
+}
+
+.photo-upload {
+  label {
+    display: block;
+    font-size: $text-sm;
+    font-weight: $font-medium;
+    margin-bottom: $spacing-sm;
+  }
+
+  .upload-area {
+    position: relative;
+    cursor: pointer;
+    overflow: hidden;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    background: var(--bg-secondary);
+    border: 2px dashed var(--border-color);
+    border-radius: 12px;
+    transition: all 0.2s ease;
+
+    &:hover {
+      border-color: $primary;
+
+      .upload-overlay {
+        opacity: 1;
+      }
+    }
+
+    &.cover {
+      height: 150px;
+      background-size: cover;
+      background-position: center;
+
+      @include md {
+        height: 180px;
+      }
+    }
+
+    &.profile {
+      width: 120px;
+      height: 120px;
+      border-radius: 50%;
+      margin: 0 auto;
+
+      img {
+        width: 100%;
+        height: 100%;
+        object-fit: cover;
+        border-radius: 50%;
+      }
+    }
+
+    .upload-placeholder {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: $spacing-sm;
+      color: var(--text-muted);
+
+      svg {
+        width: 32px;
+        height: 32px;
+      }
+
+      span {
+        font-size: $text-sm;
+      }
+    }
+
+    .upload-overlay {
+      position: absolute;
+      inset: 0;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      gap: $spacing-xs;
+      background: rgba(0, 0, 0, 0.5);
+      color: $white;
+      opacity: 0;
+      transition: opacity 0.2s ease;
+
+      svg {
+        width: 24px;
+        height: 24px;
+      }
+
+      span {
+        font-size: $text-sm;
+      }
+    }
+
+    .spinner {
+      width: 32px;
+      height: 32px;
+      color: $primary;
+      animation: spin 1s linear infinite;
+    }
+  }
+}

@@ -152,6 +152,7 @@ export const updateMyProfile = async (req, res, next) => {
       businessName,
       bio,
       profilePhoto,
+      coverPhoto,
       specialties,
       location,
       privateContact,
@@ -184,6 +185,7 @@ export const updateMyProfile = async (req, res, next) => {
     if (businessName !== undefined) tailor.businessName = businessName;
     if (bio !== undefined) tailor.bio = bio;
     if (profilePhoto !== undefined) tailor.profilePhoto = profilePhoto;
+    if (coverPhoto !== undefined) tailor.coverPhoto = coverPhoto;
     if (specialties) tailor.specialties = specialties;
     if (location) tailor.location = location;
     if (privateContact) tailor.privateContact = privateContact;
