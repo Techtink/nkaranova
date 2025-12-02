@@ -62,6 +62,7 @@ export const tailorsAPI = {
   getMyProfile: () => api.get('/tailors/me/profile'),
   updateProfile: (data) => api.put('/tailors/me/profile', data),
   updateMyProfile: (data) => api.put('/tailors/me/profile', data),
+  checkUsername: (username) => api.get(`/tailors/check-username/${username}`),
   getAvailability: (username) => api.get(`/tailors/${username}/availability`),
   updateMyAvailability: (data) => api.put('/tailors/me/availability', data),
   getSlots: (username, date) => api.get(`/tailors/${username}/slots/${date}`),

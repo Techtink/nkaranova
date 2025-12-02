@@ -9,11 +9,15 @@ import {
   FlatList,
   ActivityIndicator,
   Linking,
-  Alert
+  Alert,
+  Dimensions
 } from 'react-native';
 import { Ionicons } from '@expo/vector-icons';
+import { LinearGradient } from 'expo-linear-gradient';
 import { tailorsAPI, conversationsAPI, worksAPI, reviewsAPI } from '../../../../shared/services/api';
 import { colors, spacing, fontSize, borderRadius, shadows } from '../../../../shared/constants/theme';
+
+const { width: SCREEN_WIDTH } = Dimensions.get('window');
 
 export default function TailorProfileScreen({ route, navigation }) {
   const { username } = route.params;
@@ -29,20 +33,26 @@ export default function TailorProfileScreen({ route, navigation }) {
 
   const loadTailorData = async () => {
     try {
-      const [tailorRes, worksRes, reviewsRes] = await Promise.all([
+      const [tailorRes, reviewsRes] = await Promise.all([
         tailorsAPI.getByUsername(username),
-        worksAPI.getAll({ tailor: username, limit: 20 }),
         reviewsAPI.getTailorReviews(username, { limit: 10 })
       ]);
-      setTailor(tailorRes.data.data);
-      setWorks(worksRes.data.data);
-      setReviews(reviewsRes.data.data);
+      const data = tailorRes.data.data;
+      setTailor(data.tailor || data);
+      setWorks(data.works || []);
+      setReviews(reviewsRes.data.data || []);
     } catch (error) {
       console.error('Error loading tailor:', error);
       Alert.alert('Error', 'Failed to load tailor profile');
     } finally {
       setLoading(false);
     }
+  };
+
+  // Get display name - prefer businessName, then user name
+  const getDisplayName = () => {
+    if (!tailor) return '';
+    return tailor.businessName || `${tailor.user?.firstName || ''} ${tailor.user?.lastName || ''}`.trim() || tailor.user?.name || 'Unknown';
   };
 
   const handleMessage = async () => {
@@ -139,28 +149,78 @@ export default function TailorProfileScreen({ route, navigation }) {
     );
   }
 
+  const displayName = getDisplayName();
+  const isVerified = tailor.verificationStatus === 'approved';
+
   return (
     <View style={styles.container}>
       <ScrollView>
-        {/* Header Section */}
+        {/* Cover Photo */}
+        <View style={styles.coverContainer}>
+          {tailor.coverPhoto ? (
+            <Image source={{ uri: tailor.coverPhoto }} style={styles.coverPhoto} />
+          ) : (
+            <LinearGradient
+              colors={['#e8b5ce', '#c9a0dc', '#a78bda', '#8fa0e0']}
+              start={{ x: 0, y: 0 }}
+              end={{ x: 1, y: 1 }}
+              style={styles.coverGradient}
+            />
+          )}
+        </View>
+
+        {/* Profile Header */}
         <View style={styles.header}>
-          <Image
-            source={{ uri: tailor.user?.profilePhoto || 'https://via.placeholder.com/120' }}
-            style={styles.avatar}
-          />
+          <View style={styles.avatarContainer}>
+            <Image
+              source={{ uri: tailor.profilePhoto || 'https://via.placeholder.com/120' }}
+              style={styles.avatar}
+            />
+            {isVerified && (
+              <View style={styles.verifiedBadge}>
+                <Ionicons name="checkmark" size={14} color={colors.white} />
+              </View>
+            )}
+          </View>
           <View style={styles.headerInfo}>
             <View style={styles.nameRow}>
-              <Text style={styles.name}>{tailor.user?.name}</Text>
-              {tailor.isVerified && (
-                <Ionicons name="checkmark-circle" size={20} color={colors.primary} />
+              <Text style={styles.name}>{displayName}</Text>
+              {tailor.acceptingBookings && (
+                <View style={styles.availableBadge}>
+                  <View style={styles.availableDot} />
+                  <Text style={styles.availableText}>Available</Text>
+                </View>
               )}
             </View>
-            <Text style={styles.username}>@{tailor.user?.username}</Text>
-            <View style={styles.ratingRow}>
-              {renderStars(tailor.rating || 0)}
-              <Text style={styles.ratingText}>
-                {tailor.rating?.toFixed(1) || 'New'} ({tailor.reviewCount || 0} reviews)
-              </Text>
+            <Text style={styles.username}>@{tailor.username}</Text>
+
+            {/* Stats Row */}
+            <View style={styles.statsRow}>
+              <View style={styles.statItem}>
+                <Text style={styles.statValue}>
+                  <Ionicons name="star" size={16} color="#F59E0B" /> {tailor.averageRating?.toFixed(1) || '0.0'}
+                </Text>
+                <Text style={styles.statLabel}>Rating</Text>
+              </View>
+              <View style={styles.statDivider} />
+              <View style={styles.statItem}>
+                <Text style={styles.statValue}>{tailor.reviewCount || 0}</Text>
+                <Text style={styles.statLabel}>Reviews</Text>
+              </View>
+              <View style={styles.statDivider} />
+              <View style={styles.statItem}>
+                <Text style={styles.statValue}>{works.length}</Text>
+                <Text style={styles.statLabel}>Works</Text>
+              </View>
+              {tailor.location?.city && (
+                <>
+                  <View style={styles.statDivider} />
+                  <View style={styles.statItem}>
+                    <Text style={styles.statValue}>{tailor.location.city}</Text>
+                    <Text style={styles.statLabel}>Location</Text>
+                  </View>
+                </>
+              )}
             </View>
           </View>
         </View>
@@ -286,15 +346,51 @@ const styles = StyleSheet.create({
     color: colors.textMuted,
     marginTop: spacing.md
   },
+  // Cover Photo
+  coverContainer: {
+    width: SCREEN_WIDTH,
+    height: 180,
+    overflow: 'hidden'
+  },
+  coverPhoto: {
+    width: '100%',
+    height: '100%',
+    resizeMode: 'cover'
+  },
+  coverGradient: {
+    width: '100%',
+    height: '100%'
+  },
+  // Header
   header: {
     flexDirection: 'row',
     padding: spacing.lg,
-    backgroundColor: colors.white
+    paddingTop: spacing.md,
+    backgroundColor: colors.white,
+    marginTop: -40
+  },
+  avatarContainer: {
+    position: 'relative'
   },
   avatar: {
     width: 100,
     height: 100,
-    borderRadius: 50
+    borderRadius: 50,
+    borderWidth: 4,
+    borderColor: colors.white
+  },
+  verifiedBadge: {
+    position: 'absolute',
+    bottom: 4,
+    right: 4,
+    width: 28,
+    height: 28,
+    borderRadius: 14,
+    backgroundColor: '#1DA1F2',
+    justifyContent: 'center',
+    alignItems: 'center',
+    borderWidth: 3,
+    borderColor: colors.white
   },
   headerInfo: {
     flex: 1,
@@ -304,27 +400,64 @@ const styles = StyleSheet.create({
   nameRow: {
     flexDirection: 'row',
     alignItems: 'center',
-    gap: spacing.xs
+    flexWrap: 'wrap',
+    gap: spacing.sm
   },
   name: {
-    fontSize: fontSize.xl,
-    fontWeight: '700',
+    fontSize: fontSize.lg,
+    fontWeight: '600',
     color: colors.textPrimary
+  },
+  availableBadge: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    backgroundColor: 'rgba(16, 185, 129, 0.15)',
+    paddingHorizontal: spacing.sm,
+    paddingVertical: spacing.xs,
+    borderRadius: borderRadius.full,
+    gap: spacing.xs
+  },
+  availableDot: {
+    width: 6,
+    height: 6,
+    borderRadius: 3,
+    backgroundColor: '#10B981'
+  },
+  availableText: {
+    fontSize: fontSize.xs,
+    fontWeight: '500',
+    color: '#10B981'
   },
   username: {
     fontSize: fontSize.sm,
     color: colors.textMuted,
     marginTop: spacing.xs
   },
-  ratingRow: {
+  // Stats Row
+  statsRow: {
     flexDirection: 'row',
     alignItems: 'center',
-    marginTop: spacing.sm
+    marginTop: spacing.md,
+    flexWrap: 'wrap'
   },
-  ratingText: {
-    fontSize: fontSize.sm,
-    color: colors.textSecondary,
-    marginLeft: spacing.sm
+  statItem: {
+    alignItems: 'center',
+    paddingHorizontal: spacing.sm
+  },
+  statValue: {
+    fontSize: fontSize.lg,
+    fontWeight: '500',
+    color: colors.textPrimary
+  },
+  statLabel: {
+    fontSize: fontSize.xs,
+    color: colors.textMuted,
+    marginTop: 2
+  },
+  statDivider: {
+    width: 1,
+    height: 24,
+    backgroundColor: colors.border
   },
   section: {
     padding: spacing.md,

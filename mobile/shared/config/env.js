@@ -35,9 +35,9 @@ const ENV = {
     appName: 'Tailor Connect (Staging)'
   },
   production: {
-    apiUrl: 'https://api.tailorconnect.com/api',
-    socketUrl: 'https://api.tailorconnect.com',
-    imageBaseUrl: 'https://api.tailorconnect.com',
+    apiUrl: 'http://167.71.82.139/api',
+    socketUrl: 'http://167.71.82.139',
+    imageBaseUrl: 'http://167.71.82.139',
     enableDebugLogs: false,
     appName: 'Tailor Connect'
   }
