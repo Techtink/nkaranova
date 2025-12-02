@@ -28,6 +28,11 @@
   padding: $spacing-xs;
   box-shadow: var(--shadow-sm);
 
+  &:focus-within {
+    border-color: var(--border-color);
+    outline: none;
+  }
+
   @include mobile {
     flex-direction: column;
     padding: $spacing-sm;
@@ -39,6 +44,14 @@
   align-items: center;
   flex: 1;
   padding: $spacing-sm $spacing-md;
+  border: none;
+  outline: none;
+
+  &:focus-within {
+    border: none;
+    outline: none;
+    box-shadow: none;
+  }
 
   .input-icon {
     width: 20px;
@@ -50,18 +63,18 @@
 
   input {
     flex: 1;
-    border: none;
-    outline: none;
-    box-shadow: none;
+    border: none !important;
+    outline: none !important;
+    box-shadow: none !important;
     font-size: $text-base;
     color: var(--text-primary);
     background: transparent;
     min-width: 0;
 
     &:focus {
-      outline: none;
-      border: none;
-      box-shadow: none;
+      outline: none !important;
+      border: none !important;
+      box-shadow: none !important;
     }
 
     &::placeholder {
@@ -90,6 +103,7 @@
   display: flex;
   align-items: center;
   gap: $spacing-sm;
+  margin-right: 10px;
   padding: $spacing-sm $spacing-xl;
   background: $primary;
   border: none;
@@ -300,39 +314,39 @@
 // Tailors Grid
 .tailors-grid {
   display: flex;
-  flex-wrap: wrap;
-  gap: $spacing-lg;
-  justify-content: flex-start;
+  flex-direction: column;
+  gap: $spacing-md;
 }
 
 // Tailor Card
 .tailor-card {
+  display: flex;
+  gap: $spacing-lg;
+  padding: $spacing-lg;
   background: var(--card-bg);
   border: 1px solid var(--border-color);
   border-radius: 12px;
-  padding: $spacing-2xl $spacing-md $spacing-xl;
   text-decoration: none;
-  text-align: center;
   transition: all 0.2s ease;
-  flex: 0 0 calc(33.333% - 16px);
-
-  @include mobile {
-    flex: 0 0 calc(50% - 8px);
-  }
 
   &:hover {
-    box-shadow: var(--shadow-md);
-    transform: translateY(-2px);
+    border-color: $primary;
+    box-shadow: 0 2px 12px rgba($primary, 0.1);
+  }
+
+  @include mobile {
+    flex-direction: column;
+    align-items: center;
+    text-align: center;
   }
 }
 
-.card-photo {
-  width: 80px;
-  height: 80px;
-  margin: 0 auto $spacing-xl;
-  border-radius: 50%;
+.card-image {
+  flex-shrink: 0;
+  width: 100px;
+  height: 100px;
+  border-radius: 12px;
   overflow: hidden;
-  border: 2px solid var(--border-color);
   background: var(--bg-secondary);
 
   img {
@@ -341,66 +355,108 @@
     object-fit: cover;
   }
 
-  .photo-placeholder {
+  .avatar-placeholder {
     width: 100%;
     height: 100%;
     display: flex;
     align-items: center;
     justify-content: center;
-    font-size: 20px;
+    font-size: 36px;
     font-weight: $font-bold;
     color: $primary;
     background: rgba($primary, 0.1);
   }
 }
 
-.card-name {
-  font-family: $font-display;
-  font-size: $text-sm;
-  font-weight: $font-semibold;
-  color: var(--text-primary);
-  margin: 0 0 2px;
-  white-space: nowrap;
-  overflow: hidden;
-  text-overflow: ellipsis;
+.card-content {
+  flex: 1;
+  min-width: 0;
 }
 
-.card-reviews {
+.card-header {
   display: flex;
-  align-items: center;
-  justify-content: center;
-  gap: 4px;
-  font-size: $text-xs;
-  color: var(--text-secondary);
-  margin: 0 0 $spacing-sm;
+  justify-content: space-between;
+  align-items: flex-start;
+  gap: $spacing-md;
+  margin-bottom: $spacing-xs;
 
-  .star-icon {
-    width: 12px;
-    height: 12px;
-    color: #F59E0B;
-  }
-}
-
-.card-stat {
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  gap: 4px;
-  margin-top: $spacing-xl;
-  padding-top: $spacing-xl;
-  border-top: 1px solid var(--border-color);
-
-  .stat-label {
-    font-size: 10px;
-    color: var(--text-muted);
-    text-transform: uppercase;
-    letter-spacing: 0.5px;
-  }
-
-  .stat-value {
-    font-size: $text-base;
-    font-weight: $font-bold;
+  h3 {
+    font-family: $font-display;
+    font-size: $text-lg;
+    font-weight: $font-semibold;
     color: var(--text-primary);
+    margin: 0;
+  }
+
+  @include mobile {
+    justify-content: center;
+  }
+}
+
+.card-username {
+  display: block;
+  font-size: $text-sm;
+  color: var(--text-muted);
+  margin-bottom: $spacing-md;
+}
+
+.card-stats {
+  display: flex;
+  gap: $spacing-xl;
+  margin-bottom: $spacing-md;
+
+  @include mobile {
+    justify-content: center;
+    flex-wrap: wrap;
+    gap: $spacing-lg;
+  }
+
+  .stat {
+    display: flex;
+    flex-direction: column;
+    gap: 2px;
+
+    .stat-label {
+      font-size: $text-xs;
+      color: var(--text-muted);
+    }
+
+    .stat-value {
+      display: flex;
+      align-items: center;
+      gap: $spacing-xs;
+      font-size: $text-sm;
+      font-weight: $font-medium;
+      color: var(--text-primary);
+
+      svg {
+        width: 14px;
+        height: 14px;
+        color: var(--text-muted);
+
+        &.star {
+          color: #F59E0B;
+        }
+      }
+    }
+  }
+}
+
+.card-tags {
+  display: flex;
+  flex-wrap: wrap;
+  gap: $spacing-xs;
+
+  @include mobile {
+    justify-content: center;
+  }
+
+  .specialty-tag {
+    padding: 2px $spacing-sm;
+    background: rgba($primary, 0.1);
+    color: $primary;
+    font-size: $text-xs;
+    border-radius: 4px;
   }
 }
 

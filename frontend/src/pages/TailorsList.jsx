@@ -327,21 +327,50 @@ export default function TailorsList() {
                       to={`/tailor/${tailor.username}`}
                       className="tailor-card"
                     >
-                      <div className="card-photo">
+                      <div className="card-image">
                         {tailor.profilePhoto ? (
                           <img src={tailor.profilePhoto} alt={displayName} />
                         ) : (
-                          <span className="photo-placeholder">{displayName.charAt(0)}</span>
+                          <div className="avatar-placeholder">{displayName.charAt(0)}</div>
                         )}
                       </div>
-                      <h3 className="card-name">{displayName}</h3>
-                      <p className="card-reviews">
-                        <FiStar className="star-icon" />
-                        {reviewCount} reviews
-                      </p>
-                      <div className="card-stat">
-                        <span className="stat-label">Rating</span>
-                        <span className="stat-value">{rating.toFixed(1)}</span>
+                      <div className="card-content">
+                        <div className="card-header">
+                          <h3>{displayName}</h3>
+                        </div>
+                        <span className="card-username">@{tailor.username}</span>
+
+                        <div className="card-stats">
+                          <div className="stat">
+                            <span className="stat-label">Rating</span>
+                            <div className="stat-value">
+                              <FiStar className="star" />
+                              {rating.toFixed(1)}
+                            </div>
+                          </div>
+                          <div className="stat">
+                            <span className="stat-label">Reviews</span>
+                            <div className="stat-value">
+                              {reviewCount}
+                            </div>
+                          </div>
+                          {tailor.location?.city && (
+                            <div className="stat">
+                              <span className="stat-label">Location</span>
+                              <div className="stat-value">
+                                {tailor.location.city}
+                              </div>
+                            </div>
+                          )}
+                        </div>
+
+                        {tailor.specialties?.length > 0 && (
+                          <div className="card-tags">
+                            {tailor.specialties.slice(0, 3).map(spec => (
+                              <span key={spec} className="specialty-tag">{spec}</span>
+                            ))}
+                          </div>
+                        )}
                       </div>
                     </Link>
                   );
