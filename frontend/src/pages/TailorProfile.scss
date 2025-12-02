@@ -193,6 +193,13 @@
     flex-direction: column;
     gap: 4px;
     min-width: 80px;
+    padding-right: $spacing-3xl;
+    border-right: 1px solid var(--border-color);
+
+    &:last-child {
+      border-right: none;
+      padding-right: 0;
+    }
 
     .stat-label {
       font-size: $text-sm;
@@ -204,7 +211,7 @@
       align-items: center;
       gap: $spacing-xs;
       font-size: $text-2xl;
-      font-weight: $font-bold;
+      font-weight: $font-medium;
       color: var(--text-primary);
 
       .star-icon {
