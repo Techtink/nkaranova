@@ -52,10 +52,17 @@
     flex: 1;
     border: none;
     outline: none;
+    box-shadow: none;
     font-size: $text-base;
     color: var(--text-primary);
     background: transparent;
     min-width: 0;
+
+    &:focus {
+      outline: none;
+      border: none;
+      box-shadow: none;
+    }
 
     &::placeholder {
       color: var(--text-muted);
