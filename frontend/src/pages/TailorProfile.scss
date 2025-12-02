@@ -2,145 +2,103 @@
 @import '../styles/mixins';
 
 .tailor-profile-page {
-  padding-bottom: $spacing-3xl;
+  min-height: 100vh;
+  background: var(--bg-primary);
 }
 
 // Hero Section
 .profile-hero {
-  background: linear-gradient(135deg, $gray-900 0%, $gray-800 100%);
-  padding: $spacing-2xl 0;
+  background: var(--card-bg);
+  padding-bottom: $spacing-xl;
+  border-bottom: 1px solid var(--border-color);
 }
 
-.profile-header {
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  gap: $spacing-lg;
-  text-align: center;
+// Cover Banner
+.profile-cover {
+  position: relative;
+  height: 180px;
+  border-radius: 0 0 16px 16px;
+  overflow: hidden;
 
   @include md {
-    flex-direction: row;
-    text-align: left;
+    height: 220px;
+  }
+
+  .cover-gradient {
+    width: 100%;
+    height: 100%;
+    background: linear-gradient(135deg, #e8b5ce 0%, #c9a0dc 30%, #a78bda 60%, #8fa0e0 100%);
+  }
+}
+
+// Profile Header (avatar + actions row)
+.profile-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-end;
+  margin-top: -50px;
+  padding: 0 $spacing-lg;
+
+  @include mobile {
+    flex-direction: column;
     align-items: flex-start;
+    gap: $spacing-md;
   }
 }
 
 .profile-avatar {
-  width: 120px;
-  height: 120px;
+  position: relative;
+  width: 100px;
+  height: 100px;
   border-radius: $radius-full;
-  background: $gray-700;
-  @include flex-center;
-  overflow: hidden;
+  background: var(--card-bg);
+  border: 4px solid var(--card-bg);
+  overflow: visible;
   flex-shrink: 0;
 
   @include md {
-    width: 150px;
-    height: 150px;
+    width: 120px;
+    height: 120px;
   }
 
   img {
     width: 100%;
     height: 100%;
     object-fit: cover;
+    border-radius: $radius-full;
   }
 
   span {
-    font-family: $font-display;
-    font-size: $text-4xl;
-    font-weight: $font-bold;
-    color: $gray-400;
-  }
-}
-
-.profile-info {
-  flex: 1;
-}
-
-.profile-name-row {
-  display: flex;
-  align-items: center;
-  gap: $spacing-sm;
-  justify-content: center;
-  flex-wrap: wrap;
-
-  @include md {
-    justify-content: flex-start;
-  }
-
-  h1 {
-    color: $white;
-    margin: 0;
-  }
-
-  .verified-badge {
-    display: inline-flex;
+    width: 100%;
+    height: 100%;
+    display: flex;
     align-items: center;
-    gap: $spacing-xs;
-    padding: $spacing-xs $spacing-sm;
-    font-size: $text-xs;
-    font-weight: $font-medium;
-    color: $white;
-    background: $primary;
+    justify-content: center;
+    font-family: $font-display;
+    font-size: $text-3xl;
+    font-weight: $font-bold;
+    color: $primary;
+    background: rgba($primary, 0.1);
     border-radius: $radius-full;
+  }
+
+  .avatar-badge {
+    position: absolute;
+    bottom: 4px;
+    right: 4px;
+    width: 28px;
+    height: 28px;
+    background: #1DA1F2;
+    border-radius: $radius-full;
+    border: 3px solid var(--card-bg);
+    display: flex;
+    align-items: center;
+    justify-content: center;
 
     svg {
       width: 14px;
       height: 14px;
-    }
-  }
-}
-
-.profile-username {
-  color: $gray-400;
-  margin-bottom: $spacing-sm;
-}
-
-.profile-location {
-  display: flex;
-  align-items: center;
-  gap: $spacing-xs;
-  color: $gray-300;
-  margin-bottom: $spacing-md;
-  justify-content: center;
-
-  @include md {
-    justify-content: flex-start;
-  }
-
-  svg {
-    width: 16px;
-    height: 16px;
-  }
-}
-
-.profile-stats {
-  display: flex;
-  gap: $spacing-lg;
-  justify-content: center;
-
-  @include md {
-    justify-content: flex-start;
-  }
-
-  .stat {
-    display: flex;
-    align-items: center;
-    gap: $spacing-xs;
-    color: $gray-300;
-
-    .star-filled {
-      color: $secondary;
-      fill: $secondary;
-    }
-
-    .stat-value {
-      font-weight: $font-semibold;
       color: $white;
-    }
-
-    .stat-label {
-      font-size: $text-sm;
     }
   }
 }
@@ -150,8 +108,103 @@
   gap: $spacing-sm;
   flex-shrink: 0;
 
-  @include md {
+  @include mobile {
+    width: 100%;
+
+    button, a {
+      flex: 1;
+    }
+  }
+}
+
+// Profile Info
+.profile-info {
+  padding: $spacing-lg $spacing-lg 0;
+}
+
+.profile-name-row {
+  display: flex;
+  align-items: center;
+  gap: $spacing-sm;
+  flex-wrap: wrap;
+  margin-bottom: $spacing-xs;
+
+  h1 {
+    font-family: $font-display;
+    font-size: $text-2xl;
+    font-weight: $font-semibold;
+    color: var(--text-primary);
+    margin: 0;
+
+    @include md {
+      font-size: $text-3xl;
+    }
+  }
+
+  .status-badge {
+    display: inline-flex;
+    align-items: center;
+    gap: $spacing-xs;
+    padding: $spacing-xs $spacing-md;
+    font-size: $text-xs;
+    font-weight: $font-medium;
+    border-radius: $radius-full;
+
+    &.available {
+      color: #10B981;
+      background: rgba(#10B981, 0.15);
+
+      &::before {
+        content: '';
+        width: 6px;
+        height: 6px;
+        background: #10B981;
+        border-radius: $radius-full;
+      }
+    }
+  }
+}
+
+.profile-username {
+  font-size: $text-base;
+  color: var(--text-muted);
+  margin: 0 0 $spacing-lg;
+}
+
+// Stats Row
+.profile-stats-row {
+  display: flex;
+  gap: $spacing-2xl;
+  flex-wrap: wrap;
+
+  @include mobile {
+    gap: $spacing-lg;
+  }
+
+  .stat-item {
+    display: flex;
     flex-direction: column;
+    gap: 2px;
+
+    .stat-label {
+      font-size: $text-xs;
+      color: var(--text-muted);
+    }
+
+    .stat-value {
+      display: flex;
+      align-items: center;
+      gap: $spacing-xs;
+      font-size: $text-lg;
+      font-weight: $font-semibold;
+      color: var(--text-primary);
+
+      .star-icon {
+        width: 16px;
+        height: 16px;
+        color: #F59E0B;
+      }
+    }
   }
 }
 

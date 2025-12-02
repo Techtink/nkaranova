@@ -84,66 +84,80 @@ export default function TailorProfile() {
       <Header />
       <div className="tailor-profile-page">
         {/* Hero Section */}
-      <section className="profile-hero">
-        <div className="container">
-          <div className="profile-header">
-            <div className="profile-avatar">
-              {tailor.profilePhoto ? (
-                <img src={tailor.profilePhoto} alt={displayName} />
-              ) : (
-                <span>{displayName.charAt(0)}</span>
-              )}
+        <section className="profile-hero">
+          <div className="container">
+            {/* Cover Banner */}
+            <div className="profile-cover">
+              <div className="cover-gradient" />
             </div>
 
+            {/* Profile Header */}
+            <div className="profile-header">
+              <div className="profile-avatar">
+                {tailor.profilePhoto ? (
+                  <img src={tailor.profilePhoto} alt={displayName} />
+                ) : (
+                  <span>{displayName.charAt(0)}</span>
+                )}
+                {isVerified && (
+                  <div className="avatar-badge">
+                    <FiCheck />
+                  </div>
+                )}
+              </div>
+
+              <div className="profile-actions">
+                <Link to={`/messages?tailor=${tailor.username}`}>
+                  <Button variant="outline">
+                    <FiMessageCircle /> Message
+                  </Button>
+                </Link>
+                {tailor.acceptingBookings && (
+                  <Button onClick={() => setShowBookingModal(true)}>
+                    <FiCalendar /> Book Appointment
+                  </Button>
+                )}
+              </div>
+            </div>
+
+            {/* Profile Info */}
             <div className="profile-info">
               <div className="profile-name-row">
                 <h1>{displayName}</h1>
-                {isVerified && (
-                  <VerifiedBadge size="lg" showLabel />
+                {tailor.acceptingBookings && (
+                  <span className="status-badge available">Available</span>
                 )}
               </div>
 
               <p className="profile-username">@{tailor.username}</p>
 
-              {tailor.location && (
-                <p className="profile-location">
-                  <FiMapPin />
-                  {tailor.location.city}{tailor.location.country && `, ${tailor.location.country}`}
-                </p>
-              )}
-
-              <div className="profile-stats">
-                <div className="stat">
-                  <FiStar className="star-filled" />
-                  <span className="stat-value">{tailor.averageRating?.toFixed(1) || '0.0'}</span>
-                  <span className="stat-label">({tailor.reviewCount || 0} reviews)</span>
+              {/* Stats Row */}
+              <div className="profile-stats-row">
+                <div className="stat-item">
+                  <span className="stat-label">Rating</span>
+                  <span className="stat-value">
+                    <FiStar className="star-icon" />
+                    {tailor.averageRating?.toFixed(1) || '0.0'}
+                  </span>
                 </div>
-                <div className="stat">
+                <div className="stat-item">
+                  <span className="stat-label">Reviews</span>
+                  <span className="stat-value">{tailor.reviewCount || 0}</span>
+                </div>
+                <div className="stat-item">
+                  <span className="stat-label">Works</span>
                   <span className="stat-value">{works.length}</span>
-                  <span className="stat-label">works</span>
                 </div>
-                <div className="stat">
-                  <span className="stat-value">{tailor.completedBookings || 0}</span>
-                  <span className="stat-label">completed</span>
-                </div>
+                {tailor.location?.city && (
+                  <div className="stat-item">
+                    <span className="stat-label">Location</span>
+                    <span className="stat-value">{tailor.location.city}</span>
+                  </div>
+                )}
               </div>
             </div>
-
-            <div className="profile-actions">
-              <Link to={`/messages?tailor=${tailor.username}`}>
-                <Button variant="outline">
-                  <FiMessageCircle /> Message
-                </Button>
-              </Link>
-              {tailor.acceptingBookings && (
-                <Button onClick={() => setShowBookingModal(true)}>
-                  <FiCalendar /> Book Appointment
-                </Button>
-              )}
-            </div>
           </div>
-        </div>
-      </section>
+        </section>
 
       {/* Content */}
       <section className="profile-content">
