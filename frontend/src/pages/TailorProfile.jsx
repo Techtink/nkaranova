@@ -2,6 +2,7 @@ import { useState, useEffect } from 'react';
 import { useParams, Link } from 'react-router-dom';
 import { FiStar, FiMapPin, FiMessageCircle, FiCalendar, FiEdit3, FiUser, FiPlus, FiCheck } from 'react-icons/fi';
 import { toast } from 'react-hot-toast';
+import Header from '../components/layout/Header';
 import WorkCard from '../components/cards/WorkCard';
 import Button from '../components/common/Button';
 import Modal from '../components/common/Modal';
@@ -79,8 +80,10 @@ export default function TailorProfile() {
   const isVerified = tailor.verificationStatus === 'approved';
 
   return (
-    <div className="tailor-profile-page">
-      {/* Hero Section */}
+    <>
+      <Header />
+      <div className="tailor-profile-page">
+        {/* Hero Section */}
       <section className="profile-hero">
         <div className="container">
           <div className="profile-header">
@@ -291,19 +294,20 @@ export default function TailorProfile() {
         </div>
       </section>
 
-      {/* Booking Modal */}
-      <Modal
-        isOpen={showBookingModal}
-        onClose={() => setShowBookingModal(false)}
-        title="Book Appointment"
-        size="lg"
-      >
-        <BookingForm
-          tailor={tailor}
+        {/* Booking Modal */}
+        <Modal
+          isOpen={showBookingModal}
           onClose={() => setShowBookingModal(false)}
-        />
-      </Modal>
-    </div>
+          title="Book Appointment"
+          size="lg"
+        >
+          <BookingForm
+            tailor={tailor}
+            onClose={() => setShowBookingModal(false)}
+          />
+        </Modal>
+      </div>
+    </>
   );
 }
 
